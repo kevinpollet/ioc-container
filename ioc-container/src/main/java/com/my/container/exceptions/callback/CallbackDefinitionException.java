@@ -5,4 +5,12 @@ public class CallbackDefinitionException extends CallbackException {
     public CallbackDefinitionException(final String message) {
         super(message);
     }
+
+    public CallbackDefinitionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public CallbackDefinitionException(Throwable cause) {
+        super(cause);
+    }
 }
