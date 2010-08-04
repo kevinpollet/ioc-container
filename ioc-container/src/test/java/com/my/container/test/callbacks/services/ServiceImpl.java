@@ -1,6 +1,7 @@
-package com.my.container.services;
+package com.my.container.test.callbacks.services;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 
 
@@ -9,13 +10,18 @@ public class ServiceImpl implements Service {
 
     private String text;
 
+
     @PostConstruct
-    public void init() {
+    private void init() {
         this.text = "Hello";
     }
 
     public String sayHello() {
         return this.text;
     }
-    
+
+    @PreDestroy
+    private void destroy() {
+        
+    }
 }

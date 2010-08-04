@@ -1,20 +1,20 @@
-package com.my.container.test;
+package com.my.container.test.callbacks;
 
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
-import com.my.container.services.Service;
-import com.my.container.services.ServiceBinder;
+import com.my.container.test.callbacks.binder.BindingProviderTest;
+import com.my.container.test.callbacks.services.Service;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ContainerTest {
+public class CallbackMethodTest {
 
     private Context ctxt;
 
     @Before
     public void setUp() {
-        this.ctxt = new ApplicationContext(new ServiceBinder());
+        this.ctxt = new ApplicationContext(new BindingProviderTest());
     }
 
     @Test
