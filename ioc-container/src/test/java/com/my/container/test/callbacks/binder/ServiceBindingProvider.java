@@ -4,7 +4,7 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.test.callbacks.services.Service;
 import com.my.container.test.callbacks.services.ServiceImpl;
 
-public class BindingProviderTest extends BindingProvider {
+public class ServiceBindingProvider extends BindingProvider {
 
     @Override
     public void configureBindings() {
