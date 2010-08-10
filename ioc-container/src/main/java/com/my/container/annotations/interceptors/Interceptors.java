@@ -1,4 +1,4 @@
-package com.my.container.annotations;
+package com.my.container.annotations.interceptors;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
