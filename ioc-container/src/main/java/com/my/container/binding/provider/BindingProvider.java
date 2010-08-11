@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+//TODO callback method invocation
 public abstract class BindingProvider {
 
     private List<Binding> bindings;
@@ -18,13 +19,19 @@ public abstract class BindingProvider {
         return bindings;
     }
 
-    public <T> void addBinding(final Class<T> intf, final Class<? extends T> impl) {
-        this.bindings.add(new Binding(intf, impl));
+    public BindingBuilder bind(final Class<?> intf) {
+        Binding binding = new Binding(intf, null);
+        this.bindings.add(binding);
+
+        //Link it to an implementation
+        return new BindingBuilder(binding);
     }
 
     /**
      * Configure the binding list.
+     * Add the binding.
+     *
+     * USE : bind(interface.class).to(implementation.class)
      */
     public abstract void configureBindings();
-
 }

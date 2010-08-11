@@ -1,27 +1,23 @@
-package com.my.container.test.callbacks.services;
+package com.my.container.env.services;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 
 
 @Singleton
-public class ServiceImpl implements Service {
+public class HelloServiceImpl implements HelloService {
 
     private String text;
 
 
     @PostConstruct
     private void init() {
-        this.text = "Hello";
+        this.text = "HelloConstruct";
     }
 
     public String sayHello() {
         return this.text;
     }
 
-    @PreDestroy
-    private void destroy() {
-        
-    }
+ 
 }

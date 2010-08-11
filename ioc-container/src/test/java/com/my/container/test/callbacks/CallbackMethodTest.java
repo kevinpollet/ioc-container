@@ -2,8 +2,8 @@ package com.my.container.test.callbacks;
 
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
-import com.my.container.test.callbacks.binder.BindingProviderTest;
-import com.my.container.test.callbacks.services.Service;
+import com.my.container.env.binder.ServiceBindingProvider;
+import com.my.container.env.services.HelloService;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,26 +14,15 @@ public class CallbackMethodTest {
 
     @Before
     public void setUp() {
-        this.ctxt = new ApplicationContext(new BindingProviderTest());
+        this.ctxt = new ApplicationContext(new ServiceBindingProvider());
     }
 
     @Test
-    public void testBeanCreation() {
-        Service service = this.ctxt.getBean(Service.class);
+    public void testPostConstruct() {
+        HelloService helloService = this.ctxt.getBean(HelloService.class);
 
-        Assert.assertNotNull(service);
-        Assert.assertEquals("Hello", service.sayHello());
+        Assert.assertNotNull(helloService);
+        Assert.assertEquals("HelloConstruct", helloService.sayHello());
     }
-
-    @Test
-    public void testSingleton() {
-        Service service = this.ctxt.getBean(Service.class);
-        Service service2 = this.ctxt.getBean(Service.class);
-
-        Assert.assertNotNull(service);
-        Assert.assertNotNull(service2);
-        Assert.assertTrue(service == service2);
-    }
-
 
 }

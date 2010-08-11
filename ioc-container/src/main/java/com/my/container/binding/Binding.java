@@ -1,15 +1,23 @@
 package com.my.container.binding;
 
-
 public class Binding {
 
+    /**
+     * The binding interface.
+     */
     private Class<?> intf;
+
+    /**
+     * The binding implementation.
+     */
     private Class<?> impl;
 
-    public Binding() {
-        this(null, null);
-    }
-
+    /**
+     * Create a binding.
+     *
+     * @param intf the binding interface
+     * @param impl the binding implementation
+     */
     public <T> Binding(final Class<T> intf, final Class<? extends T> impl) {
         this.intf = intf;
         this.impl = impl;
@@ -24,7 +32,7 @@ public class Binding {
     }
 
     public void setInterface(final Class<?> intf) {
-        this.intf = intf;        
+        this.intf = intf;
     }
 
     public void setImplementation(final Class<?> impl) {
@@ -36,14 +44,20 @@ public class Binding {
      */
     @Override
     public boolean equals(final Object to) {
+        boolean eq = false;
 
-        if (to == this) return true;
-        else if (to instanceof Binding && ((Binding) to).getInterface() != null) {
-            return ((Binding) to).getInterface().equals(this.intf);
+        if (to == this) {
+            eq = true;
+
+        } else if (to instanceof Binding) {
+            Binding b = (Binding) to;
+
+            if (b.getInterface() != null) {
+                eq = this.intf.equals(b.getInterface());
+            }
         }
 
-        return false;
-
+        return eq;
     }
 
     /**
@@ -51,6 +65,12 @@ public class Binding {
      */
     @Override
     public int hashCode() {
-        return this.intf.hashCode();
+        int hash = 0;
+
+        if (this.intf != null) {
+            hash = this.intf.hashCode();
+        }
+
+        return hash;
     }
 }

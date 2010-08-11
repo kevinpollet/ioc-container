@@ -2,89 +2,54 @@ package com.my.container.context;
 
 import com.my.container.binding.Binding;
 import com.my.container.binding.provider.BindingProvider;
-import com.my.container.exceptions.beanfactory.BeanInstanciationException;
-import com.my.container.util.ReflectionUtil;
+import com.my.container.context.beanfactory.BeanFactory;
+import com.my.container.exceptions.beanfactory.BeanClassNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
+//TODO check callback  and interface
+//TODO class sans interface ??
+//TODO class interface abstract ??
 public class ApplicationContext implements Context {
 
-    private Map<Binding, Binding> bindings;
-    private Map<Binding, Object> singletons;
+    /**
+     * The Logger.
+     */
+    private final Logger logger = LoggerFactory.getLogger(ApplicationContext.class);
 
-    public ApplicationContext(final BindingProvider binder) {
-        this.bindings = new HashMap<Binding, Binding>();
-        this.singletons = new HashMap<Binding, Object>();
+    /**
+     * The bean factory
+     */
+    private BeanFactory factory;
 
-        binder.configureBindings();
+    /**
+     * Construct the context.
+     *
+     * @param provider the provider of bindings
+     */
+    public ApplicationContext(final BindingProvider provider) {
+        //Construct provider binding list
+        provider.configureBindings();
 
-        for (Binding b : binder.getBindings()) {
-            this.bindings.put(b, b);
-        }
+        this.factory = new BeanFactory(provider.getBindings());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public <T> T getBean(final Class<T> clazz) {
-
-        T newInstance = null;
-
-        Binding key = new Binding(clazz, null);
-        Binding binding = this.bindings.get(key);
-
-        if (binding != null) {
-
-            //Check if binding is singleton
-            if (binding.getImplementation().isAnnotationPresent(Singleton.class)) {
-                newInstance = (T) this.singletons.get(binding);
-            }
-
-            //Create new instance
-            if (newInstance == null) {
-
-                try {
-
-                    newInstance = (T) binding.getImplementation().newInstance();
-
-                    //Call LifeCycle callback
-                    List<Method> methodList = ReflectionUtil.getMethodAnnotatedWith(newInstance.getClass(), PostConstruct.class);
-                    if (methodList.size() == 1) {
-
-                        try {
-
-                            if (methodList.get(0).getModifiers() == Modifier.PRIVATE) {
-                                methodList.get(0).setAccessible(true);
-                            }
-
-                            methodList.get(0).invoke(newInstance, null);
-
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    
-
-                    if (binding.getImplementation().isAnnotationPresent(Singleton.class)) {
-                        this.singletons.put(binding, newInstance);
-                    }
-
-                } catch (InstantiationException e) {
-                    throw new BeanInstanciationException(e.getMessage());
-                } catch (IllegalAccessException e) {
-                    throw new BeanInstanciationException(e.getMessage());
-                }
-            }
-        }
-
-        return newInstance;
+        return this.factory.getBean(clazz);
     }
 
+    //TODO PreDestroy and Shutdown Hook
+    @Override
+    public void registerShutdownHook() {
+
+    }
 }
