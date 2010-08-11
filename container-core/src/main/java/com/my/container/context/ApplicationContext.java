@@ -1,15 +1,9 @@
 package com.my.container.context;
 
-import com.my.container.binding.Binding;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.beanfactory.BeanFactory;
-import com.my.container.exceptions.beanfactory.BeanClassNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
 
 
 //TODO check callback  and interface
@@ -47,9 +41,12 @@ public class ApplicationContext implements Context {
         return this.factory.getBean(clazz);
     }
 
-    //TODO PreDestroy and Shutdown Hook
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void registerShutdownHook() {
-
+        Thread thread = new Thread(new CallbackShutdownHook());
+        Runtime.getRuntime().addShutdownHook(thread);
     }
 }

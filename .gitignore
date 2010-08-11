@@ -1,1 +1,10 @@
+#Mac files
+.DS_Store
+
+#Taget folder
 target/
+
+#Intellij files
+*.iml
+*.ipr
+*.iws

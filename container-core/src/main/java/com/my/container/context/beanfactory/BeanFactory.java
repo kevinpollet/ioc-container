@@ -1,9 +1,12 @@
 package com.my.container.context.beanfactory;
 
 import com.my.container.binding.Binding;
+import com.my.container.exceptions.beanfactory.BeanClassNotFoundException;
 import com.my.container.exceptions.beanfactory.BeanInstanciationException;
 import com.my.container.exceptions.callback.CallbackInvocationException;
 import com.my.container.util.ReflectionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
@@ -16,8 +19,12 @@ import java.util.Map;
 
 public class BeanFactory {
 
-    private Map<Binding, Binding> bindings;
+    /**
+     * The Logger.
+     */
+    private final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
 
+    private Map<Binding, Binding> bindings;
     private List<Object> prototypesBean;
     private Map<Binding, Object> singletonsBean;
 
@@ -42,7 +49,11 @@ public class BeanFactory {
         T beanInstance = null;
         Binding binding = bindings.get(new Binding(clazz, null));
         
-        if (binding != null && binding.getImplementation() != null) {
+        if (binding == null || binding.getImplementation() == null) {
+
+            throw new BeanClassNotFoundException("Binding not found");
+
+        } else {
 
             boolean isSingleton = binding.getImplementation().isAnnotationPresent(Singleton.class);
 
@@ -80,11 +91,11 @@ public class BeanFactory {
                     throw new CallbackInvocationException(e.getMessage(), e);
                 }
             }
+
         }
 
 
         return beanInstance;
     }
-
 
 }

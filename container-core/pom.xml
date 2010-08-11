@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.my.container</groupId>
-  <artifactId>ioc-container</artifactId>
+  <artifactId>container-core</artifactId>
   <packaging>jar</packaging>
   <version>0.1-SNAPSHOT</version>
 

@@ -1,6 +1,5 @@
 package com.my.container.util;
 
-import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
