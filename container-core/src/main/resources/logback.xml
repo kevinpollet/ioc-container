@@ -7,7 +7,7 @@
         </layout>
     </appender>
 
-    <logger name="com.my.container.*" level="INFO"/>
+    <logger name="com.my.container.*" level="INFO" />
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
