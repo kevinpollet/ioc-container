@@ -18,7 +18,7 @@ public class Binding {
      * @param intf the binding interface
      * @param impl the binding implementation
      */
-    public <T> Binding(final Class<T> intf, final Class<? extends T> impl) {
+    public Binding(final Class<?> intf, final Class<?> impl) {
         this.intf = intf;
         this.impl = impl;
     }
