@@ -4,49 +4,38 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.my.container</groupId>
-  <artifactId>container-core</artifactId>
-  <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <parent>
+      <groupId>com.my.container</groupId>
+      <artifactId>container</artifactId>
+      <version>0.1-SNAPSHOT</version>
+  </parent>
 
-  <build>
-      <plugins>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <configuration>
-                  <source>1.6</source>
-                  <target>1.6</target>
-              </configuration>
-          </plugin>
-      </plugins>
-  </build>
+  <groupId>${parent.groupId}</groupId>
+  <artifactId>container-core</artifactId>
+  <version>${parent.version}</version>
+  <name>IOC-Container :: core</name>
 
   <dependencies>
     <!-- JSR 330 -->
     <dependency>
         <groupId>javax.inject</groupId>
         <artifactId>javax.inject</artifactId>
-        <version>1</version>
     </dependency>
 
     <!-- Logging -->
     <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.6.0</version>
     </dependency>
     <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>0.9.22</version>
     </dependency>
 
     <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
