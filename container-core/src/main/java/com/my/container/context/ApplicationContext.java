@@ -2,6 +2,7 @@ package com.my.container.context;
 
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.beanfactory.BeanFactory;
+import com.my.container.context.beanfactory.CallbackShutdownHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class ApplicationContext implements Context {
      */
     @Override
     public void registerShutdownHook() {
-        Thread thread = new Thread(new CallbackShutdownHook());
+        Thread thread = new Thread(new CallbackShutdownHook(this.factory));
         Runtime.getRuntime().addShutdownHook(thread);
     }
 }

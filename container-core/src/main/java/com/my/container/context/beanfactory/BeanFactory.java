@@ -9,12 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class BeanFactory {
@@ -25,9 +27,9 @@ public class BeanFactory {
     private final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
 
     private Map<Binding, Binding> bindings;
+
     private List<Object> prototypesBean;
     private Map<Binding, Object> singletonsBean;
-
 
     public BeanFactory(final List<Binding> list) {
 
@@ -48,7 +50,7 @@ public class BeanFactory {
 
         T beanInstance = null;
         Binding binding = bindings.get(new Binding(clazz, null));
-        
+
         if (binding == null || binding.getImplementation() == null) {
 
             throw new BeanClassNotFoundException("Binding not found");
@@ -63,6 +65,7 @@ public class BeanFactory {
 
             } else {
 
+                //TODO moche
                 try {
 
                     beanInstance = (T) binding.getImplementation().newInstance();
@@ -77,7 +80,7 @@ public class BeanFactory {
                 try {
 
                     //Call PostConstruct TODO call PostConstruct after injection
-                    ReflectionHelper.callDeclaredMethodWith(PostConstruct.class, beanInstance);                    
+                    ReflectionHelper.callDeclaredMethodWith(PostConstruct.class, beanInstance);
 
                     if (isSingleton) {
                         this.singletonsBean.put(binding, beanInstance);
@@ -96,6 +99,29 @@ public class BeanFactory {
 
 
         return beanInstance;
+    }
+
+    public void removeAllBeansReferences() {
+
+        try {
+
+            //Call PreDestroy methods on prototypes bean
+            for (Object o : prototypesBean) {
+                ReflectionHelper.callDeclaredMethodWith(PreDestroy.class, o);
+            }
+
+            //Call PreDestroy methods on singletons bean
+            Set<Map.Entry<Binding, Object>> set = this.singletonsBean.entrySet();
+            for (Map.Entry<Binding, Object> e : set) {
+                ReflectionHelper.callDeclaredMethodWith(PreDestroy.class, e.getValue());
+            }
+
+        } catch (InvocationTargetException e) {
+            throw new CallbackInvocationException(e.getMessage(), e);
+        } catch (IllegalAccessException e) {
+            throw new CallbackInvocationException(e.getMessage(), e);
+        }
+        
     }
 
 }
