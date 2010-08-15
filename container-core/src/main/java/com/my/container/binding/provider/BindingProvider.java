@@ -26,7 +26,7 @@ public abstract class BindingProvider {
      * Get the binding provider
      * list.
      */
-    public List<Binding> getBindings() {
+    public final List<Binding> getBindings() {
         return bindings;
     }
 
@@ -35,7 +35,7 @@ public abstract class BindingProvider {
      * @param intf the binding interface
      * @return the binding builder
      */
-    protected InnerBindingBuilder bind(final Class<?> intf) {
+    protected final InnerBindingBuilder bind(final Class<?> intf) {
         return this.new InnerBindingBuilder(intf);
     }
 
@@ -51,7 +51,7 @@ public abstract class BindingProvider {
     /**
      * The binding builder inner class
      */
-    protected class InnerBindingBuilder {
+    protected final class InnerBindingBuilder {
 
         private Class<?> intf;
 
@@ -63,7 +63,7 @@ public abstract class BindingProvider {
          * The binding implementation
          * @param impl the implementation
          */
-        public void to(final Class<?> impl) {
+        public final void to(final Class<?> impl) {
             bindings.add(new Binding(this.intf, impl));
         }
     }
