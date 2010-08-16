@@ -4,6 +4,8 @@ import javax.inject.Qualifier;
 
 /**
  * The Context Interface
+ *
+ * @author kevinpollet
  */
 public interface Context {
 
@@ -18,9 +20,9 @@ public interface Context {
 
 
     /**
-     * Permits to register a shutdown hook.
-     * All bean PreDestroy methods are called
-     * when the JVM shutdown.
+     * Register a JVM ShutDown Hook.
+     * All beans with PreDestroy methods
+     * are called when the JVM shutdown.
      */
     public void registerShutdownHook();
 

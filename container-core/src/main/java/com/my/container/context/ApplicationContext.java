@@ -7,19 +7,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-//TODO check callback  and interface
-//TODO class sans interface ??
 //TODO class interface abstract ??
+/**
+ * The application context.
+
+ * @author kevinpollet
+ */
 public class ApplicationContext implements Context {
 
-    /**
-     * The Logger.
-     */
     private final Logger logger = LoggerFactory.getLogger(ApplicationContext.class);
 
-    /**
-     * The bean factory
-     */
     private BeanFactory factory;
 
     /**

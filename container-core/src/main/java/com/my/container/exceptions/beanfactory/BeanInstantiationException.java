@@ -1,5 +1,12 @@
 package com.my.container.exceptions.beanfactory;
 
+
+/**
+ * This exception is thrown when the
+ * bean factory cannot instantiate the bean.
+ *
+ * @author kevinpollet
+ */
 public class BeanInstantiationException extends BeanFactoryException {
 
     public BeanInstantiationException(String message) {

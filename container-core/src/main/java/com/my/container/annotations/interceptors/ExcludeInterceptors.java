@@ -6,16 +6,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
- * The After annotation.
- * This interceptor method can match this signature :
- * void methodName (Object instance, Method method, Object... args)
+ * The exclude interceptors annotation.
+ * When a method is annotated by this annotation
+ * the interceptor is not applied to it.
  *
  * @author kevinpollet
  */
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface After {
+public @interface ExcludeInterceptors {
 }

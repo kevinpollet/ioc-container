@@ -1,15 +1,13 @@
 package com.my.container.binding;
 
+/**
+ * The binding class.
+ * 
+ * @author kevinpollet
+ */
 public class Binding {
 
-    /**
-     * The binding interface.
-     */
     private Class<?> intf;
-
-    /**
-     * The binding implementation.
-     */
     private Class<?> impl;
 
     /**
@@ -23,18 +21,34 @@ public class Binding {
         this.impl = impl;
     }
 
+    /**
+     * Get the binding interface class.
+     * @return the interface class
+     */
     public Class<?> getInterface() {
         return this.intf;
     }
 
+    /**
+     * Get the binding implementation class.
+     * @return the implementation class
+     */
     public Class<?> getImplementation() {
         return this.impl;
     }
 
+    /**
+     * Set the binding interface class.
+     * @param intf the binding interface class
+     */
     public void setInterface(final Class<?> intf) {
         this.intf = intf;
     }
 
+    /**
+     * Set the binding implementation class.
+     * @param impl the implementation class
+     */
     public void setImplementation(final Class<?> impl) {
         this.impl = impl;
     }

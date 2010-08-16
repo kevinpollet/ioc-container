@@ -7,6 +7,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 
+/**
+ * The Before annotation.
+ * This interceptor method can match this signature :
+ * void methodName (Object instance, Method method, Object... args)
+ *
+ * @author kevinpollet
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
