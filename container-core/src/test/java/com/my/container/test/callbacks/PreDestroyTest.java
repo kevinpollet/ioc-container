@@ -4,8 +4,8 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.BeanFactory;
-import com.my.container.env.services.HelloService;
-import com.my.container.env.services.HelloServiceImpl;
+import com.my.container.services.Service;
+import com.my.container.services.ServiceImpl;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,10 +13,9 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 
 /**
- * The PreDestroy annotation test.
+ * The PreDestroy callback test.
  *
  * @author kevinpollet
- *         Date: 16 août 2010
  */
 public class PreDestroyTest {
 
@@ -27,7 +26,7 @@ public class PreDestroyTest {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(HelloService.class).to(HelloServiceImpl.class);
+                bind(Service.class).to(ServiceImpl.class);
             }
 
         });
@@ -35,7 +34,7 @@ public class PreDestroyTest {
 
     @Test
     public void testPreDestroy() throws NoSuchFieldException, IllegalAccessException {
-        HelloService helloService = this.context.getBean(HelloService.class);
+        Service service = this.context.getBean(Service.class);
 
         //Get the private bean factory
         Field factoryField = this.context.getClass().getDeclaredField("factory");
@@ -43,8 +42,8 @@ public class PreDestroyTest {
         BeanFactory factory = (BeanFactory) factoryField.get(this.context);
         factory.removeAllBeansReferences();
 
-        Assert.assertNotNull(helloService);
-        Assert.assertEquals("HelloDestroy", helloService.sayHello());
+        Assert.assertNotNull(service);
+        Assert.assertEquals("HelloDestroy", service.sayHello());
     }
 
 }

@@ -1,1 +1,1 @@
-h1. IOC-Container Project Readme
+h1. IOC-Container Project Readme (*v0.1-SNAPSHOT*)

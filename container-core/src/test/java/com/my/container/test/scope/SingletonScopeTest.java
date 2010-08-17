@@ -3,8 +3,8 @@ package com.my.container.test.scope;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
-import com.my.container.env.services.HelloService;
-import com.my.container.env.services.HelloServiceImpl;
+import com.my.container.services.Service;
+import com.my.container.services.ServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class SingletonScopeTest {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(HelloService.class).to(HelloServiceImpl.class);
+                bind(Service.class).to(ServiceImpl.class);
             }
         });
 
@@ -29,11 +29,11 @@ public class SingletonScopeTest {
 
     @Test
     public void testSingletonScope() {
-        HelloService helloService = this.context.getBean(HelloService.class);
-        HelloService helloService2 = this.context.getBean(HelloService.class);
+        Service service = this.context.getBean(Service.class);
+        Service service2 = this.context.getBean(Service.class);
 
-        Assert.assertNotNull(helloService);
-        Assert.assertNotNull(helloService2);
-        Assert.assertTrue(helloService == helloService2);
+        Assert.assertNotNull(service);
+        Assert.assertNotNull(service2);
+        Assert.assertTrue(service == service2);
     }
 }

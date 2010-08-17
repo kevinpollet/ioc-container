@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
  *
  * @author kevinpollet
  */
+//TODO what happens if annotations are in the interface definition ???
 public class InterceptorInvocationHandler implements InvocationHandler {
 
     private Object instance;
@@ -36,10 +37,14 @@ public class InterceptorInvocationHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
+        //Retrieve the implementation annotation
+        Method realMethod = instance.getClass().getMethod(method.getName(), method.getParameterTypes());
+        boolean isExcludeInterceptor = realMethod.isAnnotationPresent(ExcludeInterceptors.class);
+
         //Call @Before interceptor method
-        if (!method.isAnnotationPresent(ExcludeInterceptors.class)) {
+        if (!isExcludeInterceptor) {
             for (Object interceptor : interceptors) {
-                ReflectionHelper.callDeclaredMethodWith(Before.class, interceptor, instance, method, args);
+                ReflectionHelper.callDeclaredMethodWith(Before.class, interceptor, instance, realMethod, args);
             }
         }
 
@@ -47,12 +52,11 @@ public class InterceptorInvocationHandler implements InvocationHandler {
         Object result = method.invoke(instance, args);
 
         //Call @After interceptor method
-        if (!method.isAnnotationPresent(ExcludeInterceptors.class)) {
+        if (!isExcludeInterceptor) {
             for (Object interceptor : interceptors) {
-                ReflectionHelper.callDeclaredMethodWith(After.class, interceptor, instance, method, args);
+                ReflectionHelper.callDeclaredMethodWith(After.class, interceptor, instance, realMethod, args);
             }
         }
-
 
         return result;
     }
