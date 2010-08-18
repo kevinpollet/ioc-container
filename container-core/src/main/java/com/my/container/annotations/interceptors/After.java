@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * The After annotation.
- * This interceptor method can match this signature :
+ * This injectservice method can match this signature :
  * void methodName (Object instance, Method method, Object... args)
  *
  * @author kevinpollet

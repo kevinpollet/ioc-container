@@ -4,8 +4,8 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.proxy.InterceptorInvocationHandler;
-import com.my.container.services.Service;
-import com.my.container.services.ServiceImpl;
+import com.my.container.services.basic.Service;
+import com.my.container.services.basic.ServiceImpl;
 import com.my.container.services.MockInterceptor;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 
 /**
- * The interceptor after test.
+ * The injectservice after test.
  *
  * @author kevinpollet
  */

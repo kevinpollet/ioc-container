@@ -1,1 +1,3 @@
-h1. IOC-Container Project Readme (*v0.1-SNAPSHOT*)
+!>http://dream-ressources.com/wp-content/themes/monochrome/images/Bean.png!
+
+h1. A Light IOC-Container in Java 

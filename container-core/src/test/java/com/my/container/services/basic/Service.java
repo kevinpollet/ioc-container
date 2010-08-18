@@ -1,4 +1,4 @@
-package com.my.container.services;
+package com.my.container.services.basic;
 
 public interface Service {
 

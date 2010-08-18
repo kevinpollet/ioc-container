@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -21,10 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 
-//TODO interceptor verification
-//TODO one instance interceptor for all prototypes ???
+//TODO injectservice verification
+//TODO one instance injectservice for all prototypes ???
 //TODO callbacks method verification
-//TODO factorize code
+//TODO add @Inject constructor, methods, fields injection
+//TODO add @Inject static and instance member
+//TODO circular dependencies
 
 /**
  * The factory of bean class
@@ -45,7 +49,6 @@ public class BeanFactory {
      * @param list the binding list
      */
     public BeanFactory(final List<Binding> list) {
-
         //Populate bindings list
         this.bindings = new HashMap<Binding, Binding>();
         if (list != null) {
@@ -113,14 +116,19 @@ public class BeanFactory {
         return beanInstance;
     }
 
+    /**
+     * This method remove all beans references
+     * memorised by the singleton for PreDestroy
+     * CallBack and Singleton scope.
+     */
     public void removeAllBeansReferences() {
 
         try {
 
             //Create on list for all beans
-            List<Object> allBeans = new ArrayList<Object>(){{
-                    addAll(prototypesBean);
-                    addAll(singletonsBean.values());
+            List<Object> allBeans = new ArrayList<Object>() {{
+                addAll(prototypesBean);
+                addAll(singletonsBean.values());
             }};
 
             //Call PreDestroy methods bean
@@ -159,10 +167,15 @@ public class BeanFactory {
 
         try {
 
+            //Create binding instance
             instance = clazz.newInstance();
 
+            //Inject dependencies
+            this.injectInstance(instance, clazz);
+
+            //Create interceptors
             if (clazz.isAnnotationPresent(Interceptors.class)) {
-                //Create interceptor class
+                //Create injectservice class
                 Class<?>[] interceptorsClass = clazz.getAnnotation(Interceptors.class).value();
                 List<Object> interceptors = new ArrayList<Object>();
 
@@ -171,8 +184,8 @@ public class BeanFactory {
                 }
 
                 instance = Proxy.newProxyInstance(clazz.getClassLoader(),
-                                                  clazz.getInterfaces(),
-                                                  new InterceptorInvocationHandler(instance, interceptors.toArray()));
+                        clazz.getInterfaces(),
+                        new InterceptorInvocationHandler(instance, interceptors.toArray()));
             }
 
         } catch (InstantiationException e) {
@@ -184,5 +197,37 @@ public class BeanFactory {
         return instance;
     }
 
+    /**
+     * Inject dependency in the instance. The SuperClass are injected
+     * first.
+     *
+     * @param instance where inject dependencies annotated by @Inject
+     * @param clazz    the class who contains the field definition who can be injected
+     */
+    private void injectInstance(final Object instance, final Class<?> clazz) {
+
+        try {
+
+            if (clazz.getSuperclass() != null) {
+                this.injectInstance(instance, clazz.getSuperclass());
+            }
+
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(Inject.class)) {
+                    //Check if field is private
+                    if (!field.isAccessible()) {
+                        field.setAccessible(true);
+                    }
+
+                    //Inject field
+                    field.set(instance, this.getBean(field.getType()));
+                }
+            }
+
+        } catch (IllegalAccessException e) {
+            throw new BeanInstantiationException(e.getMessage(), e);
+        }
+    }
 
 }

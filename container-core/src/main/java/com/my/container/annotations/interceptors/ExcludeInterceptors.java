@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * The exclude interceptors annotation.
  * When a method is annotated by this annotation
- * the interceptor is not applied to it.
+ * the injectservice is not applied to it.
  *
  * @author kevinpollet
  */

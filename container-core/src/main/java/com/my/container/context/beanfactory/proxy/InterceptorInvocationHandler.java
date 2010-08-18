@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 
 
 /**
- * The interceptor invocation handler.
+ * The injectservice invocation handler.
  *
  * @author kevinpollet
  */
@@ -24,7 +24,7 @@ public class InterceptorInvocationHandler implements InvocationHandler {
      * Create an invocation handler.
      *
      * @param instance     the object to proxy
-     * @param interceptors the interceptor list
+     * @param interceptors the injectservice list
      */
     public InterceptorInvocationHandler(final Object instance, final Object[] interceptors) {
         this.instance = instance;
@@ -41,7 +41,7 @@ public class InterceptorInvocationHandler implements InvocationHandler {
         Method realMethod = instance.getClass().getMethod(method.getName(), method.getParameterTypes());
         boolean isExcludeInterceptor = realMethod.isAnnotationPresent(ExcludeInterceptors.class);
 
-        //Call @Before interceptor method
+        //Call @Before injectservice method
         if (!isExcludeInterceptor) {
             for (Object interceptor : interceptors) {
                 ReflectionHelper.callDeclaredMethodWith(Before.class, interceptor, instance, realMethod, args);
@@ -51,7 +51,7 @@ public class InterceptorInvocationHandler implements InvocationHandler {
         //Call the original method
         Object result = method.invoke(instance, args);
 
-        //Call @After interceptor method
+        //Call @After injectservice method
         if (!isExcludeInterceptor) {
             for (Object interceptor : interceptors) {
                 ReflectionHelper.callDeclaredMethodWith(After.class, interceptor, instance, realMethod, args);

@@ -18,9 +18,9 @@ import java.lang.annotation.Target;
 public @interface Interceptors {
 
     /**
-     * The interceptor class list.
+     * The injectservice class list.
      * 
-     * Note : The interceptor class can have
+     * Note : The injectservice class can have
      * @Before or/and @After method.
      */
     public Class<?>[] value();

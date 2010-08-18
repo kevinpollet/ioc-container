@@ -1,7 +1,8 @@
-package com.my.container.services;
+package com.my.container.services.basic;
 
 import com.my.container.annotations.interceptors.ExcludeInterceptors;
 import com.my.container.annotations.interceptors.Interceptors;
+import com.my.container.services.MockInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
