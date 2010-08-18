@@ -1,3 +1,1 @@
-!>http://dream-ressources.com/wp-content/themes/monochrome/images/Bean.png!
-
 h1. A Light IOC-Container in Java 
