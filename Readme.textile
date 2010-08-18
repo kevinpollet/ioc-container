@@ -1,1 +1,1 @@
-h1. A Light IOC-Container in Java 
+h1. An IOC Container in Java 
