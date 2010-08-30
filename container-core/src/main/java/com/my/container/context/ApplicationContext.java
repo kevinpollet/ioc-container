@@ -5,11 +5,14 @@ import com.my.container.context.beanfactory.BeanFactory;
 import com.my.container.context.beanfactory.CallbackShutdownHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 //TODO class interface abstract ??
+
 /**
- * The application context.
+ * The basic implementation of the
+ * context interface.
 
  * @author kevinpollet
  */
@@ -25,9 +28,7 @@ public class ApplicationContext implements Context {
      * @param provider the provider of bindings
      */
     public ApplicationContext(final BindingProvider provider) {
-        //Construct provider binding list
         provider.configureBindings();
-
         this.factory = new BeanFactory(provider.getBindings());
     }
 
@@ -37,6 +38,14 @@ public class ApplicationContext implements Context {
     @Override
     public <T> T getBean(final Class<T> clazz) {
         return this.factory.getBean(clazz);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void injectBeanDependencies(final Object instance) {
+        throw  new NotImplementedException();
     }
 
     /**

@@ -8,7 +8,12 @@ import java.lang.annotation.Target;
 
 
 /**
- * The Interceptor annotation.
+ * <p>The Interceptor annotation. This annotation allow to declare
+ * an array of interceptor class. This annotation can have
+ * {@linkplain com.my.container.annotations.interceptors.Before @Before} and/or
+ * {@linkplain com.my.container.annotations.interceptors.After @After} annotated methods.</p>
+ * <br/>
+ * <p><b>Note :</b> an interceptor must have only one @After and/or one @Before annotated method.</p>
  *
  * @author kevinpollet
  */
@@ -17,11 +22,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Interceptors {
 
-    /**
-     * The injectservice class list.
-     * 
-     * Note : The injectservice class can have
-     * @Before or/and @After method.
-     */
     public Class<?>[] value();
 }

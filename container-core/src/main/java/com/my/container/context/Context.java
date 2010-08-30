@@ -1,7 +1,5 @@
 package com.my.container.context;
 
-import javax.inject.Qualifier;
-
 /**
  * The Context Interface
  *
@@ -18,11 +16,18 @@ public interface Context {
      */
     public <T> T getBean(final Class<T> clazz);
 
+    /**
+     * This method is used to inject dependencies in a bean
+     * instance (Method and fields).
+     *
+     * @param instance the bean instance to be injected
+     */
+    public void injectBeanDependencies(final Object instance);
 
     /**
      * Register a JVM ShutDown Hook.
      * All beans with PreDestroy methods
-     * are called when the JVM shutdown.
+     * are called when the JVM shutdowns.
      */
     public void registerShutdownHook();
 

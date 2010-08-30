@@ -2,10 +2,12 @@ package com.my.container.context.beanfactory;
 
 import com.my.container.annotations.interceptors.Interceptors;
 import com.my.container.binding.Binding;
+import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
+import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
+import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
+import com.my.container.context.beanfactory.proxy.AbstractBeanInvocationHandler;
 import com.my.container.context.beanfactory.proxy.InterceptorInvocationHandler;
-import com.my.container.exceptions.beanfactory.BeanClassNotFoundException;
-import com.my.container.exceptions.beanfactory.BeanInstantiationException;
-import com.my.container.exceptions.callback.CallbackInvocationException;
+import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,12 +26,14 @@ import java.util.List;
 import java.util.Map;
 
 
-//TODO injectservice verification
-//TODO one instance injectservice for all prototypes ???
+//TODO interceptor verification
+//TODO one instance interceptor for all prototypes ???
 //TODO callbacks method verification
 //TODO add @Inject constructor, methods, fields injection
 //TODO add @Inject static and instance member
 //TODO circular dependencies
+//TODO cyclic and dependencies
+//TODO postconstruct injection can be incompleted
 
 /**
  * The factory of bean class
@@ -40,7 +45,11 @@ public class BeanFactory {
     private final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
 
     private Map<Binding, Binding> bindings;
+
+    private Map<Class<?>, Object> markMap;
+
     private List<Object> prototypesBean;
+
     private Map<Binding, Object> singletonsBean;
 
     /**
@@ -60,6 +69,9 @@ public class BeanFactory {
         //Initialize beans instance holder for prototypes and singleton        
         this.prototypesBean = new ArrayList<Object>();
         this.singletonsBean = new HashMap<Binding, Object>();
+
+        //Cyclic dependencies map
+        this.markMap = new HashMap<Class<?>, Object>();
     }
 
     /**
@@ -68,46 +80,92 @@ public class BeanFactory {
      *
      * @param clazz the bean class
      * @return the bean instance
+     * @throws IllegalArgumentException if the bean contract clazz is null
+     * @throws NoSuchBeanDefinitionException if there is no binding for this bean contract class
      */
     public <T> T getBean(final Class<T> clazz) {
         T beanInstance = null;
-        Binding binding = bindings.get(new Binding(clazz, null));
 
-        if (binding == null || binding.getImplementation() == null) {
-            throw new BeanClassNotFoundException("Binding not found or not valid");
+        if (clazz == null) {
+            throw new IllegalArgumentException("The parameter clazz cannot be null");
         } else {
 
-            boolean isSingleton = binding.getImplementation().isAnnotationPresent(Singleton.class);
+            Binding binding = bindings.get(new Binding(clazz, null));
 
-            if (isSingleton && this.singletonsBean.containsKey(binding)) {
-
-                beanInstance = (T) this.singletonsBean.get(binding);
-
+            if (binding == null || binding.getImplementation() == null) {
+                throw new NoSuchBeanDefinitionException("The binding for the class " + clazz.getName()+ " is not found or not valid");
             } else {
 
-                try {
+                 Class<?> implClass = binding.getImplementation() ;
+                 boolean isSingleton = implClass.isAnnotationPresent(Singleton.class);
 
-                    beanInstance = (T) this.makeBeanInstance(binding.getImplementation());
+                 if (isSingleton && this.singletonsBean.containsKey(binding)) {
+                    beanInstance = (T) this.singletonsBean.get(binding);
+                 } else if (this.markMap.containsKey(implClass)) {
+                    beanInstance = (T) this.markMap.get(implClass);
+                 } else {
 
-                    //Call @PostConstruct method if one
-                    if (Proxy.isProxyClass(beanInstance.getClass()) && Proxy.getInvocationHandler(beanInstance) instanceof InterceptorInvocationHandler) {
-                        InterceptorInvocationHandler handler = (InterceptorInvocationHandler) Proxy.getInvocationHandler(beanInstance);
-                        ReflectionHelper.callDeclaredMethodWith(PostConstruct.class, handler.getProxiedInstance());
-                    } else {
-                        ReflectionHelper.callDeclaredMethodWith(PostConstruct.class, beanInstance);
+                    try {
+
+                        beanInstance = (T) implClass.newInstance();
+
+                        if (implClass.isAnnotationPresent(Interceptors.class)) {
+
+                            Class<?>[] interceptorsClass = implClass.getAnnotation(Interceptors.class).value();
+                            List<Object> interceptors = new ArrayList<Object>();
+
+                            for (Class<?> c : interceptorsClass) {
+                                interceptors.add(c.newInstance());
+                            }
+
+                            beanInstance = (T) Proxy.newProxyInstance(implClass.getClassLoader(),
+                                                                      implClass.getInterfaces(),
+                                                                      new InterceptorInvocationHandler(beanInstance, interceptors.toArray()));
+
+                        }
+
+                    } catch (InstantiationException e) {
+                        throw new BeanInstantiationException(e);
+                    } catch (IllegalAccessException e) {
+                        throw new BeanInstantiationException(e);
                     }
 
-                    if (isSingleton) {
+                    // Inject @Inject annotated fields
+                    this.injectAnnotatedFields(beanInstance, implClass);
+
+
+                    // Injection is done call PostConstruct
+                    try {
+
+                        if (Proxy.isProxyClass(beanInstance.getClass())) {
+
+                            if (Proxy.getInvocationHandler(beanInstance) instanceof AbstractBeanInvocationHandler) {
+                                AbstractBeanInvocationHandler handler = (AbstractBeanInvocationHandler) Proxy.getInvocationHandler(beanInstance);
+                                ReflectionHelper.invokeDeclaredMethodWith(PostConstruct.class, handler.getProxiedInstance());
+                            }
+
+                        } else {
+
+                            ReflectionHelper.invokeDeclaredMethodWith(PostConstruct.class, beanInstance);
+
+                        }
+
+                    } catch (InvocationTargetException e) {
+                         throw new CallbackInvocationException(e);
+                    } catch (IllegalAccessException e) {
+                        throw new CallbackInvocationException(e);
+                    }
+
+
+                    // Holds singleton and Prototype beans
+                    if (implClass.isAnnotationPresent(Singleton.class)) {
                         this.singletonsBean.put(binding, beanInstance);
                     } else {
                         this.prototypesBean.add(beanInstance);
                     }
 
-                } catch (InvocationTargetException e) {
-                    throw new CallbackInvocationException(e.getMessage(), e);
-                } catch (IllegalAccessException e) {
-                    throw new CallbackInvocationException(e.getMessage(), e);
                 }
+
             }
 
         }
@@ -131,70 +189,24 @@ public class BeanFactory {
                 addAll(singletonsBean.values());
             }};
 
-            //Call PreDestroy methods bean
-            for (Object o : allBeans) {
-                if (Proxy.isProxyClass(o.getClass()) && Proxy.getInvocationHandler(o) instanceof InterceptorInvocationHandler) {
-                    InterceptorInvocationHandler handler = (InterceptorInvocationHandler) Proxy.getInvocationHandler(o);
-                    ReflectionHelper.callDeclaredMethodWith(PreDestroy.class, handler.getProxiedInstance());
+            for (Object bean : allBeans) {
+                if (Proxy.isProxyClass(bean.getClass()) && Proxy.getInvocationHandler(bean) instanceof AbstractBeanInvocationHandler) {
+                    AbstractBeanInvocationHandler handler = (AbstractBeanInvocationHandler) Proxy.getInvocationHandler(bean);
+                    ReflectionHelper.invokeDeclaredMethodWith(PreDestroy.class, handler.getProxiedInstance());
                 } else {
-                    ReflectionHelper.callDeclaredMethodWith(PreDestroy.class, o);
+                    ReflectionHelper.invokeDeclaredMethodWith(PreDestroy.class, bean);
                 }
             }
 
-            //Remove references
             allBeans.clear();
             this.prototypesBean.clear();
             this.singletonsBean.clear();
 
         } catch (InvocationTargetException e) {
-            throw new CallbackInvocationException(e.getMessage(), e);
+            throw new CallbackInvocationException(e);
         } catch (IllegalAccessException e) {
-            throw new CallbackInvocationException(e.getMessage(), e);
+            throw new CallbackInvocationException(e);
         }
-
-    }
-
-    /**
-     * Create an instance of the given clazz.
-     *
-     * @param clazz the class
-     * @return the instance
-     * @throws BeanInstantiationException if an error occur during class instantiation
-     *                                    there is no empty constructor, or constructor is not accessible
-     */
-    private Object makeBeanInstance(final Class<?> clazz) {
-        Object instance = null;
-
-        try {
-
-            //Create binding instance
-            instance = clazz.newInstance();
-
-            //Inject dependencies
-            this.injectInstance(instance, clazz);
-
-            //Create interceptors
-            if (clazz.isAnnotationPresent(Interceptors.class)) {
-                //Create injectservice class
-                Class<?>[] interceptorsClass = clazz.getAnnotation(Interceptors.class).value();
-                List<Object> interceptors = new ArrayList<Object>();
-
-                for (Class<?> c : interceptorsClass) {
-                    interceptors.add(c.newInstance());
-                }
-
-                instance = Proxy.newProxyInstance(clazz.getClassLoader(),
-                        clazz.getInterfaces(),
-                        new InterceptorInvocationHandler(instance, interceptors.toArray()));
-            }
-
-        } catch (InstantiationException e) {
-            throw new BeanInstantiationException(e.getMessage(), e);
-        } catch (IllegalAccessException e) {
-            throw new BeanInstantiationException(e.getMessage(), e);
-        }
-
-        return instance;
     }
 
     /**
@@ -204,30 +216,56 @@ public class BeanFactory {
      * @param instance where inject dependencies annotated by @Inject
      * @param clazz    the class who contains the field definition who can be injected
      */
-    private void injectInstance(final Object instance, final Class<?> clazz) {
+    private void injectAnnotatedFields(final Object instance, final Class<?> clazz) {
+        this.logger.debug("Inject fields of class {}", clazz.getName());
 
-        try {
+        // If class have a SuperClass inject it before
+        if (clazz.getSuperclass() != null) {
+            this.injectAnnotatedFields(instance, clazz.getSuperclass());
+        }
 
-            if (clazz.getSuperclass() != null) {
-                this.injectInstance(instance, clazz.getSuperclass());
-            }
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
 
-            Field[] fields = clazz.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.isAnnotationPresent(Inject.class)) {
-                    //Check if field is private
+            // The class have a dependency
+            if (field.isAnnotationPresent(Inject.class)) {
+
+                // Inject final field is not valid
+                if (Modifier.isFinal(field.getModifiers())) {
+                   throw new BeanDependencyInjectionException("Final field " + field.getName() + " in class " + field.getDeclaringClass().getName() + " cannot be injected");
+                } else {
+
+                    //If this class is not already marked, mark it
+                    if (!this.markMap.containsKey(instance.getClass())) {
+                        this.markMap.put(instance.getClass(), instance);
+                    }
+
+                    // Field is not accessible
                     if (!field.isAccessible()) {
                         field.setAccessible(true);
                     }
 
-                    //Inject field
-                    field.set(instance, this.getBean(field.getType()));
+                    Object dependency = this.getBean(field.getType());
+
+                    try {
+
+                        field.set(instance, dependency);
+
+                    } catch (IllegalAccessException ex) {
+                        throw new BeanDependencyInjectionException("The field " + field.getName() + "is not accessible and cannot be injected");
+                    }
+
                 }
+
             }
 
-        } catch (IllegalAccessException e) {
-            throw new BeanInstantiationException(e.getMessage(), e);
         }
+
+        // All field are injected remove it from the map
+        if (this.markMap.containsKey(instance.getClass())) {
+            this.markMap.remove(instance.getClass());
+        }
+
     }
 
 }

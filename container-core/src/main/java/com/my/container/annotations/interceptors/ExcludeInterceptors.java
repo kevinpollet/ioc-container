@@ -7,9 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The exclude interceptors annotation.
+ * <p>The exclude interceptors annotation.
  * When a method is annotated by this annotation
- * the injectservice is not applied to it.
+ * the interceptors are not called before or after it.</p>
  *
  * @author kevinpollet
  */

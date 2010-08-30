@@ -3,8 +3,8 @@ package com.my.container.test.callbacks;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
-import com.my.container.services.basic.Service;
-import com.my.container.services.basic.ServiceImpl;
+import com.my.container.test.callbacks.services.Service;
+import com.my.container.test.callbacks.services.ServiceImpl;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class PostConstructTest {
         Service service = this.context.getBean(Service.class);
 
         Assert.assertNotNull(service);
-        Assert.assertEquals("HelloConstruct", service.sayHello());
+        Assert.assertEquals("PostConstruct method not called or more than one times", 1, ((ServiceImpl) service).getNbCallPostConstruct());
     }
 
 }

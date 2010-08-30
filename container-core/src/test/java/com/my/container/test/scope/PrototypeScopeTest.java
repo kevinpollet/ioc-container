@@ -3,29 +3,27 @@ package com.my.container.test.scope;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
+import com.my.container.test.scope.services.PrototypeServiceImpl;
 import com.my.container.test.scope.services.Service;
-import com.my.container.test.scope.services.SingletonServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Inject;
-
 /**
- * Test the bean scope singleton.
+ * The prototype scope test.
  *
  * @author kevinpollet
  */
-public class SingletonScopeTest {
+public class PrototypeScopeTest {
 
-    private Context context;
+     private Context context;
 
     @Before
     public void setUp() {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(Service.class).to(SingletonServiceImpl.class);
+                bind(Service.class).to(PrototypeServiceImpl.class);
             }
         });
 
@@ -38,6 +36,7 @@ public class SingletonScopeTest {
 
         Assert.assertNotNull(firstInstance);
         Assert.assertNotNull(secondInstance);
-        Assert.assertSame("Beans have not the same reference", firstInstance, secondInstance);
+        Assert.assertNotSame("Beans have the same reference", firstInstance, secondInstance);
     }
+    
 }

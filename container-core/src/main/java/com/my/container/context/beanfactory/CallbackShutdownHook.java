@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 public class CallbackShutdownHook implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(CallbackShutdownHook.class);
+    
     private final BeanFactory factory;
 
     /**

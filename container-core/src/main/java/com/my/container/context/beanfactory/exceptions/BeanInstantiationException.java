@@ -1,4 +1,4 @@
-package com.my.container.exceptions.beanfactory;
+package com.my.container.context.beanfactory.exceptions;
 
 
 /**
@@ -7,7 +7,7 @@ package com.my.container.exceptions.beanfactory;
  *
  * @author kevinpollet
  */
-public class BeanInstantiationException extends BeanFactoryException {
+public class BeanInstantiationException extends BeanException {
 
     public BeanInstantiationException(String message) {
         super(message);

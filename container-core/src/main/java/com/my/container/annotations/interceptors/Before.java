@@ -8,9 +8,9 @@ import java.lang.annotation.Target;
 
 
 /**
- * The Before annotation.
- * This injectservice method can match this signature :
- * void methodName (Object instance, Method method, Object... args)
+ * <p>The before interceptor annotation. The annotation must be used on a method.
+ * The annotated method must have this signature :
+ * {@code void methodName (Object instance, Method method, Object... args)}</p>
  *
  * @author kevinpollet
  */

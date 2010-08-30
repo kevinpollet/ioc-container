@@ -1,1 +1,3 @@
-h1. An IOC Container in Java 
+h2. Readme File 
+
+This is an implementation of an IOC container in Java with dependencies injection.

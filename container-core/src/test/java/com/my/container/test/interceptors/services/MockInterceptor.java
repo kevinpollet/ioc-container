@@ -1,4 +1,4 @@
-package com.my.container.services;
+package com.my.container.test.interceptors.services;
 
 import com.my.container.annotations.interceptors.After;
 import com.my.container.annotations.interceptors.Before;

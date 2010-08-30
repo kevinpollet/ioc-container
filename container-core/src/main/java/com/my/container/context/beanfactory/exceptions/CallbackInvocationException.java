@@ -1,7 +1,9 @@
-package com.my.container.exceptions.callback;
+package com.my.container.context.beanfactory.exceptions;
 
-
-public class CallbackInvocationException extends CallbackException {
+/**
+ * @author kevinpollet
+ */
+public class CallbackInvocationException extends BeanInstantiationException {
 
     public CallbackInvocationException(final String message) {
         super(message);

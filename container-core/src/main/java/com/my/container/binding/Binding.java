@@ -23,6 +23,7 @@ public class Binding {
 
     /**
      * Get the binding interface class.
+     *
      * @return the interface class
      */
     public Class<?> getInterface() {
@@ -31,6 +32,7 @@ public class Binding {
 
     /**
      * Get the binding implementation class.
+     *
      * @return the implementation class
      */
     public Class<?> getImplementation() {
@@ -39,6 +41,7 @@ public class Binding {
 
     /**
      * Set the binding interface class.
+     *
      * @param intf the binding interface class
      */
     public void setInterface(final Class<?> intf) {
@@ -47,6 +50,7 @@ public class Binding {
 
     /**
      * Set the binding implementation class.
+     *
      * @param impl the implementation class
      */
     public void setImplementation(final Class<?> impl) {

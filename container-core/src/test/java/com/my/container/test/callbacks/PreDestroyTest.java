@@ -4,8 +4,8 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.BeanFactory;
-import com.my.container.services.basic.Service;
-import com.my.container.services.basic.ServiceImpl;
+import com.my.container.test.callbacks.services.Service;
+import com.my.container.test.callbacks.services.ServiceImpl;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +27,7 @@ public class PreDestroyTest {
             @Override
             public void configureBindings() {
                 bind(Service.class).to(ServiceImpl.class);
+
             }
 
         });
@@ -43,7 +44,8 @@ public class PreDestroyTest {
         factory.removeAllBeansReferences();
 
         Assert.assertNotNull(service);
-        Assert.assertEquals("HelloDestroy", service.sayHello());
+        Assert.assertNotNull(service);
+        Assert.assertEquals("PreDestroy method not called or more than one times", 1, ((ServiceImpl) service).getNbCallPreDestroy());
     }
 
 }

@@ -9,10 +9,13 @@ import java.util.List;
 /**
  * The BindingProvider class. A Binding
  * provider is responsible to share the
- * class binding.
+ * bean bindings.
  */
 public abstract class BindingProvider {
 
+    /**
+     * The bindings list.
+     */
     private List<Binding> bindings;
 
     /**
@@ -23,8 +26,7 @@ public abstract class BindingProvider {
     }
 
     /**
-     * Get the binding provider
-     * list.
+     * Get the binding provider list.
      */
     public final List<Binding> getBindings() {
         return bindings;
@@ -35,15 +37,15 @@ public abstract class BindingProvider {
      * @param intf the binding interface
      * @return the binding builder
      */
-    protected final InnerBindingBuilder bind(final Class<?> intf) {
-        return this.new InnerBindingBuilder(intf);
+    protected final <T> InnerBindingBuilder<T> bind(final Class<T> intf) {
+        return this.new InnerBindingBuilder<T>(intf);
     }
 
     /**
      * Configure the binding list.
-     * 
-     * To add a binding :
-     * USE : bind(interface.class).to(implementation.class)
+     * <br/>
+     * <p>To add a binding use the following code :
+     * {@code bind(interface.class).to(implementation.class)}</p>
      */
     public abstract void configureBindings();
 
@@ -51,11 +53,18 @@ public abstract class BindingProvider {
     /**
      * The binding builder inner class
      */
-    protected final class InnerBindingBuilder {
+    protected final class InnerBindingBuilder<T> {
 
-        private Class<?> intf;
+        /**
+         * The binding interface class.
+         */
+        private Class<T> intf;
 
-        private InnerBindingBuilder(final Class<?> intf) {
+        /**
+         * The InnerBindingBuilder constructor.
+         * @param intf the binding interface
+         */
+        private InnerBindingBuilder(final Class<T> intf) {
             this.intf = intf;
         }
 
@@ -63,7 +72,7 @@ public abstract class BindingProvider {
          * The binding implementation
          * @param impl the implementation
          */
-        public final void to(final Class<?> impl) {
+        public final void to(final Class<? extends T> impl) {
             bindings.add(new Binding(this.intf, impl));
         }
     }

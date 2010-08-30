@@ -1,5 +1,8 @@
-package com.my.container.services.basic;
+package com.my.container.test.interceptors.services;
 
+/**
+ * The basic service contract.
+ */
 public interface Service {
 
     public String sayHello();
