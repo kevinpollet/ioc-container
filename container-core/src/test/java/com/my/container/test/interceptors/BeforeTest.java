@@ -7,7 +7,6 @@ import com.my.container.context.beanfactory.proxy.InterceptorInvocationHandler;
 import com.my.container.test.interceptors.services.InterceptorServiceImpl;
 import com.my.container.test.interceptors.services.MockInterceptor;
 import com.my.container.test.interceptors.services.Service;
-import com.my.container.test.scope.services.SingletonServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

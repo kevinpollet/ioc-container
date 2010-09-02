@@ -4,8 +4,10 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.BeanFactory;
-import com.my.container.test.callbacks.services.Service;
-import com.my.container.test.callbacks.services.ServiceImpl;
+import com.my.container.test.callbacks.services.Leaf;
+import com.my.container.test.callbacks.services.LeafImpl;
+import com.my.container.test.callbacks.services.Parent;
+import com.my.container.test.callbacks.services.ParentImpl;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,16 +28,15 @@ public class PreDestroyTest {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(Service.class).to(ServiceImpl.class);
-
+                bind(Parent.class).to(ParentImpl.class);
+                bind(Leaf.class).to(LeafImpl.class);
             }
-
         });
     }
 
     @Test
     public void testPreDestroy() throws NoSuchFieldException, IllegalAccessException {
-        Service service = this.context.getBean(Service.class);
+        Parent parent = this.context.getBean(Parent.class);
 
         //Get the private bean factory
         Field factoryField = this.context.getClass().getDeclaredField("factory");
@@ -43,9 +44,9 @@ public class PreDestroyTest {
         BeanFactory factory = (BeanFactory) factoryField.get(this.context);
         factory.removeAllBeansReferences();
 
-        Assert.assertNotNull(service);
-        Assert.assertNotNull(service);
-        Assert.assertEquals("PreDestroy method not called or more than one times", 1, ((ServiceImpl) service).getNbCallPreDestroy());
+        Assert.assertNotNull(parent);
+        Assert.assertNotNull(parent);
+        Assert.assertEquals("PreDestroy method not called or more than one times", 1, ((ParentImpl) parent).getNbCallPreDestroy());
     }
 
 }

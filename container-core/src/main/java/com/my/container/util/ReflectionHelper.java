@@ -8,16 +8,16 @@ import java.util.List;
 
 
 /**
- * A class who provides useful
+ * Helper who provides useful
  * methods for reflection.
  *
  * @author kevinpollet
  */
 //TODO gestion des exceptions
-public class ReflectionHelper {
+public final class ReflectionHelper {
 
     /**
-     * This class cannot be instantiate.
+     * This class cannot be instantiated.
      */
     private ReflectionHelper() {
     }

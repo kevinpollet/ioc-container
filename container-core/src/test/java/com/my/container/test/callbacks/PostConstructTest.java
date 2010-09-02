@@ -3,8 +3,10 @@ package com.my.container.test.callbacks;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
-import com.my.container.test.callbacks.services.Service;
-import com.my.container.test.callbacks.services.ServiceImpl;
+import com.my.container.test.callbacks.services.Leaf;
+import com.my.container.test.callbacks.services.LeafImpl;
+import com.my.container.test.callbacks.services.Parent;
+import com.my.container.test.callbacks.services.ParentImpl;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,17 +25,27 @@ public class PostConstructTest {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(Service.class).to(ServiceImpl.class);
+                bind(Parent.class).to(ParentImpl.class);
+                bind(Leaf.class).to(LeafImpl.class);
             }
         });
     }
 
     @Test
     public void testPostConstruct() {
-        Service service = this.context.getBean(Service.class);
+        Parent parent = this.context.getBean(Parent.class);
 
-        Assert.assertNotNull(service);
-        Assert.assertEquals("PostConstruct method not called or more than one times", 1, ((ServiceImpl) service).getNbCallPostConstruct());
+        Assert.assertNotNull(parent);
+        Assert.assertEquals("PostConstruct method not called or more than one times", 1, ((ParentImpl) parent).getNbCallPostConstruct());
+    }
+
+    @Test
+    public void testPostConstructCalledAfterAllInjections() {
+        Parent parent = this.context.getBean(Parent.class);
+
+        Assert.assertNotNull(parent);
+        Assert.assertEquals("Parent", parent.getReference());
+        Assert.assertEquals("Leaf", parent.getLeafReference());
     }
 
 }

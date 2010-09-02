@@ -60,7 +60,7 @@ public class InjectFieldTest {
     }
 
     @Test
-    public void testCyclicDepedencies() throws NoSuchFieldException, IllegalAccessException {
+    public void testCyclicDependencies() throws NoSuchFieldException, IllegalAccessException {
         ServiceA serviceA = this.context.getBean(ServiceA.class);
 
         //ServiceC dependency

@@ -9,8 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Inject;
-
 /**
  * Test the bean scope singleton.
  *
