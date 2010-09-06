@@ -90,11 +90,7 @@ public class BeanFactory {
         try {
 
             for (Object instance : newBeansCreated) {
-                if (Proxy.isProxyClass(instance.getClass())) {
-                    ReflectionHelper.invokeDeclaredMethodWith(PostConstruct.class, ProxyHelper.getProxiedInstance(instance));
-                } else {
-                    ReflectionHelper.invokeDeclaredMethodWith(PostConstruct.class, instance);
-                }
+                ReflectionHelper.invokeDeclaredMethodWith(PostConstruct.class, ProxyHelper.getTargetObject(instance));
             }
 
         } catch (InvocationTargetException e) {
@@ -214,8 +210,7 @@ public class BeanFactory {
 
                 try {
 
-                    Object realInstance = Proxy.isProxyClass(instance.getClass()) ? ProxyHelper.getProxiedInstance(instance) : instance;
-                    field.set(instance, dependency);
+                    field.set(ProxyHelper.getTargetObject(instance), dependency);
 
                 } catch (IllegalAccessException ex) {
                     throw new BeanDependencyInjectionException("The field " + field.getName() + "is not accessible and cannot be injected");
@@ -258,11 +253,10 @@ public class BeanFactory {
                         paramValue.add(this.makeInstance(paramType, markMap, newBeansCreated));
                     }
 
-                     // Invoke method
+                    // Invoke method
                     try {
 
-                        Object invokeInstance = Proxy.isProxyClass(instance.getClass()) ? ProxyHelper.getProxiedInstance(instance) : instance;
-                        method.invoke(invokeInstance, paramValue.toArray());
+                        method.invoke(ProxyHelper.getTargetObject(instance), paramValue.toArray());
 
                     } catch (IllegalAccessException e) {
                         throw new BeanDependencyInjectionException(e);
@@ -300,11 +294,7 @@ public class BeanFactory {
         try {
 
             for (Object bean : allBeans) {
-                if (Proxy.isProxyClass(bean.getClass())) {
-                    ReflectionHelper.invokeDeclaredMethodWith(PreDestroy.class, ProxyHelper.getProxiedInstance(bean));
-                } else {
-                    ReflectionHelper.invokeDeclaredMethodWith(PreDestroy.class, bean);
-                }
+                ReflectionHelper.invokeDeclaredMethodWith(PreDestroy.class, ProxyHelper.getTargetObject(bean));
             }
 
 

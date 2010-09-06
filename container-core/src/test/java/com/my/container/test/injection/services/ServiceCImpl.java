@@ -1,7 +1,5 @@
 package com.my.container.test.injection.services;
 
-import javax.inject.Inject;
-
 /**
  * @author kevinpollet
  */

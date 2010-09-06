@@ -1,7 +1,6 @@
 package com.my.container.test.injection.services;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * @author kevinpollet

@@ -22,22 +22,26 @@ public final class ProxyHelper {
      * in parameter.
      *
      * @param proxyInstance the instance of the proxy
-     * @return the proxied instance or null
-     * @throws IllegalArgumentException if proxy instance parameter is null, not a proxy
-     *                                  or doesn't implements {@link com.my.container.context.beanfactory.proxy.AbstractBeanInvocationHandler}
+     * @return the proxied instance or the parameter if :
+     *         <li>it doesn't implements {@link com.my.container.context.beanfactory.proxy.AbstractBeanInvocationHandler}</li>
+     *         <li>it's not a Java proxy</li>
+     *         <p><b>This methods never returns null</b><p>
+     * @throws IllegalArgumentException if proxy instance parameter is null
      */
-    public static <T> T getProxiedInstance(final T proxyInstance) {
-        if (proxyInstance == null || !Proxy.isProxyClass(proxyInstance.getClass())) {
+    public static <T> T getTargetObject(final T proxyInstance) {
+        if (proxyInstance == null) {
             throw new IllegalArgumentException("The proxy instance parameter cannot be null");
         }
 
         T instance = proxyInstance;
 
-        InvocationHandler handler = Proxy.getInvocationHandler(proxyInstance);
-        if (handler instanceof AbstractBeanInvocationHandler) {
-            instance = (T) ((AbstractBeanInvocationHandler) handler).getProxiedInstance();
-        } else {
-            throw new IllegalArgumentException("This proxy instance doesn't implements AbstractBeanInvocationHandler");
+        if (Proxy.isProxyClass(proxyInstance.getClass())) {
+
+            InvocationHandler handler = Proxy.getInvocationHandler(proxyInstance);
+            if (handler instanceof AbstractBeanInvocationHandler) {
+                instance = (T) ((AbstractBeanInvocationHandler) handler).getProxiedInstance();
+            }
+            
         }
 
         return instance;

@@ -1,7 +1,6 @@
 package com.my.container.context.beanfactory.proxy;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 
 /**
  * A simple invocation handler who
