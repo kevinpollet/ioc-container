@@ -15,9 +15,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 
 /**
- * The injectservice exclude method
- * from injectservice test.
- *
  * @author kevinpollet
  */
 public class ExcludeMethodTest {

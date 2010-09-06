@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Map;
 //TODO add @Inject constructor, methods, fields injection
 //TODO add @Inject static and instance member
 //TODO cyclic and dependencies
+
 /**
  * The factory of bean class
  *
@@ -73,7 +75,7 @@ public class BeanFactory {
      * @param clazz the bean class
      * @return the bean instance
      * @throws NoSuchBeanDefinitionException if there is no binding implementation for this bean contract
-     * @throws IllegalArgumentException if the clazz argument is null
+     * @throws IllegalArgumentException      if the clazz argument is null
      */
     public <T> T getBean(final Class<T> clazz) {
         if (clazz == null) {
@@ -87,7 +89,7 @@ public class BeanFactory {
         // All objects are injected call the PostContruct methods in the right order
         try {
 
-            for(Object instance : newBeansCreated) {
+            for (Object instance : newBeansCreated) {
                 if (Proxy.isProxyClass(instance.getClass())) {
                     ReflectionHelper.invokeDeclaredMethodWith(PostConstruct.class, ProxyHelper.getProxiedInstance(instance));
                 } else {
@@ -107,9 +109,8 @@ public class BeanFactory {
     /**
      * This method create a bean from it's interface. Check the
      *
-     *
-     * @param clazz the interface class
-     * @param markMap the map used to resolve cyclic dependencies
+     * @param clazz           the interface class
+     * @param markMap         the map used to resolve cyclic dependencies
      * @param newBeansCreated the list of the new beans created (the bean dependencies)
      * @return the newly created instance
      * @throws NoSuchBeanDefinitionException if there is no binding implementation for this bean contract
@@ -145,15 +146,15 @@ public class BeanFactory {
 
                     beanInstance = (T) Proxy.newProxyInstance(implClass.getClassLoader(),
                                                               implClass.getInterfaces(),
-                                                              new InterceptorInvocationHandler(beanInstance, interceptors.toArray()));
+                                                               new InterceptorInvocationHandler(beanInstance, interceptors.toArray()));
                 }
 
-                // Inject @Inject annotated fields
-                this.injectAnnotatedFields(beanInstance, implClass, markMap, newBeansCreated);
+                // Inject annotated fields and methods
+                this.injectDependencies(beanInstance, implClass, markMap, newBeansCreated);
 
                 // The bean is created and injected memorize it
                 // to call all PostConstruct when all injections are done.
-                newBeansCreated.add(beanInstance);                
+                newBeansCreated.add(beanInstance);
 
                 // Hold the singleton reference
                 if (implClass.isAnnotationPresent(Singleton.class)) {
@@ -167,7 +168,7 @@ public class BeanFactory {
             } catch (IllegalAccessException e) {
                 throw new BeanInstantiationException(e);
             }
-            
+
         }
 
         return beanInstance;
@@ -177,49 +178,96 @@ public class BeanFactory {
      * Inject dependencies in the instance. The SuperClass fields are injected
      * first.
      *
-     * @param instance where inject dependencies annotated by @Inject
-     * @param markMap the map used to resolve cyclic dependencies
+     * @param instance        where inject dependencies annotated by @Inject
+     * @param markMap         the map used to resolve cyclic dependencies
      * @param newBeansCreated the list of the new beans created (the bean dependencies)
-     * @param clazz    the class who contains the field definition who can be injected
+     * @param clazz           the class who contains the field definition who can be injected
      */
-    private void injectAnnotatedFields(final Object instance, final Class<?> clazz, final Map<Class<?>, Object> markMap, final List<Object> newBeansCreated) {
-        this.logger.debug("Inject fields of class {}", clazz.getName());
+    private void injectDependencies(final Object instance, final Class<?> clazz, final Map<Class<?>, Object> markMap, final List<Object> newBeansCreated) {
+        this.logger.debug("Inject fields and methods of class {}", clazz.getSimpleName());
 
-        // If class have a SuperClass inject it before
-        if (clazz.getSuperclass() != null) {
-            this.injectAnnotatedFields(instance, clazz.getSuperclass(), markMap, newBeansCreated);
+        if (clazz.getSuperclass() != null) { // Inject superclass before
+            this.injectDependencies(instance, clazz.getSuperclass(), markMap, newBeansCreated);
         }
+
+        /* ------ Inject Fields ------- */
 
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
-            // The class have a dependency
+            
             if (field.isAnnotationPresent(Inject.class)) {
                 // Inject final field is not valid
                 if (Modifier.isFinal(field.getModifiers())) {
                     throw new BeanDependencyInjectionException("Final field " + field.getName() + " in class " + field.getDeclaringClass().getName() + " cannot be injected");
-                } else {
+                }
 
-                    //If this class is not already marked, mark it
+                //If this class is not already marked, mark it
+                if (!markMap.containsKey(instance.getClass())) {
+                    markMap.put(instance.getClass(), instance);
+                }
+
+                if (Modifier.isPrivate(field.getModifiers())) {
+                    field.setAccessible(true);
+                }
+
+                Object dependency = this.makeInstance(field.getType(), markMap, newBeansCreated);
+
+                try {
+
+                    Object realInstance = Proxy.isProxyClass(instance.getClass()) ? ProxyHelper.getProxiedInstance(instance) : instance;
+                    field.set(instance, dependency);
+
+                } catch (IllegalAccessException ex) {
+                    throw new BeanDependencyInjectionException("The field " + field.getName() + "is not accessible and cannot be injected");
+                }
+
+            }
+
+        }
+
+        /* ------ Inject Methods ------- */
+
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+
+            if (method.isAnnotationPresent(Inject.class)) {
+
+                if (Modifier.isAbstract(method.getModifiers())) {
+                    throw new BeanDependencyInjectionException("Cannot inject dependencies in abstract method " + method.getName() + " of bean " + instance.getClass().getSimpleName());
+                }
+
+                // This method is not overidden in subclass
+                if (!ReflectionHelper.isOverriden(instance.getClass(), method)) {
+
+                    // If this class is not already marked, mark it
                     if (!markMap.containsKey(instance.getClass())) {
                         markMap.put(instance.getClass(), instance);
                     }
 
-                    if (Modifier.isPrivate(field.getModifiers())) {
-                        field.setAccessible(true);
+                    if (Modifier.isPrivate(method.getModifiers())) {
+                        method.setAccessible(true);
                     }
 
-                    Object dependency = this.makeInstance(field.getType(), markMap, newBeansCreated);
-
-                    try {
-
-                        if (Proxy.isProxyClass(instance.getClass())) {
-                            field.set(ProxyHelper.getProxiedInstance(instance), dependency);
-                        } else {
-                            field.set(instance, dependency);
+                    List<Object> paramValue = new ArrayList<Object>();
+                    Class<?>[] paramTypes = method.getParameterTypes();
+                    for (Class<?> paramType : paramTypes) {
+                        if (paramType.equals(clazz)) {
+                            throw new BeanDependencyInjectionException("Setter injection cannot have a parameter of type " + clazz.getSimpleName());  
                         }
 
-                    } catch (IllegalAccessException ex) {
-                        throw new BeanDependencyInjectionException("The field " + field.getName() + "is not accessible and cannot be injected");
+                        paramValue.add(this.makeInstance(paramType, markMap, newBeansCreated));
+                    }
+
+                     // Invoke method
+                    try {
+
+                        Object invokeInstance = Proxy.isProxyClass(instance.getClass()) ? ProxyHelper.getProxiedInstance(instance) : instance;
+                        method.invoke(invokeInstance, paramValue.toArray());
+
+                    } catch (IllegalAccessException e) {
+                        throw new BeanDependencyInjectionException(e);
+                    } catch (InvocationTargetException e) {
+                        throw new BeanDependencyInjectionException(e);
                     }
 
                 }
@@ -228,7 +276,7 @@ public class BeanFactory {
 
         }
 
-        // All fields are injected remove it from the map
+        // Injection is done remove remove it from the MarkMap
         if (markMap.containsKey(instance.getClass())) {
             markMap.remove(instance.getClass());
         }
@@ -239,6 +287,7 @@ public class BeanFactory {
      * This method remove all beans references
      * memorised by the singleton for PreDestroy
      * CallBack and Singleton scope.
+     *
      * @throws CallbackInvocationException if the invocation of a PreDestroy methods failed
      */
     public void removeAllBeansReferences() {
@@ -270,4 +319,4 @@ public class BeanFactory {
         }
     }
 
-}
+}                                                                        

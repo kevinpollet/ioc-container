@@ -35,21 +35,20 @@ public class InterceptorInvocationHandler extends AbstractBeanInvocationHandler 
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object realInstance = this.getProxiedInstance();
-        Method realMethod = realInstance.getClass().getMethod(method.getName(), method.getParameterTypes());
+        Method realMethod = this.getProxiedInstance().getClass().getMethod(method.getName(), method.getParameterTypes());
         boolean isExcludeInterceptor = realMethod.isAnnotationPresent(ExcludeInterceptors.class);
 
         if (!isExcludeInterceptor) {
             for (Object interceptor : interceptors) {
-                ReflectionHelper.invokeDeclaredMethodWith(Before.class, interceptor, realInstance, realMethod, args);
+                ReflectionHelper.invokeDeclaredMethodWith(Before.class, interceptor, this.getProxiedInstance(), realMethod, args);
             }
         }
 
-        Object result = super.invoke(proxy, method, args);
+        Object result = method.invoke(this.getProxiedInstance(), args);
 
         if (!isExcludeInterceptor) {
             for (Object interceptor : interceptors) {
-                ReflectionHelper.invokeDeclaredMethodWith(After.class, interceptor, realInstance, realMethod, args);
+                ReflectionHelper.invokeDeclaredMethodWith(After.class, interceptor, this.getProxiedInstance(), realMethod, args);
             }
         }
 

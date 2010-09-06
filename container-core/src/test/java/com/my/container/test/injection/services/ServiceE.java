@@ -3,10 +3,10 @@ package com.my.container.test.injection.services;
 /**
  * @author kevinpollet
  */
-public interface ServiceA {
+public interface ServiceE {
 
     public String echo(final String string);
 
-    public String sayHelloTo(final String name);
+    public int add(final int a, final int b);
 
 }

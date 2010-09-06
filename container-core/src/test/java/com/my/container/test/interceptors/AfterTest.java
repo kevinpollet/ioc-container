@@ -46,7 +46,7 @@ public class AfterTest {
         field.setAccessible(true);
 
         Object[] interceptors = (Object[]) field.get(handler);
-        MockInterceptor mock = (MockInterceptor)interceptors[0];
+        MockInterceptor mock = (MockInterceptor) interceptors[0];
 
         //Call service
         service.sayHello();

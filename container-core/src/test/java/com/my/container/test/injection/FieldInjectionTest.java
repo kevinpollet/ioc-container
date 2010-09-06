@@ -19,9 +19,8 @@ import java.lang.reflect.Field;
 
 /**
  * @author kevinpollet
- *         Date: 17 août 2010
  */
-public class InjectFieldTest {
+public class FieldInjectionTest {
 
     private Context context;
 
@@ -42,12 +41,17 @@ public class InjectFieldTest {
         ServiceA service = this.context.getBean(ServiceA.class);
 
         //Get dependency
-        Field dependency = service.getClass().getDeclaredField("serviceB");
-        dependency.setAccessible(true);
+        Field depB = service.getClass().getDeclaredField("serviceB");
+        depB.setAccessible(true);
+
+        Field depC = service.getClass().getDeclaredField("serviceC");
+        depC.setAccessible(true);
 
         Assert.assertNotNull(service);
-        Assert.assertNotNull("Dependency is null", dependency.get(service));
+        Assert.assertNotNull("Dependency is null", depB.get(service));
+        Assert.assertNotNull("Dependency is null", depC.get(service));
         Assert.assertEquals("Hello Injection", service.sayHelloTo("Injection"));
+        Assert.assertEquals("Great injection", service.echo("Great injection"));
     }
 
     @Test
@@ -64,16 +68,16 @@ public class InjectFieldTest {
         ServiceA serviceA = this.context.getBean(ServiceA.class);
 
         //ServiceC dependency
-        Field dependencyC = AbstractService.class.getDeclaredField("serviceC");
-        dependencyC.setAccessible(true);
+        Field depB = ServiceAImpl.class.getDeclaredField("serviceB");
+        depB.setAccessible(true);
 
-        ServiceC serviceC = (ServiceC) dependencyC.get(serviceA);
-        Field dependencyA = serviceC.getClass().getDeclaredField("serviceA");
-        dependencyA.setAccessible(true);
+        ServiceB serviceB = (ServiceB) depB.get(serviceA);
+        Field depA = ServiceBImpl.class.getDeclaredField("serviceA");
+        depA.setAccessible(true);
 
         Assert.assertNotNull(serviceA);
-        Assert.assertNotNull(serviceC);
-        Assert.assertSame("The objects have not the same reference in the cycle", serviceA, dependencyA.get(serviceC));
+        Assert.assertNotNull(serviceB);
+        Assert.assertSame("The objects have not the same reference in the cycle", serviceA, depA.get(serviceB));
     }
 
 }

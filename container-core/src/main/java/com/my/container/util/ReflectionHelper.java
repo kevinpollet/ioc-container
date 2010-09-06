@@ -13,13 +13,41 @@ import java.util.List;
  *
  * @author kevinpollet
  */
-//TODO gestion des exceptions
 public final class ReflectionHelper {
 
     /**
      * This class cannot be instantiated.
      */
     private ReflectionHelper() {
+    }
+
+    /**
+     *
+     * @param beanClass
+     * @param method
+     * @return
+     */
+    // TODO mieux
+    public static boolean isOverriden(final Class<?> beanClass, final Method method) {
+
+        if (!method.getDeclaringClass().equals(beanClass)) {
+            Class<?> currentClass = beanClass;
+
+            do {
+
+               try {
+
+                    currentClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
+                    return true;
+
+                } catch (NoSuchMethodException e) {
+                  currentClass = currentClass.getSuperclass();
+                }
+
+            } while (currentClass.getSuperclass() != null);
+        }
+
+        return false;
     }
 
     /**

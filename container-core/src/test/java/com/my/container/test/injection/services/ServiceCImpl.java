@@ -7,9 +7,6 @@ import javax.inject.Inject;
  */
 public class ServiceCImpl implements ServiceC {
 
-    @Inject
-    private ServiceA serviceA;
-
     @Override
     public String echo(final String echo) {
         return echo;

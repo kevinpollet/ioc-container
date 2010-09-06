@@ -11,18 +11,12 @@ import com.my.container.annotations.interceptors.Interceptors;
 @Interceptors({MockInterceptor.class})
 public class InterceptorServiceImpl implements Service {
 
-    private final String text;
-
-    public InterceptorServiceImpl() {
-        this.text = "Hello";
-    }
-
     public String sayHello() {
-        return this.text;
+        return "Hello";
     }
 
     @ExcludeInterceptors
     public String sayHello(final String name) {
-        return this.text + " " + name;
+        return this.sayHello() + " " + name;
     }
 }

@@ -12,17 +12,23 @@ public class MockInterceptor {
     private final Logger logger = LoggerFactory.getLogger(MockInterceptor.class);
 
     private int beforeNbCall;
+    
     private int afterNbCall;
+
+    public MockInterceptor() {
+        this.beforeNbCall = 0;
+        this.afterNbCall = 0;
+    }
 
     @Before
     public void before(Object instance, Method method, Object[] args) {
-        this.logger.debug("Before : {} on method named {}", new Object[]{instance,method.getName()});
+        this.logger.debug("Before : {} on method named {}", instance, method.getName());
         this.beforeNbCall++;
     }
 
     @After
     public void after(Object instance, Method method, Object[] args) {
-        this.logger.debug("After : {} on method named {}", new Object[]{instance,method.getName()});
+        this.logger.debug("After : {} on method named {}", instance, method.getName());
         this.afterNbCall++;
     }
 
