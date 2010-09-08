@@ -1,11 +1,13 @@
-package com.my.container.test.injection.services;
+package com.my.container.test.injection.services.impl.methods;
+
+import com.my.container.test.injection.services.ServiceC;
 
 import javax.inject.Inject;
 
 /**
  * @author kevinpollet
  */
-public class OverrideMethodService {
+public abstract class MethodOverrideService {
 
     protected int nbCallSetServiceC = 0;
 

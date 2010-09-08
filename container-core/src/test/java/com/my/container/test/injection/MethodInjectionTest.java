@@ -4,11 +4,11 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.test.injection.services.ServiceC;
-import com.my.container.test.injection.services.ServiceCImpl;
 import com.my.container.test.injection.services.ServiceD;
-import com.my.container.test.injection.services.ServiceDImpl;
 import com.my.container.test.injection.services.ServiceE;
-import com.my.container.test.injection.services.ServiceEImpl;
+import com.my.container.test.injection.services.impl.defaults.ServiceCImpl;
+import com.my.container.test.injection.services.impl.methods.MethodServiceDImpl;
+import com.my.container.test.injection.services.impl.methods.MethodServiceEImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,9 +27,9 @@ public class MethodInjectionTest {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(ServiceD.class).to(ServiceDImpl.class);
+                bind(ServiceD.class).to(MethodServiceDImpl.class);
                 bind(ServiceC.class).to(ServiceCImpl.class);
-                bind(ServiceE.class).to(ServiceEImpl.class);
+                bind(ServiceE.class).to(MethodServiceEImpl.class);
             }
         });
     }
@@ -47,11 +47,11 @@ public class MethodInjectionTest {
         ServiceD serviceD = this.context.getBean(ServiceD.class);
 
         //Get depE for serviceD
-        Field depE = ServiceDImpl.class.getDeclaredField("serviceE");
+        Field depE = MethodServiceDImpl.class.getDeclaredField("serviceE");
         depE.setAccessible(true);
 
         //Get depD for serviceE
-        Field depD = ServiceEImpl.class.getDeclaredField("serviceD");
+        Field depD = MethodServiceEImpl.class.getDeclaredField("serviceD");
         depD.setAccessible(true);
 
 
@@ -67,7 +67,7 @@ public class MethodInjectionTest {
         ServiceD service = this.context.getBean(ServiceD.class);
 
         Assert.assertNotNull(service);
-        Assert.assertEquals(1, ((ServiceDImpl) service).getNbCallSetServiceC());
+        Assert.assertEquals(1, ((MethodServiceDImpl) service).getNbCallSetServiceC());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class MethodInjectionTest {
         ServiceE service = this.context.getBean(ServiceE.class);
 
         Assert.assertNotNull(service);
-        Assert.assertEquals(0, ((ServiceEImpl) service).getNbCallSetServiceC());
+        Assert.assertEquals(0, ((MethodServiceEImpl) service).getNbCallSetServiceC());
     }
 
 }

@@ -1,11 +1,13 @@
-package com.my.container.test.injection.services;
+package com.my.container.test.injection.services.impl.fields;
+
+import com.my.container.test.injection.services.ServiceC;
 
 import javax.inject.Inject;
 
 /**
  * @author kevinpollet
  */
-public abstract class AbstractService {
+public abstract class FieldAbstractService {
 
     @Inject
     private ServiceC serviceC;

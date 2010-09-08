@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
  * @author kevinpollet
  */
 //TODO what happens if annotations are in the interface definition ???
+//TODO remove interception of toString, hashcode and equals methods
 public class InterceptorInvocationHandler extends AbstractBeanInvocationHandler {
 
     private Object[] interceptors;

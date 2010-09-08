@@ -1,11 +1,15 @@
-package com.my.container.test.injection.services;
+package com.my.container.test.injection.services.impl.methods;
+
+import com.my.container.test.injection.services.ServiceC;
+import com.my.container.test.injection.services.ServiceD;
+import com.my.container.test.injection.services.ServiceE;
 
 import javax.inject.Inject;
 
 /**
  * @author kevinpollet
  */
-public class ServiceDImpl extends OverrideMethodService implements ServiceD {
+public class MethodServiceDImpl extends MethodOverrideService implements ServiceD {
 
     private ServiceC serviceC;
 

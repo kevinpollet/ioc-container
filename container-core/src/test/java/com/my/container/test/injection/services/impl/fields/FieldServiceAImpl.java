@@ -1,12 +1,16 @@
-package com.my.container.test.injection.services;
+package com.my.container.test.injection.services.impl.fields;
 
+
+import com.my.container.test.injection.services.ServiceA;
+import com.my.container.test.injection.services.ServiceB;
+import com.my.container.test.injection.services.ServiceC;
 
 import javax.inject.Inject;
 
 /**
  * @author kevinpollet
  */
-public class ServiceAImpl extends AbstractService implements ServiceA {
+public class FieldServiceAImpl extends FieldAbstractService implements ServiceA {
 
     @Inject
     private ServiceB serviceB;

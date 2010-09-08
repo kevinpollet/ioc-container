@@ -1,4 +1,6 @@
-package com.my.container.test.injection.services;
+package com.my.container.test.injection.services.impl.defaults;
+
+import com.my.container.test.injection.services.ServiceC;
 
 /**
  * @author kevinpollet

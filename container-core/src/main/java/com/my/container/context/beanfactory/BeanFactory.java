@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,6 +34,7 @@ import java.util.Map;
 //TODO add @Inject constructor, methods, fields injection
 //TODO add @Inject static and instance member
 //TODO cyclic and dependencies
+//TODO static injection
 
 /**
  * The factory of bean class
@@ -126,12 +128,47 @@ public class BeanFactory {
             beanInstance = (T) this.singletonsBean.get(binding);
         } else if (markMap.containsKey(implClass)) {
             beanInstance = (T) markMap.get(implClass);
+            if (beanInstance == null) {
+                throw new BeanDependencyInjectionException("Cyclic dependency injection is not authorized in constructor");
+            }
         } else {
 
             try {
 
-                beanInstance = (T) implClass.newInstance();
 
+                // Inject constructors only first annotated will be used
+                // or default constructor if none have been annotated with
+                //@Inject.
+
+                Constructor<?>[] constructors = implClass.getDeclaredConstructors();
+                for (Constructor<?> constructor : constructors) {
+
+                     if (constructor.isAnnotationPresent(Inject.class) && !Modifier.isPrivate(constructor.getModifiers())) {
+
+                         Class<?>[] types = constructor.getParameterTypes();
+                         if(types.length > 0) {
+                            // Mark constructor because he have dependency with null
+                            markMap.put(implClass, null);
+                         }
+
+                         List<Object> params = new ArrayList<Object>();
+                         for (Class<?> typeClass : types) {
+                             params.add(this.makeInstance(typeClass, markMap, newBeansCreated));
+                         }
+
+                         beanInstance = (T) constructor.newInstance(params.toArray());
+                         break;
+                     }
+
+                }
+
+                // No annotated constructor have been found
+                // call default constructor
+                if (beanInstance == null) {
+                    beanInstance = (T) implClass.newInstance();
+                }
+
+                // Check if class have to be proxied for interceptors
                 if (implClass.isAnnotationPresent(Interceptors.class)) {
                     Class<?>[] interceptorsClass = implClass.getAnnotation(Interceptors.class).value();
                     List<Object> interceptors = new ArrayList<Object>();
@@ -148,8 +185,8 @@ public class BeanFactory {
                 // Inject annotated fields and methods
                 this.injectDependencies(beanInstance, implClass, markMap, newBeansCreated);
 
-                // The bean is created and injected memorize it
-                // to call all PostConstruct when all injections are done.
+                // The bean is created and injected memorize it to call all
+                // PostConstruct when all injections are done.
                 newBeansCreated.add(beanInstance);
 
                 // Hold the singleton reference
@@ -163,6 +200,8 @@ public class BeanFactory {
                 throw new BeanInstantiationException(e);
             } catch (IllegalAccessException e) {
                 throw new BeanInstantiationException(e);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
         }
