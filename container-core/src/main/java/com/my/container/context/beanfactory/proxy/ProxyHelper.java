@@ -23,7 +23,7 @@ public final class ProxyHelper {
      *
      * @param proxyInstance the instance of the proxy
      * @return the proxied instance or the parameter if :
-     *         <li>it doesn't implements {@link com.my.container.context.beanfactory.proxy.AbstractBeanInvocationHandler}</li>
+     *         <li>it doesn't implements {@link AbstractBeanAwareInvocationHandler}</li>
      *         <li>it's not a Java proxy</li>
      *         <p><b>This methods never returns null</b><p>
      * @throws IllegalArgumentException if proxy instance parameter is null
@@ -38,8 +38,8 @@ public final class ProxyHelper {
         if (Proxy.isProxyClass(proxyInstance.getClass())) {
 
             InvocationHandler handler = Proxy.getInvocationHandler(proxyInstance);
-            if (handler instanceof AbstractBeanInvocationHandler) {
-                instance = (T) ((AbstractBeanInvocationHandler) handler).getProxiedInstance();
+            if (handler instanceof AbstractBeanAwareInvocationHandler) {
+                instance = (T) ((AbstractBeanAwareInvocationHandler) handler).getProxiedInstance();
             }
             
         }

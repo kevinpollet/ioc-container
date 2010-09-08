@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationHandler;
  * @author kevinpollet
  *         Date: 22 août 2010
  */
-public abstract class AbstractBeanInvocationHandler implements InvocationHandler {
+public abstract class AbstractBeanAwareInvocationHandler implements InvocationHandler {
 
     private final Object proxiedInstance;
 
@@ -19,7 +19,7 @@ public abstract class AbstractBeanInvocationHandler implements InvocationHandler
      *
      * @param proxiedInstance the instance to be proxied
      */
-    public AbstractBeanInvocationHandler(final Object proxiedInstance) {
+    public AbstractBeanAwareInvocationHandler(final Object proxiedInstance) {
         this.proxiedInstance = proxiedInstance;
     }
 

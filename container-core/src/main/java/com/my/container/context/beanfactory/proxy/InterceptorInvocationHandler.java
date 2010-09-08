@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  */
 //TODO what happens if annotations are in the interface definition ???
 //TODO remove interception of toString, hashcode and equals methods
-public class InterceptorInvocationHandler extends AbstractBeanInvocationHandler {
+public class InterceptorInvocationHandler extends AbstractBeanAwareInvocationHandler {
 
     private Object[] interceptors;
 
@@ -36,10 +36,13 @@ public class InterceptorInvocationHandler extends AbstractBeanInvocationHandler 
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
         Method realMethod = this.getProxiedInstance().getClass().getMethod(method.getName(), method.getParameterTypes());
+        
+        boolean isObjectMethod = method.getDeclaringClass().equals(Object.class);
         boolean isExcludeInterceptor = realMethod.isAnnotationPresent(ExcludeInterceptors.class);
 
-        if (!isExcludeInterceptor) {
+        if (!isObjectMethod && !isExcludeInterceptor) {
             for (Object interceptor : interceptors) {
                 ReflectionHelper.invokeDeclaredMethodWith(Before.class, interceptor, this.getProxiedInstance(), realMethod, args);
             }
@@ -47,7 +50,7 @@ public class InterceptorInvocationHandler extends AbstractBeanInvocationHandler 
 
         Object result = method.invoke(this.getProxiedInstance(), args);
 
-        if (!isExcludeInterceptor) {
+        if (!isObjectMethod && !isExcludeInterceptor) {
             for (Object interceptor : interceptors) {
                 ReflectionHelper.invokeDeclaredMethodWith(After.class, interceptor, this.getProxiedInstance(), realMethod, args);
             }
