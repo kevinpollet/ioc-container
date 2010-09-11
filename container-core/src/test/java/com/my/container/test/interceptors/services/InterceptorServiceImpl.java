@@ -1,7 +1,7 @@
 package com.my.container.test.interceptors.services;
 
-import com.my.container.annotations.interceptors.ExcludeInterceptors;
-import com.my.container.annotations.interceptors.Interceptors;
+import com.my.container.interceptors.annotations.ExcludeInterceptors;
+import com.my.container.interceptors.annotations.Interceptors;
 
 /**
  * A service with interceptors.

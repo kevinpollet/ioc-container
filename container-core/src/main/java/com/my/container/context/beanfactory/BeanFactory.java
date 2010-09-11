@@ -1,12 +1,13 @@
 package com.my.container.context.beanfactory;
 
-import com.my.container.annotations.interceptors.Interceptors;
+import com.my.container.interceptors.annotations.AroundInvoke;
+import com.my.container.interceptors.annotations.Interceptors;
 import com.my.container.binding.Binding;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.context.beanfactory.proxy.InterceptorInvocationHandler;
+import com.my.container.interceptors.BeanInterceptorInvocationHandler;
 import com.my.container.context.beanfactory.proxy.ProxyHelper;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
@@ -31,11 +32,8 @@ import java.util.Map;
 //TODO interceptor verification
 //TODO one instance interceptor for all prototypes ???
 //TODO callbacks method verification
-//TODO add @Inject constructor, methods, fields injection
-//TODO add @Inject static and instance member
-//TODO cyclic and dependencies
-//TODO static injection
-
+//TODO constructor cyclic dependencies
+//TODO refactor interceptor
 /**
  * The factory of bean class
  *
@@ -162,25 +160,36 @@ public class BeanFactory {
 
                 }
 
-                // No annotated constructor have been found
-                // call default constructor
+                // No annotated constructor have been found call default constructor
                 if (beanInstance == null) {
                     beanInstance = (T) implClass.newInstance();
                 }
 
                 // Check if class have to be proxied for interceptors
-                if (implClass.isAnnotationPresent(Interceptors.class)) {
-                    Class<?>[] interceptorsClass = implClass.getAnnotation(Interceptors.class).value();
-                    List<Object> interceptors = new ArrayList<Object>();
+                List<Method> methods = ReflectionHelper.getDeclaredMethodsAnnotatedWith(AroundInvoke.class, implClass);
+                if (implClass.isAnnotationPresent(Interceptors.class) || !methods.isEmpty()) {
 
-                    for (Class<?> c : interceptorsClass) {
-                        interceptors.add(c.newInstance());
+                    Method aroundMethod = null;
+                    List<Object> interceptorsList = new ArrayList<Object>();
+
+                    Interceptors interceptors = implClass.getAnnotation(Interceptors.class);
+                    if (interceptors != null) {
+                        Class<?>[] interceptorsClass = interceptors.value();
+                        for (Class<?> c : interceptorsClass) {
+                            interceptorsList.add(c.newInstance());
+                        }
+                    }
+
+                    if (!methods.isEmpty()) {
+                        aroundMethod = methods.get(0);
                     }
 
                     beanInstance = (T) Proxy.newProxyInstance(implClass.getClassLoader(),
                                                               implClass.getInterfaces(),
-                                                               new InterceptorInvocationHandler(beanInstance, interceptors.toArray()));
+                                                              new BeanInterceptorInvocationHandler(beanInstance, interceptorsList.toArray(), aroundMethod));
+
                 }
+
 
                 // Inject annotated fields and methods
                 this.injectDependencies(beanInstance, implClass, markMap, newBeansCreated);

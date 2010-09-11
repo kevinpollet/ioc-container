@@ -3,7 +3,7 @@ package com.my.container.test.interceptors;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
-import com.my.container.context.beanfactory.proxy.InterceptorInvocationHandler;
+import com.my.container.interceptors.BeanInterceptorInvocationHandler;
 import com.my.container.test.interceptors.services.InterceptorServiceImpl;
 import com.my.container.test.interceptors.services.MockInterceptor;
 import com.my.container.test.interceptors.services.Service;
@@ -41,7 +41,7 @@ public class BeforeTest {
         Assert.assertTrue(Proxy.isProxyClass(service.getClass()));
 
         //GetMock
-        InterceptorInvocationHandler handler = (InterceptorInvocationHandler) Proxy.getInvocationHandler(service);
+        BeanInterceptorInvocationHandler handler = (BeanInterceptorInvocationHandler) Proxy.getInvocationHandler(service);
         Field field = handler.getClass().getDeclaredField("interceptors");
         field.setAccessible(true);
 

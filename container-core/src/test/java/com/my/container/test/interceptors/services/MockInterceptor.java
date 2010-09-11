@@ -1,7 +1,8 @@
 package com.my.container.test.interceptors.services;
 
-import com.my.container.annotations.interceptors.After;
-import com.my.container.annotations.interceptors.Before;
+import com.my.container.interceptors.JoinPoint;
+import com.my.container.interceptors.annotations.After;
+import com.my.container.interceptors.annotations.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,14 +22,14 @@ public class MockInterceptor {
     }
 
     @Before
-    public void before(Object instance, Method method, Object[] args) {
-        this.logger.debug("Before : {} on method named {}", instance, method.getName());
+    public void before(final JoinPoint jointPoint) {
+        this.logger.debug("Before : {} on method named {}", jointPoint.getTarget(), jointPoint.getMethod().getName());
         this.beforeNbCall++;
     }
 
     @After
-    public void after(Object instance, Method method, Object[] args) {
-        this.logger.debug("After : {} on method named {}", instance, method.getName());
+    public void after(final JoinPoint jointPoint) {
+        this.logger.debug("After : {} on method named {}", jointPoint.getTarget(), jointPoint.getMethod().getName());
         this.afterNbCall++;
     }
 
