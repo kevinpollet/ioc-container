@@ -18,14 +18,13 @@ public final class ProxyHelper {
     }
 
     /**
-     * This method return the proxied instance of the {@linkplain java.lang.reflect.Proxy Java Proxy}
+     * This method returns the proxied instance of the {@linkplain java.lang.reflect.Proxy Java Proxy}
      * in parameter.
      *
      * @param proxyInstance the instance of the proxy
-     * @return the proxied instance or the parameter if :
-     *         <li>it doesn't implements {@link AbstractBeanAwareInvocationHandler}</li>
-     *         <li>it's not a Java proxy</li>
-     *         <p><b>This methods never returns null</b><p>
+     * @return The proxied instance or the parameter instance if :
+     *         <ul><li>it doesn't implements {@link AbstractBeanAwareInvocationHandler}</li>
+     *         <li>it's not a Java proxy</li></ul>
      * @throws IllegalArgumentException if proxy instance parameter is null
      */
     public static <T> T getTargetObject(final T proxyInstance) {
@@ -36,15 +35,34 @@ public final class ProxyHelper {
         T instance = proxyInstance;
 
         if (Proxy.isProxyClass(proxyInstance.getClass())) {
-
             InvocationHandler handler = Proxy.getInvocationHandler(proxyInstance);
             if (handler instanceof AbstractBeanAwareInvocationHandler) {
                 instance = (T) ((AbstractBeanAwareInvocationHandler) handler).getProxiedInstance();
             }
-            
         }
 
         return instance;
+    }
+
+    /**
+     * <p>
+     * Get the target class of the object being proxied
+     * by the proxy in parameter.
+     * </p>
+     *
+     * @param proxyInstance the proxy instance
+     * @return The proxied class or the parameter class instance if :
+     *         <ul><li>it doesn't implements {@link AbstractBeanAwareInvocationHandler}</li>
+     *         <li>it's not a Java proxy</li></ul>
+     * @throws IllegalArgumentException if the proxy instance parameter is null
+     */
+    public static Class<?> getTargetClass(final Object proxyInstance) {
+        if (proxyInstance == null) {
+            throw new IllegalArgumentException("The proxy instance canot be null");
+        }
+
+        Object target = ProxyHelper.getTargetObject(proxyInstance);
+        return target.getClass();
     }
 
 }
