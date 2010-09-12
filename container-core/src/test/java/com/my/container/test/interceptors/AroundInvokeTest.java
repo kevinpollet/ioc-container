@@ -5,7 +5,6 @@ import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.proxy.ProxyHelper;
 import com.my.container.test.interceptors.services.AroundInvokeServiceImpl;
-import com.my.container.test.interceptors.services.InterceptorServiceImpl;
 import com.my.container.test.interceptors.services.Service;
 import org.junit.Assert;
 import org.junit.Before;

@@ -53,8 +53,10 @@ public final class ReflectionHelper {
     }
 
     /**
+     * <p>
      * Get all methods declared in the class
      * who are annotated by this annotation.
+     * </p>
      *
      * @param annotation the annotation class
      * @param clazz      the class
@@ -73,10 +75,12 @@ public final class ReflectionHelper {
     }
 
     /**
+     * <p>
      * Call the first declared method with the given
      * annotation. This method called only the declared
      * public, private and protected method in the given
      * class.
+     * </p>
      *
      * @param annotation the annotation
      * @param instance   the instance to call on

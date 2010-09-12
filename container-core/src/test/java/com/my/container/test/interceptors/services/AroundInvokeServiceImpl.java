@@ -2,7 +2,6 @@ package com.my.container.test.interceptors.services;
 
 import com.my.container.interceptors.ProceedingJoinPoint;
 import com.my.container.interceptors.annotations.AroundInvoke;
-import com.my.container.interceptors.JoinPoint;
 
 /**
  * @author kevinpollet

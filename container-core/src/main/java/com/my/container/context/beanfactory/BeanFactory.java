@@ -1,14 +1,14 @@
 package com.my.container.context.beanfactory;
 
-import com.my.container.interceptors.annotations.AroundInvoke;
-import com.my.container.interceptors.annotations.Interceptors;
 import com.my.container.binding.Binding;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.interceptors.BeanInterceptorInvocationHandler;
 import com.my.container.context.beanfactory.proxy.ProxyHelper;
+import com.my.container.interceptors.BeanInterceptorInvocationHandler;
+import com.my.container.interceptors.annotations.AroundInvoke;
+import com.my.container.interceptors.annotations.Interceptors;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,6 @@ import java.util.Map;
 
 
 //TODO interceptor verification
-//TODO one instance interceptor for all prototypes ???
 //TODO callbacks method verification
 //TODO constructor cyclic dependencies
 //TODO refactor interceptor

@@ -6,8 +6,6 @@ import com.my.container.interceptors.annotations.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-
 public class MockInterceptor {
 
     private final Logger logger = LoggerFactory.getLogger(MockInterceptor.class);
