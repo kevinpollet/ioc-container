@@ -44,8 +44,8 @@ public class ApplicationContext implements Context {
      * {@inheritDoc}
      */
     @Override
-    public void injectBeanDependencies(final Object instance) {
-        throw  new NotImplementedException();
+    public void resolveBeanDependencies(final Object bean) {
+        this.factory.resolveDependencies(bean);
     }
 
     /**

@@ -103,6 +103,35 @@ public class BeanFactory {
     }
 
     /**
+     * <p>
+     * This method permits to resolve dependencies of an
+     * existing bean. Generally this bean was created with
+     * the Java new operator.
+     * </p>
+     *
+     * @param bean the existing bean
+     */
+    public void resolveDependencies(final Object bean) {
+
+        List<Object> newlyCreatedBean = new ArrayList<Object>();
+        this.injectDependencies(bean, bean.getClass(), new HashMap<Class<?>, Object>(), newlyCreatedBean);
+        
+        // All objects are injected call the PostContruct methods in the right order
+        try {
+
+            for (Object instance : newlyCreatedBean) {
+                ReflectionHelper.invokeDeclaredMethodWith(PostConstruct.class, ProxyHelper.getTargetObject(instance));
+            }
+
+        } catch (InvocationTargetException e) {
+            throw new CallbackInvocationException(e);
+        } catch (IllegalAccessException e) {
+            throw new CallbackInvocationException(e);
+        }
+
+    }
+
+    /**
      * This method create a bean from it's interface. Check the
      *
      * @param clazz           the interface class

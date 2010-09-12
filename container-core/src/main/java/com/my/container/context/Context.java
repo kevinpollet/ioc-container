@@ -17,12 +17,12 @@ public interface Context {
     public <T> T getBean(final Class<T> clazz);
 
     /**
-     * This method is used to inject dependencies in a bean
-     * instance (Method and fields).
+     * This method is used to inject dependencies in an
+     * existing bean instance (Method and fields).
      *
-     * @param instance the bean instance to be injected
+     * @param bean the instance to be injected
      */
-    public void injectBeanDependencies(final Object instance);
+    public void resolveBeanDependencies(final Object bean);
 
     /**
      * Register a JVM ShutDown Hook.

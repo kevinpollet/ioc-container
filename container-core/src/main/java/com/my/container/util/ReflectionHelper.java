@@ -8,8 +8,10 @@ import java.util.List;
 
 
 /**
+ * <p>
  * Helper who provides useful
  * methods for reflection.
+ * </p>
  *
  * @author kevinpollet
  */

@@ -80,4 +80,24 @@ public class FieldInjectionTest {
         Assert.assertSame("The objects have not the same reference in the cycle", serviceA, depA.get(serviceB));
     }
 
+    @Test
+    public void testExistingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
+        ServiceA service = new FieldServiceAImpl();
+        this.context.resolveBeanDependencies(service);
+
+        //Get dependency
+        Field depB = service.getClass().getDeclaredField("serviceB");
+        depB.setAccessible(true);
+
+        Field depC = service.getClass().getDeclaredField("serviceC");
+        depC.setAccessible(true);
+
+        Assert.assertNotNull(service);
+        Assert.assertNotNull("Dependency is null", depB.get(service));
+        Assert.assertNotNull("Dependency is null", depC.get(service));
+        Assert.assertEquals("Hello Injection", service.sayHelloTo("Injection"));
+        Assert.assertEquals("Great injection", service.echo("Great injection"));
+    }
+    
+
 }

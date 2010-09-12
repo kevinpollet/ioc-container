@@ -78,4 +78,13 @@ public class MethodInjectionTest {
         Assert.assertEquals(0, ((MethodServiceEImpl) service).getNbCallSetServiceC());
     }
 
+    @Test
+    public void testExistingMethodInjection() {
+        ServiceD service = new MethodServiceDImpl();
+        this.context.resolveBeanDependencies(service);
+
+        Assert.assertNotNull(service);
+        Assert.assertEquals("Great Method Injection", service.echo("Great Method Injection"));
+    }
+
 }
