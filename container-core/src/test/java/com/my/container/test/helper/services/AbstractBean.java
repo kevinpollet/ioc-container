@@ -1,4 +1,4 @@
-package com.my.container.test.helper.servcices;
+package com.my.container.test.helper.services;
 
 /**
  * @author kevinpollet

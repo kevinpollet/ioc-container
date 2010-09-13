@@ -1,7 +1,7 @@
 package com.my.container.test.helper;
 
-import com.my.container.test.helper.servcices.AbstractBean;
-import com.my.container.test.helper.servcices.ConcreteBeanImpl;
+import com.my.container.test.helper.services.AbstractBean;
+import com.my.container.test.helper.services.ConcreteBeanImpl;
 import com.my.container.util.ReflectionHelper;
 import org.junit.Assert;
 import org.junit.Test;
