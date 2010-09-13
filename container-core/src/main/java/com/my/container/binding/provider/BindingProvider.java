@@ -73,7 +73,7 @@ public abstract class BindingProvider {
          * @param impl the implementation
          */
         public final void to(final Class<? extends T> impl) {
-            bindings.add(new Binding(this.intf, impl));
+            bindings.add(new Binding<T>(this.intf, impl));
         }
     }
 

@@ -5,10 +5,10 @@ package com.my.container.binding;
  * 
  * @author kevinpollet
  */
-public class Binding {
+public class Binding<T> {
 
-    private Class<?> intf;
-    private Class<?> impl;
+    private Class<T> intf;
+    private Class<? extends T> impl;
 
     /**
      * Create a binding.
@@ -16,7 +16,7 @@ public class Binding {
      * @param intf the binding interface
      * @param impl the binding implementation
      */
-    public Binding(final Class<?> intf, final Class<?> impl) {
+    public Binding(final Class<T> intf, final Class<? extends T> impl) {
         this.intf = intf;
         this.impl = impl;
     }
@@ -26,7 +26,7 @@ public class Binding {
      *
      * @return the interface class
      */
-    public Class<?> getInterface() {
+    public Class<T> getInterface() {
         return this.intf;
     }
 
@@ -35,7 +35,7 @@ public class Binding {
      *
      * @return the implementation class
      */
-    public Class<?> getImplementation() {
+    public Class<? extends T> getImplementation() {
         return this.impl;
     }
 
@@ -44,7 +44,7 @@ public class Binding {
      *
      * @param intf the binding interface class
      */
-    public void setInterface(final Class<?> intf) {
+    public void setInterface(final Class<T> intf) {
         this.intf = intf;
     }
 
@@ -53,7 +53,7 @@ public class Binding {
      *
      * @param impl the implementation class
      */
-    public void setImplementation(final Class<?> impl) {
+    public void setImplementation(final Class<? extends T> impl) {
         this.impl = impl;
     }
 
