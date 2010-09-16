@@ -5,10 +5,10 @@ import com.my.container.test.injection.services.ServiceC;
 /**
  * @author kevinpollet
  */
-public class ServiceCImpl implements ServiceC {
+public class UpperEchoServiceC implements ServiceC {
 
     @Override
-    public String echo(final String echo) {
-        return echo;
+    public String echo(String echo) {
+        return echo.toUpperCase();
     }
 }

@@ -4,6 +4,7 @@ import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Implementation of the Service D.

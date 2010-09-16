@@ -3,10 +3,13 @@ package com.my.container.test.injection;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
+import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
 import com.my.container.test.injection.services.ServiceE;
-import com.my.container.test.injection.services.impl.defaults.ServiceCImpl;
+import com.my.container.test.injection.services.impl.defaults.LowerServiceC;
+import com.my.container.test.injection.services.impl.defaults.UpperEchoServiceC;
+import com.my.container.test.injection.services.impl.methods.MethodServiceAImpl;
 import com.my.container.test.injection.services.impl.methods.MethodServiceDImpl;
 import com.my.container.test.injection.services.impl.methods.MethodServiceEImpl;
 import org.junit.Assert;
@@ -27,8 +30,10 @@ public class MethodInjectionTest {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
+                bind(ServiceA.class).to(MethodServiceAImpl.class);
                 bind(ServiceD.class).to(MethodServiceDImpl.class);
-                bind(ServiceC.class).to(ServiceCImpl.class);
+                bind(ServiceC.class).to(LowerServiceC.class);
+                bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
                 bind(ServiceE.class).to(MethodServiceEImpl.class);
             }
         });
@@ -85,6 +90,14 @@ public class MethodInjectionTest {
 
         Assert.assertNotNull(service);
         Assert.assertEquals("Great Method Injection", service.echo("Great Method Injection"));
+    }
+
+    @Test
+    public void testNamedMethodInjection() {
+        ServiceA service = this.context.getBean(ServiceA.class);
+
+        Assert.assertNotNull(service);
+        Assert.assertEquals("ECHO", service.echo("echo"));
     }
 
 }

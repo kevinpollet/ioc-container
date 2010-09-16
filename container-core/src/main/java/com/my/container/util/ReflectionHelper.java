@@ -8,10 +8,8 @@ import java.util.List;
 
 
 /**
- * <p>
  * Helper who provides useful
  * methods for reflection.
- * </p>
  *
  * @author kevinpollet
  */
@@ -24,22 +22,24 @@ public final class ReflectionHelper {
     }
 
     /**
+     * This method permits to know if a method is
+     * overriden by subclass.
      *
-     * @param beanClass
-     * @param method
-     * @return
+     * @param targetClass the child bean class
+     * @param method the method to test
+     * @return true is the method is overriden in subclass
      */
-    // TODO mieux
-    public static boolean isOverriden(final Class<?> beanClass, final Method method) {
+    public static boolean isOverriden(final Class<?> targetClass, final Method method) {
 
-        if (!method.getDeclaringClass().equals(beanClass)) {
-            Class<?> currentClass = beanClass;
+        if (!method.getDeclaringClass().equals(targetClass)) {
+            Class<?> currentClass = targetClass;
 
             do {
 
                try {
 
                     currentClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
+                   System.out.println(currentClass);
                     return true;
 
                 } catch (NoSuchMethodException e) {
@@ -53,10 +53,8 @@ public final class ReflectionHelper {
     }
 
     /**
-     * <p>
      * Get all methods declared in the class
      * who are annotated by this annotation.
-     * </p>
      *
      * @param annotation the annotation class
      * @param clazz      the class
@@ -75,12 +73,10 @@ public final class ReflectionHelper {
     }
 
     /**
-     * <p>
      * Call the first declared method with the given
      * annotation. This method called only the declared
      * public, private and protected method in the given
      * class.
-     * </p>
      *
      * @param annotation the annotation
      * @param instance   the instance to call on

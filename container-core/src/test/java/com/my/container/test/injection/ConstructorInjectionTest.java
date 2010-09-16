@@ -4,15 +4,18 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
+import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
-import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
+import com.my.container.test.injection.services.ServiceE;
 import com.my.container.test.injection.services.impl.constructors.ConstructorServiceAImpl;
 import com.my.container.test.injection.services.impl.constructors.ConstructorServiceBImpl;
 import com.my.container.test.injection.services.impl.constructors.ConstructorServiceCImpl;
 import com.my.container.test.injection.services.impl.constructors.ConstructorServiceDImpl;
-import com.my.container.test.injection.services.impl.defaults.ServiceCImpl;
+import com.my.container.test.injection.services.impl.constructors.ConstructorServiceEImpl;
+import com.my.container.test.injection.services.impl.defaults.LowerServiceC;
+import com.my.container.test.injection.services.impl.defaults.UpperEchoServiceC;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,7 +32,7 @@ public class ConstructorInjectionTest {
             @Override
             public void configureBindings() {
                 bind(ServiceD.class).to(ConstructorServiceDImpl.class);
-                bind(ServiceC.class).to(ServiceCImpl.class);
+                bind(ServiceC.class).to(LowerServiceC.class);
             }
         });
 
@@ -65,6 +68,23 @@ public class ConstructorInjectionTest {
 
         Assert.assertNotNull(serviceC);
         Assert.assertEquals("Echo", serviceC.echo("Echo"));
+    }
+
+    @Test
+    public void testNamedConstructorInjection() {
+        Context context = new ApplicationContext(new BindingProvider(){
+            @Override
+            public void configureBindings() {
+                bind(ServiceE.class).to(ConstructorServiceEImpl.class);
+                bind(ServiceC.class).to(ConstructorServiceCImpl.class);
+                bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
+            }
+        });
+
+        ServiceE serviceE = context.getBean(ServiceE.class);
+
+        Assert.assertNotNull(serviceE);
+        Assert.assertEquals("ECHO", serviceE.echo("echo"));
     }
 
 }

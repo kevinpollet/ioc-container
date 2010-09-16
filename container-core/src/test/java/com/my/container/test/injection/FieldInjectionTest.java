@@ -3,13 +3,16 @@ package com.my.container.test.injection;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
+import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
-import com.my.container.test.injection.services.ServiceC;
-import com.my.container.test.injection.services.impl.defaults.ServiceCImpl;
+import com.my.container.test.injection.services.ServiceD;
+import com.my.container.test.injection.services.impl.defaults.LowerServiceC;
+import com.my.container.test.injection.services.impl.defaults.UpperEchoServiceC;
 import com.my.container.test.injection.services.impl.fields.FieldAbstractService;
 import com.my.container.test.injection.services.impl.fields.FieldServiceAImpl;
 import com.my.container.test.injection.services.impl.fields.FieldServiceBImpl;
+import com.my.container.test.injection.services.impl.fields.FieldServiceDImpl;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +34,9 @@ public class FieldInjectionTest {
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
                 bind(ServiceB.class).to(FieldServiceBImpl.class);
-                bind(ServiceC.class).to(ServiceCImpl.class);
+                bind(ServiceC.class).to(LowerServiceC.class);
+                bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
+                bind(ServiceD.class).to(FieldServiceDImpl.class);
             }
         });
     }
@@ -99,5 +104,12 @@ public class FieldInjectionTest {
         Assert.assertEquals("Great injection", service.echo("Great injection"));
     }
     
+    @Test
+    public void testNamedBindingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
+        ServiceD serviceD = this.context.getBean(ServiceD.class);
+
+        Assert.assertNotNull(serviceD);
+        Assert.assertEquals("ECHO", serviceD.echo("echo"));
+    }
 
 }

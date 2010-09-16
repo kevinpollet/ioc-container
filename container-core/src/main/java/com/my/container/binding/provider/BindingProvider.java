@@ -37,8 +37,8 @@ public abstract class BindingProvider {
      * @param intf the binding interface
      * @return the binding builder
      */
-    protected final <T> InnerBindingBuilder<T> bind(final Class<T> intf) {
-        return this.new InnerBindingBuilder<T>(intf);
+    protected final <T> BasicBindingBuilder<T> bind(final Class<T> intf) {
+        return this.new BasicBindingBuilder(new Binding(intf, null));
     }
 
     /**
@@ -51,30 +51,69 @@ public abstract class BindingProvider {
 
 
     /**
-     * The binding builder inner class
+     * The basic binding builder inner class.
      */
-    protected final class InnerBindingBuilder<T> {
+    protected final class BasicBindingBuilder<T> {
 
         /**
-         * The binding interface class.
+         * The binding to be built.
          */
-        private Class<T> intf;
+        private Binding binding;
 
         /**
-         * The InnerBindingBuilder constructor.
-         * @param intf the binding interface
+         * The BasicBindingBuilder constructor.
+         * 
+         * @param binding the binding to be build
          */
-        private InnerBindingBuilder(final Class<T> intf) {
-            this.intf = intf;
+        private BasicBindingBuilder(final Binding binding) {
+            this.binding = binding;
         }
 
         /**
-         * The binding implementation
+         * The binding implementation.
+         *
          * @param impl the implementation
          */
-        public final void to(final Class<? extends T> impl) {
-            bindings.add(new Binding<T>(this.intf, impl));
+        public final QualifierBindingBuilder to(final Class<? extends T> impl) {
+            this.binding.setImplementation(impl);
+
+            // Binding can be added because a binding
+            // is valid with no qualifier.
+            BindingProvider.this.bindings.add(binding);
+
+            return  BindingProvider.this.new QualifierBindingBuilder(this.binding);
         }
+    }
+
+    /**
+     * The qualifier binding builder inner class .
+     */
+    protected final class QualifierBindingBuilder {
+
+        /**
+         * The binding to be build.
+         */
+        private Binding binding;
+
+        /**
+         * Create a QualifierBindingBuilder.
+         *
+         * @param binding the binding to be built.
+         */
+        public QualifierBindingBuilder(final Binding binding) {
+            this.binding = binding;
+        }
+
+        /**
+         * The binding Named qualifier.
+         * @see javax.inject.Named
+         *
+         * @param named the Named qualifier binding named
+         */
+        public final void named(final String named) {
+            this.binding.setNamed(named);
+        }
+
     }
 
 }
