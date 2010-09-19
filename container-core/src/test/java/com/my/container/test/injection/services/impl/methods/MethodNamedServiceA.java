@@ -9,7 +9,7 @@ import javax.inject.Named;
 /**
  * @author kevinpollet
  */
-public class MethodServiceAImpl implements ServiceA {
+public class MethodNamedServiceA implements ServiceA {
 
     private ServiceC serviceC;
 

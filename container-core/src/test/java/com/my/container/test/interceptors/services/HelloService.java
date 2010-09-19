@@ -3,7 +3,7 @@ package com.my.container.test.interceptors.services;
 /**
  * The basic service contract.
  */
-public interface Service {
+public interface HelloService {
 
     public String sayHello();
 

@@ -27,9 +27,9 @@ public final class ReflectionHelper {
      *
      * @param targetClass the child bean class
      * @param method the method to test
-     * @return true is the method is overriden in subclass
+     * @return true is the method is overridden in subclass
      */
-    public static boolean isOverriden(final Class<?> targetClass, final Method method) {
+    public static boolean isOverridden(final Class<?> targetClass, final Method method) {
 
         if (!method.getDeclaringClass().equals(targetClass)) {
             Class<?> currentClass = targetClass;

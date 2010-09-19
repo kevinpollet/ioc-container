@@ -4,8 +4,8 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.proxy.ProxyHelper;
-import com.my.container.test.interceptors.services.AroundInvokeServiceImpl;
-import com.my.container.test.interceptors.services.Service;
+import com.my.container.test.interceptors.services.HelloService;
+import com.my.container.test.interceptors.services.impl.HelloServiceWithAroundInvoke;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,20 +22,20 @@ public class AroundInvokeTest {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(Service.class).to(AroundInvokeServiceImpl.class);
+                bind(HelloService.class).to(HelloServiceWithAroundInvoke.class);
             }
         });
     }
 
     @Test
-    public void testAroundInvoke() {
-        Service service = this.context.getBean(Service.class);
+    public void testAroundInvokeInterceptor() {
+        HelloService service = this.context.getBean(HelloService.class);
 
         Assert.assertNotNull(service);
         Assert.assertEquals("Hello", service.sayHello());
         Assert.assertEquals("Hello AroundInvoke", service.sayHello("AroundInvoke"));
-        Assert.assertEquals(2, ((AroundInvokeServiceImpl) ProxyHelper.getTargetObject(service)).getBeforeCall());
-        Assert.assertEquals(2, ((AroundInvokeServiceImpl) ProxyHelper.getTargetObject(service)).getAfterCall());
+        Assert.assertEquals(2, ((HelloServiceWithAroundInvoke) ProxyHelper.getTargetObject(service)).getBeforeCall());
+        Assert.assertEquals(2, ((HelloServiceWithAroundInvoke) ProxyHelper.getTargetObject(service)).getAfterCall());
     }
     
 }

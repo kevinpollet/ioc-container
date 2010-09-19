@@ -1,12 +1,16 @@
-package com.my.container.test.interceptors.services;
+package com.my.container.test.interceptors.services.impl;
 
 import com.my.container.interceptors.ProceedingJoinPoint;
 import com.my.container.interceptors.annotations.AroundInvoke;
+import com.my.container.test.interceptors.services.HelloService;
 
 /**
+ * The Hello service implementation
+ * with an @AroundInvoke method.
+ * 
  * @author kevinpollet
  */
-public class AroundInvokeServiceImpl implements Service {
+public class HelloServiceWithAroundInvoke implements HelloService {
 
     private int beforeCall = 0;
 

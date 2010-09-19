@@ -2,17 +2,17 @@ package com.my.container.test.injection.services.impl.fields;
 
 import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
+import com.my.container.test.injection.services.impl.LowerEcho;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * @author kevinpollet
  */
-public class FieldServiceDImpl implements ServiceD {
+public class FieldQualifierServiceD implements ServiceD {
 
     @Inject
-    @Named("upperEchoService")
+    @LowerEcho
     private ServiceC serviceC;
 
     @Override

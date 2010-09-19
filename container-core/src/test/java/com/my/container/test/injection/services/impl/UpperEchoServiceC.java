@@ -1,4 +1,4 @@
-package com.my.container.test.injection.services.impl.defaults;
+package com.my.container.test.injection.services.impl;
 
 import com.my.container.test.injection.services.ServiceC;
 

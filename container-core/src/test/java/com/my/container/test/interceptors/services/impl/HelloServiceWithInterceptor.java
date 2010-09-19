@@ -1,7 +1,8 @@
-package com.my.container.test.interceptors.services;
+package com.my.container.test.interceptors.services.impl;
 
 import com.my.container.interceptors.annotations.ExcludeInterceptors;
 import com.my.container.interceptors.annotations.Interceptors;
+import com.my.container.test.interceptors.services.HelloService;
 
 /**
  * A service with interceptors.
@@ -9,7 +10,7 @@ import com.my.container.interceptors.annotations.Interceptors;
  * @author kevinpollet
  */
 @Interceptors({MockInterceptor.class})
-public class InterceptorServiceImpl implements Service {
+public class HelloServiceWithInterceptor implements HelloService {
 
     public String sayHello() {
         return "Hello";

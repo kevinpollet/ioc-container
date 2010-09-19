@@ -9,13 +9,15 @@ import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
 import com.my.container.test.injection.services.ServiceD;
 import com.my.container.test.injection.services.ServiceE;
+import com.my.container.test.injection.services.impl.EchoServiceC;
+import com.my.container.test.injection.services.impl.LowerEcho;
+import com.my.container.test.injection.services.impl.constructors.ConstructorNamedServiceE;
+import com.my.container.test.injection.services.impl.constructors.ConstructorQualifierServiceE;
 import com.my.container.test.injection.services.impl.constructors.ConstructorServiceAImpl;
 import com.my.container.test.injection.services.impl.constructors.ConstructorServiceBImpl;
 import com.my.container.test.injection.services.impl.constructors.ConstructorServiceCImpl;
 import com.my.container.test.injection.services.impl.constructors.ConstructorServiceDImpl;
-import com.my.container.test.injection.services.impl.constructors.ConstructorServiceEImpl;
-import com.my.container.test.injection.services.impl.defaults.LowerServiceC;
-import com.my.container.test.injection.services.impl.defaults.UpperEchoServiceC;
+import com.my.container.test.injection.services.impl.UpperEchoServiceC;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,7 +34,7 @@ public class ConstructorInjectionTest {
             @Override
             public void configureBindings() {
                 bind(ServiceD.class).to(ConstructorServiceDImpl.class);
-                bind(ServiceC.class).to(LowerServiceC.class);
+                bind(ServiceC.class).to(EchoServiceC.class);
             }
         });
 
@@ -75,9 +77,26 @@ public class ConstructorInjectionTest {
         Context context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(ServiceE.class).to(ConstructorServiceEImpl.class);
+                bind(ServiceE.class).to(ConstructorQualifierServiceE.class);
                 bind(ServiceC.class).to(ConstructorServiceCImpl.class);
                 bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
+            }
+        });
+
+        ServiceE serviceE = context.getBean(ServiceE.class);
+
+        Assert.assertNotNull(serviceE);
+        Assert.assertEquals("ECHO", serviceE.echo("echo"));
+    }
+
+    @Test
+    public void testCustomQualifierConstructorInjection() {
+        Context context = new ApplicationContext(new BindingProvider(){
+            @Override
+            public void configureBindings() {
+                bind(ServiceE.class).to(ConstructorNamedServiceE.class);
+                bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
+                bind(ServiceC.class).to(UpperEchoServiceC.class).qualifiedBy(LowerEcho.class);
             }
         });
 

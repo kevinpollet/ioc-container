@@ -1,12 +1,14 @@
 package com.my.container.test.helper;
 
-import com.my.container.test.helper.services.AbstractBean;
-import com.my.container.test.helper.services.ConcreteBeanImpl;
+import com.my.container.test.helper.services.impl.AbstractBean;
+import com.my.container.test.helper.services.impl.ConcreteBeanImpl;
 import com.my.container.util.ReflectionHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * Test the helper class behaviour.
+ * 
  * @author kevinpollet
  */
 public class ReflectionHelperTest {
@@ -14,17 +16,17 @@ public class ReflectionHelperTest {
 
     @Test
     public void testMethodNotOverridedIsOverriden() throws NoSuchMethodException {
-        Assert.assertFalse(ReflectionHelper.isOverriden(ConcreteBeanImpl.class, ConcreteBeanImpl.class.getDeclaredMethod("getSecondText")));
+        Assert.assertFalse(ReflectionHelper.isOverridden(ConcreteBeanImpl.class, ConcreteBeanImpl.class.getDeclaredMethod("getNotOverriddenText")));
     }
 
     @Test
     public void testPublicMethodIsOverriden() throws NoSuchMethodException {
-        Assert.assertTrue(ReflectionHelper.isOverriden(ConcreteBeanImpl.class, AbstractBean.class.getDeclaredMethod("getText")));
+        Assert.assertTrue(ReflectionHelper.isOverridden(ConcreteBeanImpl.class, AbstractBean.class.getDeclaredMethod("getOverriddenPublicText")));
     }
 
     @Test
     public void testProtectedMethodIsOverriden() throws NoSuchMethodException {
-        Assert.assertTrue(ReflectionHelper.isOverriden(ConcreteBeanImpl.class, AbstractBean.class.getDeclaredMethod("getProtectedText")));
+        Assert.assertTrue(ReflectionHelper.isOverridden(ConcreteBeanImpl.class, AbstractBean.class.getDeclaredMethod("getOverriddenProtectedText")));
     }
 
 }

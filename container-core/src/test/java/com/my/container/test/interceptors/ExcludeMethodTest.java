@@ -4,9 +4,9 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.interceptors.BeanInterceptorInvocationHandler;
-import com.my.container.test.interceptors.services.InterceptorServiceImpl;
-import com.my.container.test.interceptors.services.MockInterceptor;
-import com.my.container.test.interceptors.services.Service;
+import com.my.container.test.interceptors.services.HelloService;
+import com.my.container.test.interceptors.services.impl.HelloServiceWithInterceptor;
+import com.my.container.test.interceptors.services.impl.MockInterceptor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,14 +26,14 @@ public class ExcludeMethodTest {
         this.context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(Service.class).to(InterceptorServiceImpl.class);
+                bind(HelloService.class).to(HelloServiceWithInterceptor.class);
             }
         });
     }
 
     @Test
     public void testExcludeMethodInterceptor() throws NoSuchFieldException, IllegalAccessException {
-        Service service = this.context.getBean(Service.class);
+        HelloService service = this.context.getBean(HelloService.class);
 
         Assert.assertNotNull(service);
         Assert.assertTrue(Proxy.isProxyClass(service.getClass()));
@@ -53,10 +53,5 @@ public class ExcludeMethodTest {
         Assert.assertEquals(0, mock.getBeforeNbCall());
         Assert.assertEquals(0, mock.getAfterNbCall());
     }
-
-
-
-
-
     
 }

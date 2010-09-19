@@ -1,4 +1,4 @@
-package com.my.container.test.interceptors.services;
+package com.my.container.test.interceptors.services.impl;
 
 import com.my.container.interceptors.JoinPoint;
 import com.my.container.interceptors.annotations.After;

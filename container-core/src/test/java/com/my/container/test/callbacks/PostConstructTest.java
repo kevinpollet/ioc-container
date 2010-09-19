@@ -4,9 +4,9 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.test.callbacks.services.Leaf;
-import com.my.container.test.callbacks.services.LeafImpl;
+import com.my.container.test.callbacks.services.impl.LeafImpl;
 import com.my.container.test.callbacks.services.Parent;
-import com.my.container.test.callbacks.services.ParentImpl;
+import com.my.container.test.callbacks.services.impl.ParentImpl;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,8 +44,8 @@ public class PostConstructTest {
         Parent parent = this.context.getBean(Parent.class);
 
         Assert.assertNotNull(parent);
-        Assert.assertEquals("Parent", parent.getReference());
-        Assert.assertEquals("Leaf", parent.getLeafReference());
+        Assert.assertEquals("Parent", parent.getName());
+        Assert.assertEquals("Leaf", parent.getLeafName());
     }
 
 }

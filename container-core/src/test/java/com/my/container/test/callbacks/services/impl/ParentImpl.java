@@ -1,22 +1,23 @@
-package com.my.container.test.callbacks.services;
+package com.my.container.test.callbacks.services.impl;
+
+import com.my.container.test.callbacks.services.Leaf;
+import com.my.container.test.callbacks.services.Parent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 /**
- * Implementation of the Basic service.
- * 
  * @author kevinpollet
  */
 public class ParentImpl implements Parent {
 
-    private String reference;
+    private String name;
 
-    private String leafReference;
+    private String leafName;
 
     @Inject
-    private Leaf leaf; 
+    private Leaf leaf;
 
     private int nbCallPostConstruct;
     private int nbCallPreDestroy;
@@ -29,18 +30,18 @@ public class ParentImpl implements Parent {
     @PostConstruct
     private void init() {
         this.nbCallPostConstruct++;
-        this.reference = "Parent";
-        this.leafReference = this.leaf.getReference();
+        this.name = "Parent";
+        this.leafName = this.leaf.getName();
     }
 
     @Override
-    public String getReference() {
-        return this.reference;
+    public String getName() {
+        return this.name;
     }
 
     @Override
-    public String getLeafReference() {
-        return this.leafReference;
+    public String getLeafName() {
+        return this.leafName;
     }
 
     public int getNbCallPostConstruct() {

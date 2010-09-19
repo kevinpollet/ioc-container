@@ -7,13 +7,15 @@ import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
 import com.my.container.test.injection.services.ServiceE;
-import com.my.container.test.injection.services.impl.defaults.LowerServiceC;
-import com.my.container.test.injection.services.impl.defaults.UpperEchoServiceC;
-import com.my.container.test.injection.services.impl.methods.MethodServiceAImpl;
+import com.my.container.test.injection.services.impl.EchoServiceC;
+import com.my.container.test.injection.services.impl.LowerEcho;
+import com.my.container.test.injection.services.impl.LowerEchoServiceC;
+import com.my.container.test.injection.services.impl.UpperEchoServiceC;
+import com.my.container.test.injection.services.impl.methods.MethodNamedServiceA;
 import com.my.container.test.injection.services.impl.methods.MethodServiceDImpl;
 import com.my.container.test.injection.services.impl.methods.MethodServiceEImpl;
+import com.my.container.test.injection.services.impl.methods.MethodQualifierServiceA;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -23,25 +25,18 @@ import java.lang.reflect.Field;
  */
 public class MethodInjectionTest {
 
-    private Context context;
-
-    @Before
-    public void setUp() {
-        this.context = new ApplicationContext(new BindingProvider(){
+    @Test
+    public void testMethodInjection() {
+      Context context = new ApplicationContext(new BindingProvider(){
             @Override
             public void configureBindings() {
-                bind(ServiceA.class).to(MethodServiceAImpl.class);
                 bind(ServiceD.class).to(MethodServiceDImpl.class);
-                bind(ServiceC.class).to(LowerServiceC.class);
-                bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
+                bind(ServiceC.class).to(EchoServiceC.class);
                 bind(ServiceE.class).to(MethodServiceEImpl.class);
             }
         });
-    }
 
-    @Test
-    public void testMethodInjection() {
-        ServiceD service = this.context.getBean(ServiceD.class);
+        ServiceD service = context.getBean(ServiceD.class);
 
         Assert.assertNotNull(service);
         Assert.assertEquals("Great Method Injection", service.echo("Great Method Injection"));        
@@ -49,7 +44,16 @@ public class MethodInjectionTest {
 
     @Test
     public void testCyclicMethodInjection() throws NoSuchFieldException, IllegalAccessException {
-        ServiceD serviceD = this.context.getBean(ServiceD.class);
+        Context context = new ApplicationContext(new BindingProvider(){
+            @Override
+            public void configureBindings() {
+                bind(ServiceD.class).to(MethodServiceDImpl.class);
+                bind(ServiceC.class).to(EchoServiceC.class);
+                bind(ServiceE.class).to(MethodServiceEImpl.class);
+            }
+        });
+
+        ServiceD serviceD = context.getBean(ServiceD.class);
 
         //Get depE for serviceD
         Field depE = MethodServiceDImpl.class.getDeclaredField("serviceE");
@@ -69,7 +73,16 @@ public class MethodInjectionTest {
 
     @Test
     public void testInjectOverrideInject() {
-        ServiceD service = this.context.getBean(ServiceD.class);
+        Context context = new ApplicationContext(new BindingProvider(){
+            @Override
+            public void configureBindings() {
+                bind(ServiceD.class).to(MethodServiceDImpl.class);
+                bind(ServiceC.class).to(EchoServiceC.class);
+                bind(ServiceE.class).to(MethodServiceEImpl.class);
+            }
+        });
+
+        ServiceD service = context.getBean(ServiceD.class);
 
         Assert.assertNotNull(service);
         Assert.assertEquals(1, ((MethodServiceDImpl) service).getNbCallSetServiceC());
@@ -77,7 +90,16 @@ public class MethodInjectionTest {
 
     @Test
     public void testNoInjectOverrideInject() {
-        ServiceE service = this.context.getBean(ServiceE.class);
+        Context context = new ApplicationContext(new BindingProvider(){
+            @Override
+            public void configureBindings() {
+                bind(ServiceD.class).to(MethodServiceDImpl.class);
+                bind(ServiceC.class).to(EchoServiceC.class);
+                bind(ServiceE.class).to(MethodServiceEImpl.class);
+            }
+        });
+
+        ServiceE service = context.getBean(ServiceE.class);
 
         Assert.assertNotNull(service);
         Assert.assertEquals(0, ((MethodServiceEImpl) service).getNbCallSetServiceC());
@@ -85,8 +107,17 @@ public class MethodInjectionTest {
 
     @Test
     public void testExistingMethodInjection() {
+        Context context = new ApplicationContext(new BindingProvider(){
+            @Override
+            public void configureBindings() {
+                bind(ServiceD.class).to(MethodServiceDImpl.class);
+                bind(ServiceC.class).to(EchoServiceC.class);
+                bind(ServiceE.class).to(MethodServiceEImpl.class);
+            }
+        });
+
         ServiceD service = new MethodServiceDImpl();
-        this.context.resolveBeanDependencies(service);
+        context.resolveBeanDependencies(service);
 
         Assert.assertNotNull(service);
         Assert.assertEquals("Great Method Injection", service.echo("Great Method Injection"));
@@ -94,10 +125,38 @@ public class MethodInjectionTest {
 
     @Test
     public void testNamedMethodInjection() {
-        ServiceA service = this.context.getBean(ServiceA.class);
+        Context context = new ApplicationContext(new BindingProvider(){
+            @Override
+            public void configureBindings() {
+                bind(ServiceA.class).to(MethodNamedServiceA.class);
+                bind(ServiceC.class).to(EchoServiceC.class);
+                bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
+                bind(ServiceE.class).to(MethodServiceEImpl.class);
+            }
+        });
+
+        ServiceA service = context.getBean(ServiceA.class);
 
         Assert.assertNotNull(service);
         Assert.assertEquals("ECHO", service.echo("echo"));
+    }
+
+    @Test
+    public void testQualifiedMethodInjection() {
+        Context context = new ApplicationContext(new BindingProvider(){
+            @Override
+            public void configureBindings() {
+                bind(ServiceA.class).to(MethodQualifierServiceA.class);
+                bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
+                bind(ServiceC.class).to(LowerEchoServiceC.class).qualifiedBy(LowerEcho.class);
+                bind(ServiceE.class).to(MethodServiceEImpl.class);
+            }
+        });
+
+        ServiceA service = context.getBean(ServiceA.class);
+
+        Assert.assertNotNull(service);
+        Assert.assertEquals("echo", service.echo("ECHO"));
     }
 
 }

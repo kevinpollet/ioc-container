@@ -1,7 +1,7 @@
-package com.my.container.test.injection.services.impl.constructors;
+package com.my.container.test.injection.services.impl.fields;
 
 import com.my.container.test.injection.services.ServiceC;
-import com.my.container.test.injection.services.ServiceE;
+import com.my.container.test.injection.services.ServiceD;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -9,14 +9,11 @@ import javax.inject.Named;
 /**
  * @author kevinpollet
  */
-public class ConstructorServiceEImpl implements ServiceE {
-
-    public ServiceC serviceC;
+public class FieldNamedServiceD implements ServiceD {
 
     @Inject
-    public ConstructorServiceEImpl(@Named("upperEchoService") final ServiceC serviceC) {
-        this.serviceC = serviceC;
-    }
+    @Named("upperEchoService")
+    private ServiceC serviceC;
 
     @Override
     public String echo(final String string) {

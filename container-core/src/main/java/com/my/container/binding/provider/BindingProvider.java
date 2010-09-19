@@ -2,6 +2,7 @@ package com.my.container.binding.provider;
 
 import com.my.container.binding.Binding;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public abstract class BindingProvider {
     /**
      * The bindings list.
      */
-    private List<Binding> bindings;
+    private final List<Binding> bindings;
 
     /**
      * Create a binding provider.
@@ -38,7 +39,7 @@ public abstract class BindingProvider {
      * @return the binding builder
      */
     protected final <T> BasicBindingBuilder<T> bind(final Class<T> intf) {
-        return this.new BasicBindingBuilder(new Binding(intf, null));
+        return this.new BasicBindingBuilder<T>(new Binding<T>(intf, null));
     }
 
     /**
@@ -58,14 +59,14 @@ public abstract class BindingProvider {
         /**
          * The binding to be built.
          */
-        private Binding binding;
+        private Binding<T> binding;
 
         /**
          * The BasicBindingBuilder constructor.
          * 
          * @param binding the binding to be build
          */
-        private BasicBindingBuilder(final Binding binding) {
+        private BasicBindingBuilder(final Binding<T> binding) {
             this.binding = binding;
         }
 
@@ -81,26 +82,26 @@ public abstract class BindingProvider {
             // is valid with no qualifier.
             BindingProvider.this.bindings.add(binding);
 
-            return  BindingProvider.this.new QualifierBindingBuilder(this.binding);
+            return  BindingProvider.this.new QualifierBindingBuilder<T>(this.binding);
         }
     }
 
     /**
      * The qualifier binding builder inner class .
      */
-    protected final class QualifierBindingBuilder {
+    protected final class QualifierBindingBuilder<T> {
 
         /**
          * The binding to be build.
          */
-        private Binding binding;
+        private Binding<T> binding;
 
         /**
          * Create a QualifierBindingBuilder.
          *
          * @param binding the binding to be built.
          */
-        public QualifierBindingBuilder(final Binding binding) {
+        public QualifierBindingBuilder(final Binding<T> binding) {
             this.binding = binding;
         }
 
@@ -112,6 +113,15 @@ public abstract class BindingProvider {
          */
         public final void named(final String named) {
             this.binding.setNamed(named);
+        }
+
+        /**
+         * The binding qualifier.
+         *
+         * @param qualifier the class of the qualifier 
+         */
+        public final void qualifiedBy(final Class<? extends Annotation> qualifier) {
+            this.binding.setQualifier(qualifier);
         }
 
     }

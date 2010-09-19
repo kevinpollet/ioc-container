@@ -1,5 +1,7 @@
 package com.my.container.binding;
 
+import java.lang.annotation.Annotation;
+
 /**
  * The binding definition Class.
  *
@@ -7,11 +9,28 @@ package com.my.container.binding;
  */
 public class Binding<T> {
 
+    /**
+     * The contract of the binding.
+     */
     private Class<T> intf;
 
+    /**
+     * The implementation of the binding.
+     */
     private Class<? extends T> impl;
 
+    /**
+     * The named qualifier.
+     * @see javax.inject.Named
+     */
     private String name;
+
+    /**
+     * The customs qualifier. A qualifier is
+     * an annotation annotated with @Qualifier.
+     * @see javax.inject.Qualifier
+     */
+    private Class<? extends Annotation> qualifier;
 
     /**
      * Create a binding.
@@ -20,13 +39,15 @@ public class Binding<T> {
      * @param impl the binding implementation
      */
     public Binding(final Class<T> intf, final Class<? extends T> impl) {
-        this(intf, impl, null);
+        this.intf = intf;
+        this.impl = impl;
+        this.name = null;
+        this.qualifier = null;
     }
 
     /**
-     * Create a qualify binding. A Named binding is used
+     * Create a named binding. A Named binding is used
      * when the contract is implemented by multiple class.
-     * This Named is the Qualifier.
      * @see javax.inject.Named
      *
      * @param intf the binding interface
@@ -37,8 +58,34 @@ public class Binding<T> {
         this.intf = intf;
         this.impl = impl;
         this.name = name;
+        this.qualifier = null;
     }
-    
+
+    /**
+     * Create a custom qualified binding. A qualified binding is used
+     * when the contract is implemented by multiple class.
+     * @see javax.inject.Qualifier
+     *
+     * @param intf the binding interface
+     * @param impl the binding implementation
+     * @param qualifier the qualifier of the binding
+     */
+    public Binding(final Class<T> intf, final Class<? extends T> impl, final Class<? extends Annotation> qualifier) {
+        this.intf = intf;
+        this.impl = impl;
+        this.name = null;
+        this.qualifier = qualifier;
+    }
+
+
+    /**
+     * Get the qualifier for this binding.
+     * @return the qualifier
+     */
+    public Class<? extends Annotation> getQualifier() {
+       return this.qualifier; 
+    }
+
     /**
      * Get the binding interface class.
      *
@@ -94,6 +141,14 @@ public class Binding<T> {
     }
 
     /**
+     * Set the binding qualifier.
+     * @param qualifier the qualifier
+     */
+    public void setQualifier(final Class<? extends Annotation> qualifier) {
+        this.qualifier = qualifier;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -106,12 +161,16 @@ public class Binding<T> {
             Binding toBinding = (Binding) to;
 
             if (toBinding.getInterface() != null) {
-              eq = toBinding.getInterface().equals(this.intf);
+              eq = toBinding.intf.equals(this.intf);
+
               if (toBinding.getName() != null) {
-                eq = eq && toBinding.getName().equals(this.name);
+                eq = eq && toBinding.name.equals(this.name);
+              }
+
+              if (toBinding.getQualifier() != null) {
+                eq = eq && toBinding.qualifier.isAssignableFrom(this.qualifier);
               }
             }
-            
         }
 
         return eq;
@@ -129,6 +188,10 @@ public class Binding<T> {
             
             if (this.name != null) {
                 hash += this.name.hashCode();
+            }
+
+            if (this.qualifier != null) {
+                hash += this.qualifier.hashCode();
             }
         }
 

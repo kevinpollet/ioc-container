@@ -169,6 +169,8 @@ public class BeanFactory {
                                     if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
                                         if (annotation instanceof Named) {
                                             pBinding = this.bindings.get(new Binding(pClass, null, ((Named) annotation).value()));
+                                        } else {
+                                            pBinding = this.bindings.get(new Binding(pClass, null, annotation.annotationType()));
                                         }
 
                                         break;
@@ -291,7 +293,10 @@ public class BeanFactory {
                         if(annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
                            if (annotation instanceof Named) {
                               fieldBinding = this.bindings.get(new Binding(field.getType(), null, ((Named) annotation).value()));
+                           } else {
+                              fieldBinding = this.bindings.get(new Binding(field.getType(), null, annotation.annotationType()));
                            }
+
                           break;
                         }
 
@@ -328,7 +333,7 @@ public class BeanFactory {
                 }
 
                 // This method is not overidden in subclass
-                if (!ReflectionHelper.isOverriden(instance.getClass(), method)) {
+                if (!ReflectionHelper.isOverridden(instance.getClass(), method)) {
 
                     // If this class is not already marked, mark it
                     if (!markMap.containsKey(instance.getClass())) {
@@ -359,7 +364,10 @@ public class BeanFactory {
                                 if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
                                     if (annotation instanceof Named) {
                                        pBinding = this.bindings.get(new Binding(pClass, null, ((Named) annotation).value()));
+                                    } else {
+                                       pBinding = this.bindings.get(new Binding(pClass, null, annotation.annotationType())); 
                                     }
+
                                     break;
                                 }
                             }
