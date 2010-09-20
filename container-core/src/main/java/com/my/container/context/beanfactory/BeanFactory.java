@@ -1,6 +1,8 @@
 package com.my.container.context.beanfactory;
 
 import com.my.container.binding.Binding;
+import com.my.container.binding.BindingHolder;
+import com.my.container.binding.MapBindingHolder;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
@@ -46,7 +48,7 @@ public class BeanFactory {
 
     private final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
 
-    private Map<Binding, Binding> bindings;
+    private BindingHolder holder;
 
     private List<Object> prototypesBean;
 
@@ -57,12 +59,12 @@ public class BeanFactory {
      *
      * @param list the binding list
      */
-    public BeanFactory(final List<Binding> list) {
-        //Populate bindings list
-        this.bindings = new HashMap<Binding, Binding>();
+    public BeanFactory(final List<Binding<?>> list) {
+        //Populate binding holder
+        this.holder = new MapBindingHolder();
         if (list != null) {
             for (Binding b : list) {
-                this.bindings.put(b, b);
+                this.holder.put(b);
             }
         }
 
@@ -86,8 +88,7 @@ public class BeanFactory {
         }
 
         T createdInstance;
-        Binding binding = this.bindings.get(new Binding(clazz, null));
-
+        Binding binding = this.holder.getBindingsFor(clazz);
         if (binding == null) {
             throw new NoSuchBeanDefinitionException("The class " + clazz.getSimpleName() + " have no binding defined");
         }
@@ -163,16 +164,11 @@ public class BeanFactory {
                              Binding pBinding = null;
 
                              if (paramsAnnotations[i].length == 0) {
-                                 pBinding = this.bindings.get(new Binding(pClass, null));
+                                 pBinding = this.holder.getBindingsFor(pClass);
                              } else {
                                  for(Annotation annotation : paramsAnnotations[i]) {
                                     if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
-                                        if (annotation instanceof Named) {
-                                            pBinding = this.bindings.get(new Binding(pClass, null, ((Named) annotation).value()));
-                                        } else {
-                                            pBinding = this.bindings.get(new Binding(pClass, null, annotation.annotationType()));
-                                        }
-
+                                        pBinding = this.holder.getQualifiedBindingFor(pClass, annotation);
                                         break;
                                     }
                                  }
@@ -256,9 +252,7 @@ public class BeanFactory {
      * @param clazz           the class who contains the field definition who can be injected
      */
     private void injectDependencies(final Object instance, final Class<?> clazz, final Map<Class<?>, Object> markMap, final List<Object> newBeansCreated) {
-        this.logger.debug("Inject fields and methods of class {}", clazz.getSimpleName());
-
-        if (clazz.getSuperclass() != null) { // Inject superclass before
+        if (clazz.getSuperclass() != null) { // Inject superclass first
             this.injectDependencies(instance, clazz.getSuperclass(), markMap, newBeansCreated);
         }
 
@@ -287,19 +281,13 @@ public class BeanFactory {
                 Annotation[] annotations = field.getAnnotations();
 
                 if (annotations.length == 1) {
-                    fieldBinding = this.bindings.get(new Binding(field.getType(), null));
+                    fieldBinding = this.holder.getBindingsFor(field.getType());
                 } else {
                     for (Annotation annotation : annotations) {
                         if(annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
-                           if (annotation instanceof Named) {
-                              fieldBinding = this.bindings.get(new Binding(field.getType(), null, ((Named) annotation).value()));
-                           } else {
-                              fieldBinding = this.bindings.get(new Binding(field.getType(), null, annotation.annotationType()));
-                           }
-
-                          break;
+                           fieldBinding = this.holder.getQualifiedBindingFor(field.getType(), annotation);
+                           break;
                         }
-
                     }
                 }
 
@@ -313,8 +301,8 @@ public class BeanFactory {
 
                     field.set(ProxyHelper.getTargetObject(instance), dependency);
 
-                } catch (IllegalAccessException ex) {
-                    throw new BeanDependencyInjectionException("The field " + field.getName() + "is not accessible and cannot be injected");
+                } catch (IllegalAccessException e) {
+                    throw new BeanDependencyInjectionException("The field " + field.getName() + "is not accessible and cannot be injected", e);
                 }
 
             }
@@ -358,16 +346,11 @@ public class BeanFactory {
                         Binding pBinding = null;
 
                         if (paramsAnnotation[i].length == 0) {
-                            pBinding = this.bindings.get(new Binding(pClass, null));
+                            pBinding = this.holder.getBindingsFor(pClass);
                         } else {
                             for (Annotation annotation : paramsAnnotation[i]) {
                                 if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
-                                    if (annotation instanceof Named) {
-                                       pBinding = this.bindings.get(new Binding(pClass, null, ((Named) annotation).value()));
-                                    } else {
-                                       pBinding = this.bindings.get(new Binding(pClass, null, annotation.annotationType())); 
-                                    }
-
+                                    pBinding = this.holder.getQualifiedBindingFor(pClass, annotation); 
                                     break;
                                 }
                             }

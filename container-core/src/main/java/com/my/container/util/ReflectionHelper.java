@@ -39,7 +39,6 @@ public final class ReflectionHelper {
                try {
 
                     currentClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
-                   System.out.println(currentClass);
                     return true;
 
                 } catch (NoSuchMethodException e) {

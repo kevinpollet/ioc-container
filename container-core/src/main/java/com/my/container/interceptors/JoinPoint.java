@@ -3,12 +3,10 @@ package com.my.container.interceptors;
 import java.lang.reflect.Method;
 
 /**
- * <p>
  * This class define the JoinPoint parameter class
  * of interceptors methods annotated with
  * {@linkplain com.my.container.interceptors.annotations.Before @Before}
  * and {@linkplain com.my.container.interceptors.annotations.After @After}.
- * </p>
  *
  * @author kevinpollet
  */
