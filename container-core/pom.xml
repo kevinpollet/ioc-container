@@ -10,9 +10,9 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>${parent.groupId}</groupId>
+    <groupId>com.my.container</groupId>
     <artifactId>container-core</artifactId>
-    <version>${parent.version}</version>
+    <version>0.1-SNAPSHOT</version>
     <name>IOC-Container :: core</name>
 
     <dependencies>

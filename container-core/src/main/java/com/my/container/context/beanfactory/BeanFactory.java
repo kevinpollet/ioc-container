@@ -7,10 +7,7 @@ import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionEx
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.context.beanfactory.proxy.ProxyHelper;
-import com.my.container.interceptors.BeanInterceptorInvocationHandler;
-import com.my.container.interceptors.annotations.AroundInvoke;
-import com.my.container.interceptors.annotations.Interceptors;
+import com.my.container.context.beanfactory.handler.ProxyHelper;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
@@ -27,11 +23,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 
 //TODO interceptor verification
@@ -193,30 +190,17 @@ public class BeanFactory {
                     beanInstance = implClass.newInstance();
                 }
 
-                // Check if class have to be proxied for interceptors
-                List<Method> methods = ReflectionHelper.getDeclaredMethodsAnnotatedWith(AroundInvoke.class, implClass);
-                if (implClass.isAnnotationPresent(Interceptors.class) || !methods.isEmpty()) {
-
-                    Method aroundMethod = null;
-                    List<Object> interceptorsList = new ArrayList<Object>();
-
-                    Interceptors interceptors = implClass.getAnnotation(Interceptors.class);
-                    if (interceptors != null) {
-                        Class<?>[] interceptorsClass = interceptors.value();
-                        for (Class<?> c : interceptorsClass) {
-                            interceptorsList.add(c.newInstance());
-                        }
+                // Check SPI for InvocationHandler
+                ServiceLoader<BeanInstanceWeaver> loader = ServiceLoader.load(BeanInstanceWeaver.class);
+                Iterator<BeanInstanceWeaver> iterator = loader.iterator();
+                while (iterator.hasNext()) {
+                    BeanInstanceWeaver handler = iterator.next();
+                    if (handler.isValidBean(beanInstance)) {
+                        beanInstance = handler.weaveBean(beanInstance);
                     }
-
-                    if (!methods.isEmpty()) {
-                        aroundMethod = methods.get(0);
-                    }
-
-                    beanInstance = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                                                          implClass.getInterfaces(),
-                                                          new BeanInterceptorInvocationHandler(beanInstance, interceptorsList.toArray(), aroundMethod));
                 }
 
+                // Inject dependencies
                 this.injectDependencies(beanInstance, implClass, markMap, newBeansCreated);
 
                 // The bean is created and injected memorize it to call all PostConstruct when all injections are done.
