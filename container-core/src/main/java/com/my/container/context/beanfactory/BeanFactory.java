@@ -7,7 +7,7 @@ import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionEx
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.context.beanfactory.handler.ProxyHelper;
+import com.my.container.context.beanfactory.proxy.ProxyHelper;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,12 +191,12 @@ public class BeanFactory {
                 }
 
                 // Check SPI for InvocationHandler
-                ServiceLoader<BeanInstanceWeaver> loader = ServiceLoader.load(BeanInstanceWeaver.class);
-                Iterator<BeanInstanceWeaver> iterator = loader.iterator();
+                ServiceLoader<InvocationProcessor> loader = ServiceLoader.load(InvocationProcessor.class);
+                Iterator<InvocationProcessor> iterator = loader.iterator();
                 while (iterator.hasNext()) {
-                    BeanInstanceWeaver handler = iterator.next();
-                    if (handler.isValidBean(beanInstance)) {
-                        beanInstance = handler.weaveBean(beanInstance);
+                    InvocationProcessor handler = iterator.next();
+                    if (handler.isProcessable(beanInstance)) {
+                        beanInstance = handler.processBean(beanInstance);
                     }
                 }
 

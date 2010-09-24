@@ -1,4 +1,4 @@
-package com.my.container.context.beanfactory.handler;
+package com.my.container.context.beanfactory.proxy;
 
 import java.lang.reflect.InvocationHandler;
 

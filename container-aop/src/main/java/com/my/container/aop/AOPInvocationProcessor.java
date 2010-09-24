@@ -2,7 +2,8 @@ package com.my.container.aop;
 
 import com.my.container.aop.annotations.AroundInvoke;
 import com.my.container.aop.annotations.Interceptors;
-import com.my.container.context.beanfactory.BeanInstanceWeaver;
+import com.my.container.context.beanfactory.InvocationProcessor;
+import com.my.container.context.beanfactory.exceptions.BeanProcessorException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -10,15 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * The AOP invocation processor. 
+ *
  * @author kevinpollet
  */
-public class AOPBeanInstanceWeaver extends BeanInstanceWeaver {
+public class AOPInvocationProcessor extends InvocationProcessor {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isValidBean(final Object bean) {
+    public boolean isProcessable(final Object bean) {
         Class<?> beanClass = bean.getClass();
         return beanClass.isAnnotationPresent(Interceptors.class) || this.isAroundMethod(beanClass);
     }
@@ -27,7 +30,7 @@ public class AOPBeanInstanceWeaver extends BeanInstanceWeaver {
      * {@inheritDoc}
      */
     @Override
-    public <T> T weaveBean(final T bean) {
+    public <T> T processBean(final T bean) throws BeanProcessorException {
         Class<?> beanClass = bean.getClass();
 
         List<Object> interceptors = new ArrayList<Object>();
@@ -52,9 +55,9 @@ public class AOPBeanInstanceWeaver extends BeanInstanceWeaver {
                     interceptors.add(intClass.newInstance());
 
                 } catch (InstantiationException e) {
-                    e.printStackTrace();
+                    throw new BeanProcessorException(String.format("The interceptor named %s cannot be instantiated", intClass.getSimpleName()), e);
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    throw new BeanProcessorException(String.format("The interceptor named %s cannot be instantiated", intClass.getSimpleName()), e);
                 }
             }
             
