@@ -1,3 +1,7 @@
 h2. Readme File 
 
-This is an implementation of an IOC container in Java with dependencies injection.
+The aim of this project is to implement a lightweight IOC container 
+who respects the  "JSR 330":http://code.google.com/p/atinject/ in Java.
+
+
+!>{width:250px}http://newsfuzion.com/wp-content/uploads/2010/05/coffee-beans.jpg!
