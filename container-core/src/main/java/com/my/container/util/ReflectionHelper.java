@@ -23,7 +23,7 @@ public final class ReflectionHelper {
 
     /**
      * This method permits to know if a method is
-     * overriden by subclass.
+     * overridden by subclass.
      *
      * @param targetClass the child bean class
      * @param method the method to test
@@ -39,7 +39,6 @@ public final class ReflectionHelper {
                try {
 
                     currentClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
-                   System.out.println(currentClass);
                     return true;
 
                 } catch (NoSuchMethodException e) {

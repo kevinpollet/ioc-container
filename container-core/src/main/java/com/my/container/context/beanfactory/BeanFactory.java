@@ -1,14 +1,13 @@
 package com.my.container.context.beanfactory;
 
 import com.my.container.binding.Binding;
+import com.my.container.binding.BindingHolder;
+import com.my.container.binding.MapBindingHolder;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.context.beanfactory.proxy.ProxyHelper;
-import com.my.container.interceptors.BeanInterceptorInvocationHandler;
-import com.my.container.interceptors.annotations.AroundInvoke;
-import com.my.container.interceptors.annotations.Interceptors;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
@@ -25,11 +23,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 
 //TODO interceptor verification
@@ -37,6 +36,7 @@ import java.util.Map;
 //TODO constructor cyclic dependencies
 //TODO refactor interceptor
 //TODO asynchronous bean destruction can be good if one PreDestroy crash :p
+
 /**
  * The factory of bean class
  *
@@ -46,29 +46,40 @@ public class BeanFactory {
 
     private final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
 
-    private Map<Binding, Binding> bindings;
+    private BindingHolder holder;
 
     private List<Object> prototypesBean;
 
     private Map<Binding, Object> singletonsBean;
+
+    private List<BeanProcessor> beanProcessors;
 
     /**
      * Bean Factory constructor.
      *
      * @param list the binding list
      */
-    public BeanFactory(final List<Binding> list) {
-        //Populate bindings list
-        this.bindings = new HashMap<Binding, Binding>();
+    public BeanFactory(final List<Binding<?>> list) {
+        // Populate binding holder
+        this.holder = new MapBindingHolder();
         if (list != null) {
             for (Binding b : list) {
-                this.bindings.put(b, b);
+                this.holder.put(b);
             }
         }
 
-        //Initialize beans instance holder for prototypes and singleton        
+        // Initialize beans instance holder for prototypes and singleton
         this.prototypesBean = new ArrayList<Object>();
         this.singletonsBean = new HashMap<Binding, Object>();
+
+        // Eager load bean processors
+        this.beanProcessors = new ArrayList<BeanProcessor>();
+
+        ServiceLoader<BeanProcessor> loader = ServiceLoader.load(BeanProcessor.class);
+        Iterator<BeanProcessor> iterator = loader.iterator();
+        while (iterator.hasNext()) {
+            this.beanProcessors.add(iterator.next());
+        }
     }
 
     /**
@@ -86,8 +97,7 @@ public class BeanFactory {
         }
 
         T createdInstance;
-        Binding binding = this.bindings.get(new Binding(clazz, null));
-
+        Binding binding = this.holder.getBindingsFor(clazz);
         if (binding == null) {
             throw new NoSuchBeanDefinitionException("The class " + clazz.getSimpleName() + " have no binding defined");
         }
@@ -124,7 +134,7 @@ public class BeanFactory {
         }
 
         Object beanInstance = null;
-        Class<?> implClass = binding.getImplementation(); 
+        Class<?> implClass = binding.getImplementation();
 
         if (implClass.isAnnotationPresent(Singleton.class) && this.singletonsBean.containsKey(binding)) {
             beanInstance = this.singletonsBean.get(binding);
@@ -147,48 +157,43 @@ public class BeanFactory {
                 Constructor<?>[] constructors = implClass.getConstructors();
                 for (Constructor<?> constructor : constructors) {
 
-                     if (constructor.isAnnotationPresent(Inject.class)) {
+                    if (constructor.isAnnotationPresent(Inject.class)) {
 
-                         List<Object> params = new ArrayList<Object>();
-                         Class<?>[] paramsClass = constructor.getParameterTypes();
-                         Annotation[][] paramsAnnotations = constructor.getParameterAnnotations();
+                        List<Object> params = new ArrayList<Object>();
+                        Class<?>[] paramsClass = constructor.getParameterTypes();
+                        Annotation[][] paramsAnnotations = constructor.getParameterAnnotations();
 
-                         if(paramsClass.length > 0) {
+                        if (paramsClass.length > 0) {
                             markMap.put(implClass, null); // value is null because instance is not created yet
-                         }
+                        }
 
-                         int i = 0;
-                         for (Class<?> pClass : paramsClass) {
+                        int i = 0;
+                        for (Class<?> pClass : paramsClass) {
 
-                             Binding pBinding = null;
+                            Binding pBinding = null;
 
-                             if (paramsAnnotations[i].length == 0) {
-                                 pBinding = this.bindings.get(new Binding(pClass, null));
-                             } else {
-                                 for(Annotation annotation : paramsAnnotations[i]) {
+                            if (paramsAnnotations[i].length == 0) {
+                                pBinding = this.holder.getBindingsFor(pClass);
+                            } else {
+                                for (Annotation annotation : paramsAnnotations[i]) {
                                     if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
-                                        if (annotation instanceof Named) {
-                                            pBinding = this.bindings.get(new Binding(pClass, null, ((Named) annotation).value()));
-                                        } else {
-                                            pBinding = this.bindings.get(new Binding(pClass, null, annotation.annotationType()));
-                                        }
-
+                                        pBinding = this.holder.getQualifiedBindingFor(pClass, annotation);
                                         break;
                                     }
-                                 }
-                             }
+                                }
+                            }
 
-                             if (pBinding == null) {
+                            if (pBinding == null) {
                                 throw new NoSuchBeanDefinitionException("The class " + pClass.getSimpleName() + " have no binding defined");
-                             }
+                            }
 
-                             params.add(this.makeInstance(pBinding, markMap, newBeansCreated));
-                             i++;
-                         }
+                            params.add(this.makeInstance(pBinding, markMap, newBeansCreated));
+                            i++;
+                        }
 
-                         beanInstance = constructor.newInstance(params.toArray());
-                         break;
-                     }
+                        beanInstance = constructor.newInstance(params.toArray());
+                        break;
+                    }
 
                 }
 
@@ -197,33 +202,17 @@ public class BeanFactory {
                     beanInstance = implClass.newInstance();
                 }
 
-                // Check if class have to be proxied for interceptors
-                List<Method> methods = ReflectionHelper.getDeclaredMethodsAnnotatedWith(AroundInvoke.class, implClass);
-                if (implClass.isAnnotationPresent(Interceptors.class) || !methods.isEmpty()) {
-
-                    Method aroundMethod = null;
-                    List<Object> interceptorsList = new ArrayList<Object>();
-
-                    Interceptors interceptors = implClass.getAnnotation(Interceptors.class);
-                    if (interceptors != null) {
-                        Class<?>[] interceptorsClass = interceptors.value();
-                        for (Class<?> c : interceptorsClass) {
-                            interceptorsList.add(c.newInstance());
-                        }
+                // Apply bean processor
+                for (BeanProcessor processor : this.beanProcessors) {
+                    if (processor.isProcessable(beanInstance)) {
+                        beanInstance = processor.processBean(beanInstance);
                     }
-
-                    if (!methods.isEmpty()) {
-                        aroundMethod = methods.get(0);
-                    }
-
-                    beanInstance = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                                                          implClass.getInterfaces(),
-                                                          new BeanInterceptorInvocationHandler(beanInstance, interceptorsList.toArray(), aroundMethod));
                 }
 
                 this.injectDependencies(beanInstance, implClass, markMap, newBeansCreated);
 
-                // The bean is created and injected memorize it to call all PostConstruct when all injections are done.
+                // The bean is created and injected memorize it to call
+                // all PostConstruct callback when all injections are done.
                 newBeansCreated.add(beanInstance);
 
                 // Hold the singleton reference
@@ -256,9 +245,7 @@ public class BeanFactory {
      * @param clazz           the class who contains the field definition who can be injected
      */
     private void injectDependencies(final Object instance, final Class<?> clazz, final Map<Class<?>, Object> markMap, final List<Object> newBeansCreated) {
-        this.logger.debug("Inject fields and methods of class {}", clazz.getSimpleName());
-
-        if (clazz.getSuperclass() != null) { // Inject superclass before
+        if (clazz.getSuperclass() != null) { // Inject superclass first
             this.injectDependencies(instance, clazz.getSuperclass(), markMap, newBeansCreated);
         }
 
@@ -287,24 +274,18 @@ public class BeanFactory {
                 Annotation[] annotations = field.getAnnotations();
 
                 if (annotations.length == 1) {
-                    fieldBinding = this.bindings.get(new Binding(field.getType(), null));
+                    fieldBinding = this.holder.getBindingsFor(field.getType());
                 } else {
                     for (Annotation annotation : annotations) {
-                        if(annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
-                           if (annotation instanceof Named) {
-                              fieldBinding = this.bindings.get(new Binding(field.getType(), null, ((Named) annotation).value()));
-                           } else {
-                              fieldBinding = this.bindings.get(new Binding(field.getType(), null, annotation.annotationType()));
-                           }
-
-                          break;
+                        if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
+                            fieldBinding = this.holder.getQualifiedBindingFor(field.getType(), annotation);
+                            break;
                         }
-
                     }
                 }
 
                 if (fieldBinding == null) {
-                   throw new NoSuchBeanDefinitionException("The class " + field.getType().getSimpleName() + " have no binding defined");
+                    throw new NoSuchBeanDefinitionException("The class " + field.getType().getSimpleName() + " have no binding defined");
                 }
 
                 Object dependency = this.makeInstance(fieldBinding, markMap, newBeansCreated);
@@ -313,8 +294,8 @@ public class BeanFactory {
 
                     field.set(ProxyHelper.getTargetObject(instance), dependency);
 
-                } catch (IllegalAccessException ex) {
-                    throw new BeanDependencyInjectionException("The field " + field.getName() + "is not accessible and cannot be injected");
+                } catch (IllegalAccessException e) {
+                    throw new BeanDependencyInjectionException("The field " + field.getName() + "is not accessible and cannot be injected", e);
                 }
 
             }
@@ -358,23 +339,18 @@ public class BeanFactory {
                         Binding pBinding = null;
 
                         if (paramsAnnotation[i].length == 0) {
-                            pBinding = this.bindings.get(new Binding(pClass, null));
+                            pBinding = this.holder.getBindingsFor(pClass);
                         } else {
                             for (Annotation annotation : paramsAnnotation[i]) {
                                 if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
-                                    if (annotation instanceof Named) {
-                                       pBinding = this.bindings.get(new Binding(pClass, null, ((Named) annotation).value()));
-                                    } else {
-                                       pBinding = this.bindings.get(new Binding(pClass, null, annotation.annotationType())); 
-                                    }
-
+                                    pBinding = this.holder.getQualifiedBindingFor(pClass, annotation);
                                     break;
                                 }
                             }
                         }
 
                         if (pBinding == null) {
-                           throw new NoSuchBeanDefinitionException("The class " + pClass.getSimpleName() + " have no binding defined");
+                            throw new NoSuchBeanDefinitionException("The class " + pClass.getSimpleName() + " have no binding defined");
                         }
 
                         params.add(this.makeInstance(pBinding, markMap, newBeansCreated));

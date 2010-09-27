@@ -7,9 +7,9 @@
         </layout>
     </appender>
 
-    <logger name="com.my.container.*" level="INFO"/>
+    <logger name="com.my.container.*" level="DEBUG"/>
 
-    <root level="DEBUG">
+    <root level="WARNING">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

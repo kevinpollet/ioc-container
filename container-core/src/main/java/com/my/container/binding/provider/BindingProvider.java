@@ -17,19 +17,19 @@ public abstract class BindingProvider {
     /**
      * The bindings list.
      */
-    private final List<Binding> bindings;
+    private final List<Binding<?>> bindings;
 
     /**
      * Create a binding provider.
      */
-    public BindingProvider() {
-        this.bindings = new ArrayList<Binding>();
+    protected BindingProvider() {
+        this.bindings = new ArrayList<Binding<?>>();
     }
 
     /**
      * Get the binding provider list.
      */
-    public final List<Binding> getBindings() {
+    public final List<Binding<?>> getBindings() {
         return bindings;
     }
 
@@ -43,13 +43,22 @@ public abstract class BindingProvider {
     }
 
     /**
-     * Configure the binding list.
-     * <br/>
-     * <p>To add a binding use the following code :
-     * {@code bind(interface.class).to(implementation.class)}</p>
+     * <p>
+     * Configure the binding list provided by this
+     * binding provider.
+     * </p>
+     * <p>
+     * To add a binding you can use the following code :
+     * <pre>
+     * bind(interface.class).to(implementation.class)
+     * bind(interface.class).to(implementation.class).named("name")
+     * bind(interface.class).to(implementation.class).qualifiedBy(MyQualifier.class)
+     * </pre>
+     * </p>
      */
     public abstract void configureBindings();
 
+    /*--------- Inner Fluent Binding builder ---------*/
 
     /**
      * The basic binding builder inner class.
