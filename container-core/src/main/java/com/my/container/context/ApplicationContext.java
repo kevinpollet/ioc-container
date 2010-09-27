@@ -2,7 +2,6 @@ package com.my.container.context;
 
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.beanfactory.BeanFactory;
-import com.my.container.context.beanfactory.CallbackShutdownHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

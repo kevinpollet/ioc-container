@@ -1,5 +1,6 @@
-package com.my.container.context.beanfactory;
+package com.my.container.context;
 
+import com.my.container.context.beanfactory.BeanFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -3,12 +3,13 @@ package com.my.container.context.beanfactory;
 import com.my.container.context.beanfactory.exceptions.BeanProcessorException;
 
 /**
- * The bean invocation processor
- * contract.
+ * The bean processor contract. This
+ * contract must be implemented by
+ * extensions.
  *
  * @author kevinpollet
  */
-public abstract class InvocationProcessor {
+public abstract class BeanProcessor {
 
     /**
      * Check if the bean is processable.
@@ -19,7 +20,8 @@ public abstract class InvocationProcessor {
     public abstract boolean isProcessable(final Object bean);
 
     /**
-     * Process the bean in parameter.
+     * Process the bean in parameter. <b>This method
+     * must never return null.</b>
      *
      * @param bean the bean to process
      * @param <T> the type of the bean

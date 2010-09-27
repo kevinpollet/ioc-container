@@ -2,7 +2,7 @@ package com.my.container.aop;
 
 import com.my.container.aop.annotations.AroundInvoke;
 import com.my.container.aop.annotations.Interceptors;
-import com.my.container.context.beanfactory.InvocationProcessor;
+import com.my.container.context.beanfactory.BeanProcessor;
 import com.my.container.context.beanfactory.exceptions.BeanProcessorException;
 
 import java.lang.reflect.Method;
@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author kevinpollet
  */
-public class AOPInvocationProcessor extends InvocationProcessor {
+public class AOPBeanProcessor extends BeanProcessor {
 
     /**
      * {@inheritDoc}

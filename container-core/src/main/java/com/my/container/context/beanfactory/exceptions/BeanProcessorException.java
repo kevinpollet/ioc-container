@@ -1,19 +1,31 @@
 package com.my.container.context.beanfactory.exceptions;
 
 /**
+ * The bean processor exception. This exception
+ * can be thrown by bean processor extensions.
+ *
  * @author kevinpollet
  */
 public class BeanProcessorException extends BeanException {
 
-    public BeanProcessorException(String message) {
+    /**
+     * {@inheritDoc}
+     */
+    public BeanProcessorException(final String message) {
         super(message);
     }
 
-    public BeanProcessorException(String message, Throwable cause) {
+    /**
+     * {@inheritDoc}
+     */
+    public BeanProcessorException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public BeanProcessorException(Throwable cause) {
+    /**
+     * {@inheritDoc}
+     */
+    public BeanProcessorException(final Throwable cause) {
         super(cause);
     }
 }
