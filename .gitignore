@@ -1,10 +1,12 @@
-#Mac files
+# ignore MacOs Files
 .DS_Store
 
-#Taget folder
-target/
-
-#Intellij files
+# ignore Intellij files
 *.iml
 *.ipr
 *.iws
+
+
+# ignore Maven Target Folder
+target/
+
