@@ -8,6 +8,8 @@ import com.my.container.context.beanfactory.exceptions.BeanInstantiationExceptio
 import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.context.beanfactory.proxy.ProxyHelper;
+import com.my.container.spi.BeanProcessor;
+import com.my.container.spi.loader.ServiceLoader;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 
 
 //TODO interceptor verification
@@ -76,9 +77,8 @@ public class BeanFactory {
         this.beanProcessors = new ArrayList<BeanProcessor>();
 
         ServiceLoader<BeanProcessor> loader = ServiceLoader.load(BeanProcessor.class);
-        Iterator<BeanProcessor> iterator = loader.iterator();
-        while (iterator.hasNext()) {
-            this.beanProcessors.add(iterator.next());
+        for (BeanProcessor processor : loader) {
+            this.beanProcessors.add(processor);
         }
     }
 
@@ -203,11 +203,16 @@ public class BeanFactory {
                 }
 
                 // Apply bean processor
-                for (BeanProcessor processor : this.beanProcessors) {
-                    if (processor.isProcessable(beanInstance)) {
-                        beanInstance = processor.processBean(beanInstance);
+                try {
+                    for (BeanProcessor processor : this.beanProcessors) {
+                        if (processor.isProcessable(beanInstance)) {
+                            beanInstance = processor.processBean(beanInstance);
+                        }
                     }
+                } catch (Exception ex) {
+                    throw new BeanDependencyInjectionException("Error when applying bean processor", ex);                  
                 }
+
 
                 this.injectDependencies(beanInstance, implClass, markMap, newBeansCreated);
 
@@ -229,7 +234,6 @@ public class BeanFactory {
             } catch (InvocationTargetException e) {
                 throw new BeanInstantiationException(e);
             }
-
         }
 
         return beanInstance;

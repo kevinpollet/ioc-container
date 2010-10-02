@@ -1,6 +1,4 @@
-package com.my.container.context.beanfactory;
-
-import com.my.container.context.beanfactory.exceptions.BeanProcessorException;
+package com.my.container.spi;
 
 /**
  * The bean processor contract. This
@@ -26,8 +24,8 @@ public abstract class BeanProcessor {
      * @param bean the bean to process
      * @param <T> the type of the bean
      * @return the bean processed
-     * @throws BeanProcessorException if an exception occurs during the bean processing
+     * @throws Exception if an exception occurs during the bean processing
      */
-    public abstract <T> T processBean(final T bean) throws BeanProcessorException;
+    public abstract <T> T processBean(final T bean) throws Exception;
 
 }

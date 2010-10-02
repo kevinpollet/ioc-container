@@ -22,6 +22,12 @@
             <artifactId>javax.inject</artifactId>
         </dependency>
 
+        <!-- JSR 250 -->
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
