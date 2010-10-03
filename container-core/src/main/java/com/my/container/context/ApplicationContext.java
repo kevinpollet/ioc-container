@@ -33,7 +33,6 @@ public class ApplicationContext implements Context {
     /**
      * {@inheritDoc}
      */
-    @Override
     public <T> T getBean(final Class<T> clazz) {
         return this.factory.getBean(clazz);
     }
@@ -41,7 +40,6 @@ public class ApplicationContext implements Context {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void resolveBeanDependencies(final Object bean) {
         this.factory.resolveDependencies(bean);
     }
@@ -49,7 +47,6 @@ public class ApplicationContext implements Context {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void registerShutdownHook() {
         Thread thread = new Thread(new CallbackShutdownHook(this.factory));
         Runtime.getRuntime().addShutdownHook(thread);

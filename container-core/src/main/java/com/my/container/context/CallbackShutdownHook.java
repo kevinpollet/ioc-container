@@ -30,7 +30,6 @@ public class CallbackShutdownHook implements Runnable {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void run() {
         logger.info("Shutdown hook called : Call all created bean PreDestroy methods");
         this.factory.removeAllBeansReferences();

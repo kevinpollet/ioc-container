@@ -14,12 +14,11 @@ import java.util.List;
  *
  * @author kevinpollet
  */
-public class AOPBeanProcessor extends BeanProcessor {
+public class AOPBeanProcessor implements BeanProcessor {
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean isProcessable(final Object bean) {
         Class<?> beanClass = bean.getClass();
         return beanClass.isAnnotationPresent(Interceptors.class) || this.isAroundMethod(beanClass);
@@ -28,7 +27,6 @@ public class AOPBeanProcessor extends BeanProcessor {
     /**
      * {@inheritDoc}
      */
-    @Override
     public <T> T processBean(final T bean) throws Exception {
         Class<?> beanClass = bean.getClass();
 

@@ -40,7 +40,6 @@ public class InterceptorInvocationHandler extends AbstractBeanAwareInvocationHan
     /**
      * {@inheritDoc}
      */
-    @Override
     public Object invoke(final Object proxy,final Method method,final Object[] parameters) throws Throwable {
         Object result = null;
         Method realMethod = this.getProxiedInstance().getClass().getMethod(method.getName(), method.getParameterTypes());

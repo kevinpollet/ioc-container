@@ -31,7 +31,6 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void put(final Binding<?> binding) {
         if (binding == null) {
             throw new IllegalArgumentException("The binding parameter cannot be null");
@@ -49,7 +48,6 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean isBindingFor(final Class<?> clazz) {
         return this.bindings.containsKey(clazz);
     }
@@ -57,7 +55,6 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Binding<?> getBindingsFor(final Class<?> clazz) {
         if (clazz == null) {
             throw new IllegalArgumentException("The clazz parameter cannot be null");
@@ -81,7 +78,6 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    @Override
     public <Q extends Annotation> Binding<?> getQualifiedBindingFor(final Class<?> clazz, final Q qualifier) {
         if (clazz == null) {
             throw new IllegalArgumentException("The clazz parameter cannot be null");
@@ -109,7 +105,6 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    @Override
     public List<Binding<?>> removeAllBindingFor(final Class<?> clazz) {
        return this.bindings.remove(clazz);
     }
@@ -117,7 +112,6 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    @Override
     public <Q extends Annotation> Binding<?> removeQualifiedBindingFor(final Class<?> clazz, final Q qualifier) {
         if (clazz == null) {
             throw new IllegalArgumentException("The clazz parameter cannot be null");
@@ -146,7 +140,6 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void removeAllBindings() {
         this.bindings.clear();
     }

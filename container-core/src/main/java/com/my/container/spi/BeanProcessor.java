@@ -7,7 +7,7 @@ package com.my.container.spi;
  *
  * @author kevinpollet
  */
-public abstract class BeanProcessor {
+public interface BeanProcessor {
 
     /**
      * Check if the bean is processable.
@@ -15,7 +15,7 @@ public abstract class BeanProcessor {
      * @param bean the bean to process
      * @return true if the bean is processable or false otherwise
      */
-    public abstract boolean isProcessable(final Object bean);
+    public boolean isProcessable(final Object bean);
 
     /**
      * Process the bean in parameter. <b>This method
@@ -26,6 +26,6 @@ public abstract class BeanProcessor {
      * @return the bean processed
      * @throws Exception if an exception occurs during the bean processing
      */
-    public abstract <T> T processBean(final T bean) throws Exception;
+    public <T> T processBean(final T bean) throws Exception;
 
 }
