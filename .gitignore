@@ -1,4 +1,7 @@
-# ignore MacOs Files
+# ignore Private build dir
+.myPrivateBuild
+
+# ignore MacOs File s
 .DS_Store
 
 # ignore Intellij files
