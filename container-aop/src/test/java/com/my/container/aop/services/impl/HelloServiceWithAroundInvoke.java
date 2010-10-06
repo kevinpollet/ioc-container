@@ -16,12 +16,10 @@ public class HelloServiceWithAroundInvoke implements HelloService {
 
     private int afterCall = 0;
 
-    @Override
     public String sayHello() {
         return "Hello";
     }
 
-    @Override
     public String sayHello(String name) {
         return "Hello " + name;
     }
