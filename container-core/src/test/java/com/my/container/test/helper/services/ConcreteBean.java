@@ -10,5 +10,5 @@ public interface ConcreteBean {
     public String getOverriddenPublicText();
 
     public String getNotOverriddenText();
-    
+
 }

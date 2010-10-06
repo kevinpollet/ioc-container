@@ -7,7 +7,6 @@ import com.my.container.test.injection.services.ServiceC;
  */
 public class EchoServiceC implements ServiceC {
 
-    @Override
     public String echo(final String echo) {
         return echo;
     }

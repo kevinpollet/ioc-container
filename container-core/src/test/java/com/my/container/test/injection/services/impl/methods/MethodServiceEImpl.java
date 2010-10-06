@@ -15,19 +15,17 @@ public class MethodServiceEImpl extends MethodOverrideService implements Service
 
     private ServiceC serviceC;
 
-    @Override
     public int add(int a, int b) {
-        return a+b;
+        return a + b;
     }
 
-    @Override
     public String echo(final String string) {
         return this.serviceD.echo(string);
     }
 
     @Override
     public void setServiceC(final ServiceC serviceC) {
-         this.serviceC = serviceC;
+        this.serviceC = serviceC;
     }
 
     @Inject

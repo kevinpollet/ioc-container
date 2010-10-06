@@ -15,13 +15,11 @@ public class FieldNamedServiceD implements ServiceD {
     @Named("upperEchoService")
     private ServiceC serviceC;
 
-    @Override
     public String echo(final String string) {
         return this.serviceC.echo(string);
     }
 
-    @Override
     public int add(final int a, final int b) {
-        return a+b;
+        return a + b;
     }
 }

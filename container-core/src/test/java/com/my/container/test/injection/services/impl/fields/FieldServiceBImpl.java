@@ -13,7 +13,6 @@ public class FieldServiceBImpl implements ServiceB {
     @Inject
     private ServiceA serviceA;
 
-    @Override
     public String sayHello() {
         return "Hello";
     }

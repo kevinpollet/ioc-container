@@ -16,7 +16,6 @@ public class LeafImpl implements Leaf {
         this.name = "Leaf";
     }
 
-    @Override
     public String getName() {
         return this.name;
     }

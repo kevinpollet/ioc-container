@@ -3,19 +3,15 @@ package com.my.container.test.injection;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
-import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
+import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
 import com.my.container.test.injection.services.impl.EchoServiceC;
 import com.my.container.test.injection.services.impl.LowerEcho;
 import com.my.container.test.injection.services.impl.LowerEchoServiceC;
 import com.my.container.test.injection.services.impl.UpperEchoServiceC;
-import com.my.container.test.injection.services.impl.fields.FieldAbstractService;
-import com.my.container.test.injection.services.impl.fields.FieldQualifierServiceD;
-import com.my.container.test.injection.services.impl.fields.FieldNamedServiceD;
-import com.my.container.test.injection.services.impl.fields.FieldServiceAImpl;
-import com.my.container.test.injection.services.impl.fields.FieldServiceBImpl;
+import com.my.container.test.injection.services.impl.fields.*;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -29,7 +25,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testFieldDependencyInjection() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
@@ -57,7 +53,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testSuperFieldDependencyInjection() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
@@ -70,13 +66,13 @@ public class FieldInjectionTest {
         ServiceA service = context.getBean(ServiceA.class);
 
         Assert.assertNotNull(service);
-        Assert.assertNotNull("SuperClass dependency is null", ((FieldAbstractService)service).getServiceC());
+        Assert.assertNotNull("SuperClass dependency is null", ((FieldAbstractService) service).getServiceC());
         Assert.assertEquals("Hello Injection", service.sayHelloTo("Injection"));
     }
 
     @Test
     public void testCyclicDependencies() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
@@ -103,7 +99,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testExistingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
@@ -129,10 +125,10 @@ public class FieldInjectionTest {
         Assert.assertEquals("Hello Injection", service.sayHelloTo("Injection"));
         Assert.assertEquals("Great injection", service.echo("Great injection"));
     }
-    
+
     @Test
     public void testNamedBindingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
@@ -148,7 +144,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testQualifiedBindingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
-         Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceC.class).to(LowerEchoServiceC.class).qualifiedBy(LowerEcho.class);

@@ -7,7 +7,6 @@ import com.my.container.test.injection.services.ServiceC;
  */
 public class UpperEchoServiceC implements ServiceC {
 
-    @Override
     public String echo(String echo) {
         return echo.toUpperCase();
     }

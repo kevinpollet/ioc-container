@@ -4,8 +4,8 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.test.callbacks.services.Leaf;
-import com.my.container.test.callbacks.services.impl.LeafImpl;
 import com.my.container.test.callbacks.services.Parent;
+import com.my.container.test.callbacks.services.impl.LeafImpl;
 import com.my.container.test.callbacks.services.impl.ParentImpl;
 import junit.framework.Assert;
 import org.junit.Before;
@@ -22,7 +22,7 @@ public class PostConstructTest {
 
     @Before
     public void setUp() {
-        this.context = new ApplicationContext(new BindingProvider(){
+        this.context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(Parent.class).to(ParentImpl.class);

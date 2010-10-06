@@ -13,12 +13,10 @@ public class MethodQualifierServiceA implements ServiceA {
 
     private ServiceC serviceC;
 
-    @Override
     public String echo(final String string) {
         return this.serviceC.echo(string);
     }
 
-    @Override
     public String sayHelloTo(final String name) {
         return "Hello " + name;
     }

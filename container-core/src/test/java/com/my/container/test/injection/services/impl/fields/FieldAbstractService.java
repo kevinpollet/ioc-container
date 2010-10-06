@@ -15,5 +15,5 @@ public abstract class FieldAbstractService {
     public ServiceC getServiceC() {
         return this.serviceC;
     }
-    
+
 }

@@ -15,12 +15,10 @@ public class MethodServiceDImpl extends MethodOverrideService implements Service
 
     private ServiceE serviceE;
 
-    @Override
     public String echo(final String string) {
         return this.serviceC.echo(string);
     }
 
-    @Override
     public int add(int a, int b) {
         return this.serviceE.add(a, b);
     }
@@ -31,7 +29,7 @@ public class MethodServiceDImpl extends MethodOverrideService implements Service
         this.nbCallSetServiceC++;
         this.serviceC = service;
     }
-    
+
 
     @Inject
     public void setServiceE(final ServiceE service) {

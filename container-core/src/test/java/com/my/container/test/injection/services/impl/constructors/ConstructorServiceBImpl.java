@@ -19,7 +19,6 @@ public class ConstructorServiceBImpl implements ServiceB {
         this.serviceA = serviceA;
     }
 
-    @Override
     public String sayHello() {
         return "Hello";
     }

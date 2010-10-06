@@ -16,11 +16,11 @@ import org.junit.Test;
  */
 public class PrototypeScopeTest {
 
-     private Context context;
+    private Context context;
 
     @Before
     public void setUp() {
-        this.context = new ApplicationContext(new BindingProvider(){
+        this.context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(HelloService.class).to(PrototypeHelloService.class);
@@ -40,5 +40,5 @@ public class PrototypeScopeTest {
         Assert.assertEquals("Hello", firstInstance.sayHello());
         Assert.assertEquals("Hello", secondInstance.sayHello());
     }
-    
+
 }

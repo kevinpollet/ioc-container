@@ -34,12 +34,10 @@ public class ParentImpl implements Parent {
         this.leafName = this.leaf.getName();
     }
 
-    @Override
     public String getName() {
         return this.name;
     }
 
-    @Override
     public String getLeafName() {
         return this.leafName;
     }
@@ -47,7 +45,7 @@ public class ParentImpl implements Parent {
     public int getNbCallPostConstruct() {
         return this.nbCallPostConstruct;
     }
-    
+
     public int getNbCallPreDestroy() {
         return this.nbCallPreDestroy;
     }

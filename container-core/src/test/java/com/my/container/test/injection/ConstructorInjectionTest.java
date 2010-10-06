@@ -4,33 +4,24 @@ import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
-import com.my.container.test.injection.services.ServiceC;
-import com.my.container.test.injection.services.ServiceA;
-import com.my.container.test.injection.services.ServiceB;
-import com.my.container.test.injection.services.ServiceD;
-import com.my.container.test.injection.services.ServiceE;
+import com.my.container.test.injection.services.*;
 import com.my.container.test.injection.services.impl.EchoServiceC;
 import com.my.container.test.injection.services.impl.LowerEcho;
-import com.my.container.test.injection.services.impl.constructors.ConstructorNamedServiceE;
-import com.my.container.test.injection.services.impl.constructors.ConstructorQualifierServiceE;
-import com.my.container.test.injection.services.impl.constructors.ConstructorServiceAImpl;
-import com.my.container.test.injection.services.impl.constructors.ConstructorServiceBImpl;
-import com.my.container.test.injection.services.impl.constructors.ConstructorServiceCImpl;
-import com.my.container.test.injection.services.impl.constructors.ConstructorServiceDImpl;
 import com.my.container.test.injection.services.impl.UpperEchoServiceC;
+import com.my.container.test.injection.services.impl.constructors.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * Test the constructor injection.
- * 
+ *
  * @author kevinpollet
  */
 public class ConstructorInjectionTest {
 
     @Test
     public void testConstructorInjection() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceD.class).to(ConstructorServiceDImpl.class);
@@ -46,7 +37,7 @@ public class ConstructorInjectionTest {
 
     @Test(expected = BeanInstantiationException.class)
     public void testCyclicConstructorInjection() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(ConstructorServiceAImpl.class);
@@ -59,7 +50,7 @@ public class ConstructorInjectionTest {
 
     @Test
     public void testDefaultConstructorInjection() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceC.class).to(ConstructorServiceCImpl.class);
@@ -74,7 +65,7 @@ public class ConstructorInjectionTest {
 
     @Test
     public void testNamedConstructorInjection() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceE.class).to(ConstructorQualifierServiceE.class);
@@ -91,7 +82,7 @@ public class ConstructorInjectionTest {
 
     @Test
     public void testCustomQualifierConstructorInjection() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceE.class).to(ConstructorNamedServiceE.class);

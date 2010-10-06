@@ -12,7 +12,7 @@ public abstract class MethodOverrideService {
     protected int nbCallSetServiceC = 0;
 
     @Inject
-    public void setServiceC(final ServiceC serviceC){
+    public void setServiceC(final ServiceC serviceC) {
         this.nbCallSetServiceC++;
     }
 
@@ -20,6 +20,6 @@ public abstract class MethodOverrideService {
     public int getNbCallSetServiceC() {
         return this.nbCallSetServiceC;
     }
-        
+
 
 }

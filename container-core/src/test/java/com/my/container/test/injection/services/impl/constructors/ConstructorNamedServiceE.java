@@ -18,13 +18,11 @@ public class ConstructorNamedServiceE implements ServiceE {
         this.serviceC = serviceC;
     }
 
-    @Override
     public String echo(final String string) {
         return this.serviceC.echo(string);
     }
 
-    @Override
     public int add(final int a, final int b) {
-        return a+b;
+        return a + b;
     }
 }

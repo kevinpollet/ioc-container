@@ -16,7 +16,6 @@ public class ConstructorServiceCImpl implements ServiceC {
 
     }
 
-    @Override
     public String echo(final String echo) {
         return echo;
     }

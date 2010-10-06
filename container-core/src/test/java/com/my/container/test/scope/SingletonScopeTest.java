@@ -20,7 +20,7 @@ public class SingletonScopeTest {
 
     @Before
     public void setUp() {
-        this.context = new ApplicationContext(new BindingProvider(){
+        this.context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(HelloService.class).to(SingletonHelloService.class);

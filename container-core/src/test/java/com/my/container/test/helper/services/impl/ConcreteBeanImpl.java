@@ -17,7 +17,6 @@ public class ConcreteBeanImpl extends AbstractBean implements ConcreteBean {
         return "Override" + super.getOverriddenPublicText();
     }
 
-    @Override
     public String getNotOverriddenText() {
         return "NotOverriddenText";
     }

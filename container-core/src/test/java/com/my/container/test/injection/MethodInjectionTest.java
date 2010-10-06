@@ -12,9 +12,9 @@ import com.my.container.test.injection.services.impl.LowerEcho;
 import com.my.container.test.injection.services.impl.LowerEchoServiceC;
 import com.my.container.test.injection.services.impl.UpperEchoServiceC;
 import com.my.container.test.injection.services.impl.methods.MethodNamedServiceA;
+import com.my.container.test.injection.services.impl.methods.MethodQualifierServiceA;
 import com.my.container.test.injection.services.impl.methods.MethodServiceDImpl;
 import com.my.container.test.injection.services.impl.methods.MethodServiceEImpl;
-import com.my.container.test.injection.services.impl.methods.MethodQualifierServiceA;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class MethodInjectionTest {
 
     @Test
     public void testMethodInjection() {
-      Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceD.class).to(MethodServiceDImpl.class);
@@ -39,12 +39,12 @@ public class MethodInjectionTest {
         ServiceD service = context.getBean(ServiceD.class);
 
         Assert.assertNotNull(service);
-        Assert.assertEquals("Great Method Injection", service.echo("Great Method Injection"));        
+        Assert.assertEquals("Great Method Injection", service.echo("Great Method Injection"));
     }
 
     @Test
     public void testCyclicMethodInjection() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceD.class).to(MethodServiceDImpl.class);
@@ -73,7 +73,7 @@ public class MethodInjectionTest {
 
     @Test
     public void testInjectOverrideInject() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceD.class).to(MethodServiceDImpl.class);
@@ -90,7 +90,7 @@ public class MethodInjectionTest {
 
     @Test
     public void testNoInjectOverrideInject() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceD.class).to(MethodServiceDImpl.class);
@@ -107,7 +107,7 @@ public class MethodInjectionTest {
 
     @Test
     public void testExistingMethodInjection() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceD.class).to(MethodServiceDImpl.class);
@@ -125,7 +125,7 @@ public class MethodInjectionTest {
 
     @Test
     public void testNamedMethodInjection() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(MethodNamedServiceA.class);
@@ -143,7 +143,7 @@ public class MethodInjectionTest {
 
     @Test
     public void testQualifiedMethodInjection() {
-        Context context = new ApplicationContext(new BindingProvider(){
+        Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(MethodQualifierServiceA.class);

@@ -8,7 +8,7 @@ import org.junit.Test;
 
 /**
  * Test the helper class behaviour.
- * 
+ *
  * @author kevinpollet
  */
 public class ReflectionHelperTest {
