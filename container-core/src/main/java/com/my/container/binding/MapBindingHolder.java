@@ -55,12 +55,12 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    public Binding<?> getBindingsFor(final Class<?> clazz) {
+    public <T> Binding<T> getBindingFor(final Class<T> clazz) {
         if (clazz == null) {
             throw new IllegalArgumentException("The clazz parameter cannot be null");
         }
 
-        Binding<?> result = null;
+        Binding<T> result = null;
 
         List<Binding<?>> bindingList = this.bindings.get(clazz);
         if (bindingList != null) {

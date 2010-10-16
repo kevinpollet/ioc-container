@@ -30,9 +30,10 @@ public interface BindingHolder {
      * Retrieve all binding defined ro the given class.
      *
      * @param clazz the class
+     * @param <T> the type of the binding
      * @return null if none or the binding list
      */
-    public  Binding<?> getBindingsFor(final Class<?> clazz);
+    public <T>  Binding<T> getBindingFor(final Class<T> clazz);
 
     /**
      * Get the binding defined for the given class with
