@@ -25,68 +25,131 @@ import java.lang.annotation.Annotation;
 public class Binding<T> {
 
     /**
-     * The contract of the binding.
+     * The class to be bind.
      */
-    private Class<T> intf;
+    private Class<T> clazz;
 
     /**
-     * The implementation of the binding.
+     * The binding implementation class.
      */
     private Class<? extends T> impl;
 
     /**
      * The named qualifier.
+     *
      * @see javax.inject.Named
      */
     private String name;
 
     /**
-     * The customs qualifier. A qualifier is
-     * an annotation annotated with @Qualifier.
+     * The qualifier. A qualifier is an
+     * annotation annotated with @Qualifier.
+     *
      * @see javax.inject.Qualifier
      */
     private Class<? extends Annotation> qualifier;
 
     /**
+     * Create a simple binding where the class to be bind
+     * is equal to the class implementation.
+     *
+     * @param clazz the class to be bind
+     */
+    public Binding(final Class<T> clazz) {
+        this(clazz, clazz);
+    }
+
+    /**
      * Create a binding.
      *
-     * @param intf the binding interface
-     * @param impl the binding implementation
+     * @param clazz the binding class
+     * @param impl  the binding implementation
      */
-    public Binding(final Class<T> intf, final Class<? extends T> impl) {
-        this.intf = intf;
+    public Binding(final Class<T> clazz, final Class<? extends T> impl) {
+        this.clazz = clazz;
         this.impl = impl;
         this.name = null;
         this.qualifier = null;
     }
 
     /**
-     * Create a named binding. A Named binding is used
-     * when the contract is implemented by multiple class.
-     * @see javax.inject.Named
+     * <p>
+     * Create a named binding.
+     * </p>
+     * <p>
+     * A Named binding is a binding who can be injected if the
+     * injection is qualified by @Name like :
+     * <br/>
+     * <br/>
+     * <pre>
+     * public class Sample {
      *
-     * @param intf the binding interface
-     * @param impl the binding implementation
-     * @param name the name of the binding
+     *     &#64;Inject &#64;Name("name")
+     *     private Dependency dependency;
+     *
+     *     &#64;Inject
+     *     public Sample(&#64;Name("name") Dependency dependency) {
+     *      //...
+     *     }
+     *
+     *     &#64;Inject
+     *     public void sampleMethod(&#64;Name("name") Dependency dependency) {
+     *      //...
+     *     }
+     *
+     *  }
+     * </pre>
+     * </p>
+     *
+     * @param clazz the binding class
+     * @param impl  the binding class implementation
+     * @param name  the name qualifier of this binding
+     * @see javax.inject.Named
      */
-    public Binding(final Class<T> intf, final Class<? extends T> impl, final String name) {
-        this.intf = intf;
+    public Binding(final Class<T> clazz, final Class<? extends T> impl, final String name) {
+        this.clazz = clazz;
         this.impl = impl;
         this.name = name;
         this.qualifier = null;
     }
 
     /**
-     * Create a custom qualified binding. A qualified binding is used
-     * when the contract is implemented by multiple class.
-     * @see javax.inject.Qualifier
+     * <p>
+     * Create a qualified binding.
+     * </p>
+     * <p>
+     * A Qualified binding is a binding who can be injected if the
+     * injection is qualified by the the given qualifier. For example
+     * with the qualifier @Foo :
+     * <br/>
+     * <br/>
+     * <pre>
+     * <code>public class Sample {
      *
-     * @param intf the binding interface
-     * @param impl the binding implementation
+     *     &#64;Inject &#64;Foo
+     *     private Dependency dependency;
+     *
+     *     &#64;Inject
+     *     public Sample(&#64;Foo Dependency dependency) {
+     *      //...
+     *     }
+     *
+     *     &#64;Inject
+     *     public void sampleMethod(&#64;Foo Dependency dependency) {
+     *      //...
+     *     }
+     *
+     *  }</code>
+     * </pre>
+     * </p>
+     *
+     * @param clazz     the binding class
+     * @param impl      the binding implementation
      * @param qualifier the qualifier of the binding
+     * @see javax.inject.Qualifier
      */
-    public Binding(final Class<T> intf, final Class<? extends T> impl, final Class<? extends Annotation> qualifier) {
-        this.intf = intf;
+    public Binding(final Class<T> clazz, final Class<? extends T> impl, final Class<? extends Annotation> qualifier) {
+        this.clazz = clazz;
         this.impl = impl;
         this.name = null;
         this.qualifier = qualifier;
@@ -95,19 +158,20 @@ public class Binding<T> {
 
     /**
      * Get the qualifier for this binding.
+     *
      * @return the qualifier
      */
     public Class<? extends Annotation> getQualifier() {
-       return this.qualifier; 
+        return this.qualifier;
     }
 
     /**
-     * Get the binding interface class.
+     * Get the binding class.
      *
-     * @return the interface class
+     * @return the biding class
      */
-    public Class<T> getInterface() {
-        return this.intf;
+    public Class<T> getClazz() {
+        return this.clazz;
     }
 
     /**
@@ -120,21 +184,21 @@ public class Binding<T> {
     }
 
     /**
-     * Get the binding Named qualifier.
+     * Get the binding Named qualifier value.
      *
-     * @return the name of the binding
+     * @return the value of the name qualifier or null if none
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * Set the binding interface class.
+     * Set the binding class.
      *
-     * @param intf the binding interface class
+     * @param clazz the binding class
      */
-    public void setInterface(final Class<T> intf) {
-        this.intf = intf;
+    public void setClazz(final Class<T> clazz) {
+        this.clazz = clazz;
     }
 
     /**
@@ -147,9 +211,9 @@ public class Binding<T> {
     }
 
     /**
-     * Set the binding named
+     * Set the binding name qualifier value
      *
-     * @param name the name of the binding
+     * @param name the name of the name qualifier value
      */
     public void setNamed(final String name) {
         this.name = name;
@@ -157,7 +221,8 @@ public class Binding<T> {
 
     /**
      * Set the binding qualifier.
-     * @param qualifier the qualifier
+     *
+     * @param qualifier the qualifier of the binding or null if none
      */
     public void setQualifier(final Class<? extends Annotation> qualifier) {
         this.qualifier = qualifier;

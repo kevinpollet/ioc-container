@@ -19,6 +19,7 @@ import com.my.container.binding.Binding;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -45,40 +46,47 @@ public abstract class BindingProvider {
      * Get the binding provider list.
      */
     public final List<Binding<?>> getBindings() {
-        return bindings;
+        return Collections.unmodifiableList(bindings);
     }
 
     /**
-     * Initiate the binding creation.
-     * @param intf the binding interface
+     * Bind a class.
+     *
+     * @param clazz the class to bind
+     */
+    protected final void bindClass(final Class<?> clazz) {
+        this.bindings.add(new Binding(clazz, clazz));
+    }
+
+    /**
+     * Create a binding.
+     *
+     * @param clazz the binding class
      * @return the binding builder
      */
-    protected final <T> BasicBindingBuilder<T> bind(final Class<T> intf) {
-        return this.new BasicBindingBuilder<T>(new Binding<T>(intf, null));
+    protected final <T> BindingBuilder<T> bind(final Class<T> clazz) {
+        return this.new BindingBuilder(new Binding<T>(clazz));
     }
 
     /**
      * <p>
      * Configure the binding list provided by this
-     * binding provider.
-     * </p>
-     * <p>
-     * To add a binding you can use the following code :
+     * binding provider. To add a binding you can
+     * use the following code :
      * <pre>
-     * bind(interface.class).to(implementation.class)
-     * bind(interface.class).to(implementation.class).named("name")
-     * bind(interface.class).to(implementation.class).qualifiedBy(MyQualifier.class)
+     * bindClass(class)
+     * bind(class).to(implementation)
+     * bind(class).to(implementation).named("myName")
+     * bind(class).to(implementation).qualifiedBy(MyQualifier)
      * </pre>
      * </p>
      */
     public abstract void configureBindings();
 
-    /*--------- Inner Fluent Binding builder ---------*/
-
     /**
      * The basic binding builder inner class.
      */
-    protected final class BasicBindingBuilder<T> {
+    protected final class BindingBuilder<T> {
 
         /**
          * The binding to be built.
@@ -90,7 +98,7 @@ public abstract class BindingProvider {
          * 
          * @param binding the binding to be build
          */
-        private BasicBindingBuilder(final Binding<T> binding) {
+        private BindingBuilder(final Binding<T> binding) {
             this.binding = binding;
         }
 
@@ -99,21 +107,17 @@ public abstract class BindingProvider {
          *
          * @param impl the implementation
          */
-        public final QualifierBindingBuilder to(final Class<? extends T> impl) {
+        public final QualifiedBindingBuilder to(final Class<? extends T> impl) {
             this.binding.setImplementation(impl);
-
-            // Binding can be added because a binding
-            // is valid with no qualifier.
-            BindingProvider.this.bindings.add(binding);
-
-            return  BindingProvider.this.new QualifierBindingBuilder<T>(this.binding);
+            BindingProvider.this.bindings.add(this.binding);
+            return BindingProvider.this.new QualifiedBindingBuilder(this.binding);
         }
     }
 
     /**
      * The qualifier binding builder inner class .
      */
-    protected final class QualifierBindingBuilder<T> {
+    protected final class QualifiedBindingBuilder<T> {
 
         /**
          * The binding to be build.
@@ -125,7 +129,7 @@ public abstract class BindingProvider {
          *
          * @param binding the binding to be built.
          */
-        public QualifierBindingBuilder(final Binding<T> binding) {
+        public QualifiedBindingBuilder(final Binding<T> binding) {
             this.binding = binding;
         }
 

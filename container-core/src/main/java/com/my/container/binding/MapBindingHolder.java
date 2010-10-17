@@ -51,13 +51,13 @@ public class MapBindingHolder implements BindingHolder {
             throw new IllegalArgumentException("The binding parameter cannot be null");
         }
 
-        List<Binding<?>> bindingList = this.bindings.get(binding.getInterface());
+        List<Binding<?>> bindingList = this.bindings.get(binding.getClazz());
         if (bindingList == null) {
             bindingList = new ArrayList<Binding<?>>();
         }
 
         bindingList.add(binding);
-        this.bindings.put(binding.getInterface(), bindingList);
+        this.bindings.put(binding.getClazz(), bindingList);
     }
 
     /**
