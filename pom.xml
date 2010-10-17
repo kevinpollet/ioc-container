@@ -13,11 +13,11 @@
 
     <distributionManagement>
         <repository>
-            <id>releases</id>
+            <id>release-repo</id>
             <url>http://github.com/kevinpollet/maven-repository/tree/master/releases</url>
         </repository>
         <snapshotRepository>
-            <id>snapshots</id>
+            <id>snapshot-repo</id>
             <url>http://github.com/kevinpollet/maven-repository/tree/master/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
