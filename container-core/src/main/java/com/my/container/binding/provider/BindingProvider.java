@@ -16,7 +16,9 @@
 package com.my.container.binding.provider;
 
 import com.my.container.binding.Binding;
+import com.my.container.binding.ProvidedBinding;
 
+import javax.inject.Provider;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +57,7 @@ public abstract class BindingProvider {
      * @param clazz the class to bind
      */
     protected final void bindClass(final Class<?> clazz) {
-        this.bindings.add(new Binding(clazz, clazz));
+        this.bindings.add(new Binding(clazz));
     }
 
     /**
@@ -65,7 +67,7 @@ public abstract class BindingProvider {
      * @return the binding builder
      */
     protected final <T> BindingBuilder<T> bind(final Class<T> clazz) {
-        return this.new BindingBuilder(new Binding<T>(clazz));
+        return this.new BindingBuilder(clazz);
     }
 
     /**
@@ -89,29 +91,41 @@ public abstract class BindingProvider {
     protected final class BindingBuilder<T> {
 
         /**
-         * The binding to be built.
+         * The clazz to be bind.
          */
-        private Binding<T> binding;
+        private final Class<T> clazz;
 
         /**
          * The BasicBindingBuilder constructor.
          * 
-         * @param binding the binding to be build
+         * @param clazz the clazz to be bind
          */
-        private BindingBuilder(final Binding<T> binding) {
-            this.binding = binding;
+        private BindingBuilder(final Class<T> clazz) {
+            this.clazz = clazz;
         }
 
         /**
          * The binding implementation.
          *
-         * @param impl the implementation
+         * @param impl the implementation class
          */
-        public final QualifiedBindingBuilder to(final Class<? extends T> impl) {
-            this.binding.setImplementation(impl);
-            BindingProvider.this.bindings.add(this.binding);
-            return BindingProvider.this.new QualifiedBindingBuilder(this.binding);
+        public QualifiedBindingBuilder to(final Class<? extends T> impl) {
+            Binding<T> binding = new Binding<T>(this.clazz, impl);
+            BindingProvider.this.bindings.add(binding);
+            return BindingProvider.this.new QualifiedBindingBuilder(binding);
         }
+
+        /**
+         * The binding provider
+         *
+         * @param provider the provider class
+         */
+        public QualifiedBindingBuilder toProvider(final Class<? extends Provider<T>> provider) {
+            Binding<T> binding = new ProvidedBinding<T>(this.clazz, provider);
+            BindingProvider.this.bindings.add(binding);
+            return BindingProvider.this.new QualifiedBindingBuilder(binding);
+        }
+        
     }
 
     /**
@@ -120,9 +134,9 @@ public abstract class BindingProvider {
     protected final class QualifiedBindingBuilder<T> {
 
         /**
-         * The binding to be build.
+         * The binding to be built.
          */
-        private Binding<T> binding;
+        private final Binding<T> binding;
 
         /**
          * Create a QualifierBindingBuilder.
@@ -139,7 +153,7 @@ public abstract class BindingProvider {
          *
          * @param named the Named qualifier binding named
          */
-        public final void named(final String named) {
+        public void named(final String named) {
             this.binding.setNamed(named);
         }
 
@@ -148,7 +162,7 @@ public abstract class BindingProvider {
          *
          * @param qualifier the class of the qualifier 
          */
-        public final void qualifiedBy(final Class<? extends Annotation> qualifier) {
+        public void qualifiedBy(final Class<? extends Annotation> qualifier) {
             this.binding.setQualifier(qualifier);
         }
 

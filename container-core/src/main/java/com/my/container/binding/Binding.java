@@ -155,7 +155,6 @@ public class Binding<T> {
         this.qualifier = qualifier;
     }
 
-
     /**
      * Get the qualifier for this binding.
      *
