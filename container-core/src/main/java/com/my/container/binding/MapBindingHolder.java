@@ -94,22 +94,23 @@ public class MapBindingHolder implements BindingHolder {
         if (clazz == null) {
             throw new IllegalArgumentException("The clazz parameter cannot be null");
         }
-        if (!qualifier.annotationType().isAnnotationPresent(Qualifier.class)) {
+        if (qualifier != null && !qualifier.annotationType().isAnnotationPresent(Qualifier.class)) {
             throw new IllegalArgumentException("The qualifier must be annotated with @Qualifier");
-        }
-        if (qualifier == null) {
-            return this.getBindingFor(clazz);
         }
 
         Binding<?> result = null;
 
-        List<Binding<?>> bindingList = this.bindings.get(clazz);
-        if (bindingList != null) {
-            for (Binding b : bindingList) {
-                if ((qualifier instanceof Named && ((Named) qualifier).value().equals(b.getName())) ||
-                    qualifier.annotationType().equals(b.getQualifier())) {
-                    result = b;
-                    break;
+        if (qualifier == null) {
+            result = this.getBindingFor(clazz);
+        } else {
+            List<Binding<?>> bindingList = this.bindings.get(clazz);
+            if (bindingList != null) {
+                for (Binding b : bindingList) {
+                    if ((qualifier instanceof Named && ((Named) qualifier).value().equals(b.getName())) ||
+                            qualifier.annotationType().equals(b.getQualifier())) {
+                        result = b;
+                        break;
+                    }
                 }
             }
         }
