@@ -135,7 +135,7 @@ public final class ServiceLoader<S> implements Iterable<S> {
                         try {
 
                             this.logger.info("Load provider implementation {}", className);
-                            Class<? extends S> clazz = (Class<? extends S>) Class.forName(className);
+                            Class<? extends S> clazz = (Class<? extends S>) classLoader.loadClass(className);
                             this.providers.add(contract.cast(clazz.newInstance()));
 
                         } catch (ClassNotFoundException ex) {
