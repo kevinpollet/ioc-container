@@ -31,13 +31,10 @@ import java.util.Map;
  */
 public class MapBindingHolder implements BindingHolder {
 
-    /**
-     * The bindings map.
-     */
     private Map<Class<?>, List<Binding<?>>> bindings;
 
     /**
-     * The default constructor. 
+     * Default constructor. 
      */
     public MapBindingHolder() {
         this.bindings = new HashMap<Class<?>, List<Binding<?>>>();
@@ -93,11 +90,15 @@ public class MapBindingHolder implements BindingHolder {
     /**
      * {@inheritDoc}
      */
-    public <Q extends Annotation> Binding<?> getQualifiedBindingFor(final Class<?> clazz, final Q qualifier) {
+    public <Q extends Annotation> Binding<?> getBindingFor(final Class<?> clazz, final Q qualifier) {
         if (clazz == null) {
             throw new IllegalArgumentException("The clazz parameter cannot be null");
-        } else if (qualifier == null || !qualifier.annotationType().isAnnotationPresent(Qualifier.class)) {
-            throw new IllegalArgumentException("The qualifier cannot be null or must be annotated with @Qualifier");
+        }
+        if (!qualifier.annotationType().isAnnotationPresent(Qualifier.class)) {
+            throw new IllegalArgumentException("The qualifier must be annotated with @Qualifier");
+        }
+        if (qualifier == null) {
+            return this.getBindingFor(clazz);
         }
 
         Binding<?> result = null;
@@ -107,7 +108,6 @@ public class MapBindingHolder implements BindingHolder {
             for (Binding b : bindingList) {
                 if ((qualifier instanceof Named && ((Named) qualifier).value().equals(b.getName())) ||
                     qualifier.annotationType().equals(b.getQualifier())) {
-                    
                     result = b;
                     break;
                 }
@@ -141,7 +141,6 @@ public class MapBindingHolder implements BindingHolder {
             for (Binding b : bindingList) {
                 if ((qualifier instanceof Named && ((Named) qualifier).value().equals(b.getName())) ||
                     qualifier.annotationType().equals(b.getQualifier())) {
-
                     result = b;
                     break;
                 }
@@ -158,6 +157,5 @@ public class MapBindingHolder implements BindingHolder {
     public void removeAllBindings() {
         this.bindings.clear();
     }
-
 
 }

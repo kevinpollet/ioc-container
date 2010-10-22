@@ -22,7 +22,7 @@ import java.util.List;
  * This interface is the contract for
  * a binding holder.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public interface BindingHolder {
 
@@ -42,7 +42,7 @@ public interface BindingHolder {
     public boolean isBindingFor(final Class<?> clazz);
 
     /**
-     * Retrieve all binding defined ro the given class.
+     * Retrieve all binding defined to the given class.
      *
      * @param clazz the class
      * @param <T> the type of the binding
@@ -52,14 +52,17 @@ public interface BindingHolder {
 
     /**
      * Get the binding defined for the given class with
-     * the given qualifier.
+     * the given qualifier. if the qualifier parameter
+     * is null have the same effect of calling the
+     * {@link com.my.container.binding.BindingHolder#getBindingFor(Class)}
+     * method.
      *
      * @param clazz the class
      * @param qualifier the binding qualifier
      * @param <Q> the qualifier type
      * @return null if none or the binding
      */
-    public <Q extends Annotation> Binding<?> getQualifiedBindingFor(final Class<?> clazz, final Q qualifier);
+    public <Q extends Annotation> Binding<?> getBindingFor(final Class<?> clazz, final Q qualifier);
 
     /**
      * Remove all the bindings for the given class.
