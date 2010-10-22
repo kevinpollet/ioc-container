@@ -18,7 +18,7 @@ package com.my.container.aop;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
-import com.my.container.context.beanfactory.proxy.ProxyHelper;
+import com.my.container.util.ProxyHelper;
 import com.my.container.aop.services.HelloService;
 import com.my.container.aop.services.impl.HelloServiceWithAroundInvoke;
 import org.junit.Assert;

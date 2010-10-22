@@ -18,7 +18,7 @@ package com.my.container.context.beanfactory.injector;
 import com.my.container.binding.Binding;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.context.beanfactory.proxy.ProxyHelper;
+import com.my.container.util.ProxyHelper;
 import com.my.container.util.ReflectionHelper;
 
 import javax.inject.Inject;
@@ -103,7 +103,7 @@ public class MethodInjector {
 
                         //Get binding
                         if (qualifier != null) {
-                            binding = context.getBeanFactory().getBindingHolder().getQualifiedBindingFor(parametersClass[i], qualifier);
+                            binding = context.getBeanFactory().getBindingHolder().getBindingFor(parametersClass[i], qualifier);
                         } else {
                             binding = context.getBeanFactory().getBindingHolder().getBindingFor(parametersClass[i]);
                         }

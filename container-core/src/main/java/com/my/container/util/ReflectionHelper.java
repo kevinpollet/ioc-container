@@ -15,6 +15,8 @@
  */
 package com.my.container.util;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,6 +38,32 @@ public final class ReflectionHelper {
     private ReflectionHelper() {
     }
 
+    /**
+     * Check if there is callback method in the
+     * given clazz. A callback method is a method
+     * annotated by {link PostConstruct} or {link PreDestroy}.
+     *
+     * @param clazz the clazz
+     * @return true if one, false otherwise
+     * @throws IllegalArgumentException if clazz parameter is null
+     */
+    public static boolean isCallbackMethod(final Class<?> clazz) {
+        if (clazz == null) {
+            throw new IllegalArgumentException("The clazz parameter cannot be null");
+        }
+
+        Method[] methods = clazz.getDeclaredMethods();
+        for(Method method : methods) {
+            if (method.isAnnotationPresent(PostConstruct.class) ||
+                method.isAnnotationPresent(PreDestroy.class)) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     /**
      * This method permits to know if a method is
      * overridden by subclass.

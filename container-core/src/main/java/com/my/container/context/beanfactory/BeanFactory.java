@@ -18,11 +18,12 @@ package com.my.container.context.beanfactory;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.MapBindingHolder;
+import com.my.container.binding.ProvidedBinding;
 import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.context.beanfactory.injector.InjectionContext;
 import com.my.container.context.beanfactory.injector.Injector;
-import com.my.container.context.beanfactory.proxy.ProxyHelper;
+import com.my.container.util.ProxyHelper;
 import com.my.container.spi.BeanProcessor;
 import com.my.container.spi.loader.ServiceLoader;
 import com.my.container.util.ReflectionHelper;
@@ -49,12 +50,11 @@ import java.util.Map;
  */
 public final class BeanFactory {
 
-    /**
-     * The logger.
-     */
     private final Logger logger = LoggerFactory.getLogger(BeanFactory.class);
 
     private final BindingHolder holder;
+
+    private final BindingHolder providerHolder;
 
     private final List<Object> prototypesBean;
 
@@ -71,6 +71,7 @@ public final class BeanFactory {
      */
     public BeanFactory(final List<Binding<?>> list) {
         this.holder = new MapBindingHolder();
+        this.providerHolder = new MapBindingHolder();
 
         this.prototypesBean = new ArrayList<Object>();
         this.singletonsBean = new HashMap<Class<?>, Object>();
@@ -87,7 +88,11 @@ public final class BeanFactory {
         //Populate holder
         if (list != null) {
             for (Binding b : list) {
-                this.holder.put(b);
+                if (b instanceof ProvidedBinding) {
+                    this.providerHolder.put(b);
+                } else {
+                    this.holder.put(b);
+                }
             }
         }
     }
@@ -140,7 +145,7 @@ public final class BeanFactory {
         List<Object> newlyCreatedBean = new ArrayList<Object>();
         InjectionContext context = new InjectionContext(this, newlyCreatedBean);
 
-        this.injector.injectExistingInstance(context, bean);
+        this.injector.injectDependencies(context, bean);
 
         //Call PostConstruct method on newly created bean
         this.invokePostConstructCallback(newlyCreatedBean);
@@ -214,6 +219,15 @@ public final class BeanFactory {
         return this.holder;
     }
 
+    /**
+     * Get the provided binding holder.
+     *
+     * @return the provided binding holder
+     */
+    public BindingHolder getProviderHolder() {
+        return this.providerHolder;
+    }
+    
     /**
      * Call PostConstruct callback on a list of bean.
      *

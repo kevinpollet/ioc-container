@@ -18,7 +18,7 @@ package com.my.container.context.beanfactory.injector;
 import com.my.container.binding.Binding;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.context.beanfactory.proxy.ProxyHelper;
+import com.my.container.util.ProxyHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +96,7 @@ public class FieldInjector {
                 if (qualifier == null) {
                     binding = context.getBeanFactory().getBindingHolder().getBindingFor(field.getType());
                 } else {
-                    binding = context.getBeanFactory().getBindingHolder().getQualifiedBindingFor(field.getType(), qualifier);
+                    binding = context.getBeanFactory().getBindingHolder().getBindingFor(field.getType(), qualifier);
                 }
 
                 if (binding == null) {

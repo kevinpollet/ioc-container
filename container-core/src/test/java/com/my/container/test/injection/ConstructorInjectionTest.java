@@ -20,19 +20,32 @@ import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import com.my.container.context.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.test.injection.services.*;
-import com.my.container.test.injection.services.impl.EchoServiceC;
-import com.my.container.test.injection.services.impl.LowerEcho;
-import com.my.container.test.injection.services.impl.UpperEchoServiceC;
+import com.my.container.test.injection.services.impl.*;
 import com.my.container.test.injection.services.impl.constructors.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test the constructor injection.
+ * Test Injection in constructor.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public class ConstructorInjectionTest {
+
+    @Test
+    public void testEmptyConstructorInjection() {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceC.class).to(ConstructorServiceCImpl.class);
+            }
+        });
+
+        ServiceC serviceC = context.getBean(ServiceC.class);
+
+        Assert.assertNotNull(serviceC);
+        Assert.assertEquals("Echo", serviceC.echo("Echo"));
+    }
 
     @Test
     public void testConstructorInjection() {
@@ -48,34 +61,6 @@ public class ConstructorInjectionTest {
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("Hello", serviceD.echo("Hello"));
-    }
-
-    @Test(expected = BeanInstantiationException.class)
-    public void testCyclicConstructorInjection() {
-        Context context = new ApplicationContext(new BindingProvider() {
-            @Override
-            public void configureBindings() {
-                bind(ServiceA.class).to(ConstructorServiceAImpl.class);
-                bind(ServiceB.class).to(ConstructorServiceBImpl.class);
-            }
-        });
-
-        context.getBean(ServiceA.class);
-    }
-
-    @Test
-    public void testDefaultConstructorInjection() {
-        Context context = new ApplicationContext(new BindingProvider() {
-            @Override
-            public void configureBindings() {
-                bind(ServiceC.class).to(ConstructorServiceCImpl.class);
-            }
-        });
-
-        ServiceC serviceC = context.getBean(ServiceC.class);
-
-        Assert.assertNotNull(serviceC);
-        Assert.assertEquals("Echo", serviceC.echo("Echo"));
     }
 
     @Test
@@ -96,7 +81,7 @@ public class ConstructorInjectionTest {
     }
 
     @Test
-    public void testCustomQualifierConstructorInjection() {
+    public void testQualifierConstructorInjection() {
         Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
@@ -110,6 +95,51 @@ public class ConstructorInjectionTest {
 
         Assert.assertNotNull(serviceE);
         Assert.assertEquals("ECHO", serviceE.echo("echo"));
+    }
+
+    @Test
+    public void testUserProviderConstructorInjection() {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceE.class).to(ConstructorProviderServiceE.class);
+                bind(ServiceC.class).toProvider(LowerEchoProvider.class);
+            }
+        });
+
+        ServiceE serviceE = context.getBean(ServiceE.class);
+
+        Assert.assertNotNull(serviceE);
+        Assert.assertEquals("echo", serviceE.echo("ECHO"));
+    }
+
+    @Test
+    public void testDefaultProviderConstructorInjection() {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceE.class).to(ConstructorProviderServiceE.class);
+                bind(ServiceC.class).to(LowerEchoServiceC.class);
+            }
+        });
+
+        ServiceE serviceE = context.getBean(ServiceE.class);
+
+        Assert.assertNotNull(serviceE);
+        Assert.assertEquals("echo", serviceE.echo("ECHO"));
+    }
+
+    @Test(expected = BeanInstantiationException.class)
+    public void testCyclicConstructorInjection() {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceA.class).to(ConstructorServiceAImpl.class);
+                bind(ServiceB.class).to(ConstructorServiceBImpl.class);
+            }
+        });
+
+        context.getBean(ServiceA.class);
     }
 
 }
