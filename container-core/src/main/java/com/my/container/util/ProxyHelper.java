@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory.proxy;
+package com.my.container.util;
+
+import com.my.container.context.beanfactory.proxy.AbstractBeanAwareInvocationHandler;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
