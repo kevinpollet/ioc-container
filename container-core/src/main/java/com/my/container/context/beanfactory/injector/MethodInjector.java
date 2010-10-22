@@ -16,17 +16,22 @@
 package com.my.container.context.beanfactory.injector;
 
 import com.my.container.binding.Binding;
+import com.my.container.binding.ProvidedBinding;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.util.ProxyHelper;
-import com.my.container.util.ReflectionHelper;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+import static com.my.container.util.ReflectionHelper.isOverridden;
 
 /**
  * Definition pf an Injector of fields.
@@ -68,28 +73,27 @@ public class MethodInjector {
 
             if (method.isAnnotationPresent(Inject.class)) {
 
-                boolean isOverridden = ReflectionHelper.isOverridden(ProxyHelper.getTargetClass(instance), method);
-                boolean isAccessible = !Modifier.isPrivate(method.getModifiers());
-
                 if (Modifier.isAbstract(method.getModifiers())) {
                     throw new BeanDependencyInjectionException(String.format("Injection of dependencies in abstract method %s is invalid in class %s.", method.getName(), clazz.getName()));
                 }
 
-                if (!isOverridden) {
+                if (!isOverridden(ProxyHelper.getTargetClass(instance), method)) {
 
                     Class<?>[] parametersClass = method.getParameterTypes();
                     Object[] parameters = new Object[parametersClass.length];
+                    Type[] parametersType = method.getGenericParameterTypes();
                     Annotation[][] parametersAnnotation = method.getParameterAnnotations();
 
-                    //Mark this class
                     context.getCyclicHandlerMap().put(instance.getClass(), instance);
 
                     for (int i = 0; i < parametersClass.length; i++) {
 
-                        Binding<?> binding;
+                        Binding<?> injectionBinding;
                         Annotation qualifier = null;
+                        Class<?> parameterClass = parametersClass[i];
 
-                        if (parametersClass[i].equals(clazz)) {
+                        //Method cannot declare parameter of type of it's enclosing class
+                        if (parameterClass.isAssignableFrom(clazz)) {
                             throw new BeanDependencyInjectionException(String.format("Method injection for %s cannot have a parameter of their own type.", parametersClass[i].getSimpleName()));
                         }
 
@@ -101,49 +105,49 @@ public class MethodInjector {
                             }
                         }
 
-                        //Get binding
-                        if (qualifier != null) {
-                            binding = context.getBeanFactory().getBindingHolder().getBindingFor(parametersClass[i], qualifier);
+                        //Create parameter instance
+                        if (parameterClass.isAssignableFrom(Provider.class)) {
+                            if (parametersType[i] instanceof ParameterizedType) {
+                                Class<?> classToInject = (Class<?>) ((ParameterizedType) parametersType[i]).getActualTypeArguments()[0];
+                                injectionBinding = context.getBeanFactory().getProviderHolder().getBindingFor(classToInject, qualifier);
+                                if (injectionBinding == null) {
+                                    parameters[i] = new DefaultInstanceProvider(context.getBeanFactory(), classToInject);
+                                } else {
+                                    parameters[i] = this.injector.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
+                                }
+                            }
                         } else {
-                            binding = context.getBeanFactory().getBindingHolder().getBindingFor(parametersClass[i]);
+                            injectionBinding = context.getBeanFactory().getBindingHolder().getBindingFor(parameterClass, qualifier);
+                            if (injectionBinding == null) {
+                                throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", parameterClass.getName()));
+                            }
+                            parameters[i] = this.injector.constructClass(context, injectionBinding.getImplementation());
                         }
-
-                        if (binding == null) {
-                            throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", parametersClass[i].getName()));
-                        }
-
-                        //Create and store parameter
-                        parameters[i] = this.injector.constructClass(context, binding.getImplementation());
-
                     }
 
 
                     //Call method
                     try {
 
-                        if (!isAccessible) {
+                        if (Modifier.isPrivate(method.getModifiers())) {
                             method.setAccessible(true);
                         }
-
                         method.invoke(ProxyHelper.getTargetObject(instance), parameters);
 
-                        //Remove mark
-                        context.getCyclicHandlerMap().remove(instance.getClass());
-
-                    } catch (IllegalAccessException ex) {
+                    }
+                    catch (IllegalAccessException ex) {
                         throw new BeanDependencyInjectionException(ex);
-                    } catch (InvocationTargetException ex) {
+                    }
+                    catch (InvocationTargetException ex) {
                         throw new BeanDependencyInjectionException(ex);
                     }
 
+                    //Remove mark
+                    context.getCyclicHandlerMap().remove(instance.getClass());
 
                 }
-
             }
-
         }
-
-
     }
 
 }

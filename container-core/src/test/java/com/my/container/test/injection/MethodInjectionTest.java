@@ -24,9 +24,11 @@ import com.my.container.test.injection.services.ServiceD;
 import com.my.container.test.injection.services.ServiceE;
 import com.my.container.test.injection.services.impl.EchoServiceC;
 import com.my.container.test.injection.services.impl.LowerEcho;
+import com.my.container.test.injection.services.impl.LowerEchoProvider;
 import com.my.container.test.injection.services.impl.LowerEchoServiceC;
 import com.my.container.test.injection.services.impl.UpperEchoServiceC;
 import com.my.container.test.injection.services.impl.methods.MethodNamedServiceA;
+import com.my.container.test.injection.services.impl.methods.MethodProviderServiceA;
 import com.my.container.test.injection.services.impl.methods.MethodQualifierServiceA;
 import com.my.container.test.injection.services.impl.methods.MethodServiceDImpl;
 import com.my.container.test.injection.services.impl.methods.MethodServiceEImpl;
@@ -58,36 +60,7 @@ public class MethodInjectionTest {
     }
 
     @Test
-    public void testCyclicMethodInjection() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider() {
-            @Override
-            public void configureBindings() {
-                bind(ServiceD.class).to(MethodServiceDImpl.class);
-                bind(ServiceC.class).to(EchoServiceC.class);
-                bind(ServiceE.class).to(MethodServiceEImpl.class);
-            }
-        });
-
-        ServiceD serviceD = context.getBean(ServiceD.class);
-
-        //Get depE for serviceD
-        Field depE = MethodServiceDImpl.class.getDeclaredField("serviceE");
-        depE.setAccessible(true);
-
-        //Get depD for serviceE
-        Field depD = MethodServiceEImpl.class.getDeclaredField("serviceD");
-        depD.setAccessible(true);
-
-
-        Assert.assertNotNull(serviceD);
-        Assert.assertEquals(2, serviceD.add(1, 1));
-        Assert.assertEquals("Hello", ((ServiceE) depE.get(serviceD)).echo("Hello"));
-        Assert.assertSame(serviceD, depD.get(depE.get(serviceD)));
-
-    }
-
-    @Test
-    public void testInjectOverrideInject() {
+    public void testInjectOverriddenInjectMethod() {
         Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
@@ -104,7 +77,7 @@ public class MethodInjectionTest {
     }
 
     @Test
-    public void testNoInjectOverrideInject() {
+    public void testNoInjectOverriddenInjectMethod() {
         Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
@@ -172,6 +145,67 @@ public class MethodInjectionTest {
 
         Assert.assertNotNull(service);
         Assert.assertEquals("echo", service.echo("ECHO"));
+    }
+
+    @Test
+    public void testDefaultProviderMethodInjection() {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceA.class).to(MethodProviderServiceA.class);
+                bind(ServiceC.class).to(LowerEchoServiceC.class);
+            }
+        });
+
+        ServiceA service = context.getBean(ServiceA.class);
+
+        Assert.assertNotNull(service);
+        Assert.assertEquals("echo", service.echo("ECHO"));
+    }
+
+    @Test
+    public void testUserProviderMethodInjection() {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceA.class).to(MethodProviderServiceA.class);
+                bind(ServiceC.class).toProvider(LowerEchoProvider.class);
+            }
+        });
+
+        ServiceA service = context.getBean(ServiceA.class);
+
+        Assert.assertNotNull(service);
+        Assert.assertEquals("echo", service.echo("ECHO"));
+    }
+
+    @Test
+    public void testCyclicMethodInjection() throws NoSuchFieldException, IllegalAccessException {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceD.class).to(MethodServiceDImpl.class);
+                bind(ServiceC.class).to(EchoServiceC.class);
+                bind(ServiceE.class).to(MethodServiceEImpl.class);
+            }
+        });
+
+        ServiceD serviceD = context.getBean(ServiceD.class);
+
+        //Get depE for serviceD
+        Field depE = MethodServiceDImpl.class.getDeclaredField("serviceE");
+        depE.setAccessible(true);
+
+        //Get depD for serviceE
+        Field depD = MethodServiceEImpl.class.getDeclaredField("serviceD");
+        depD.setAccessible(true);
+
+
+        Assert.assertNotNull(serviceD);
+        Assert.assertEquals(2, serviceD.add(1, 1));
+        Assert.assertEquals("Hello", ((ServiceE) depE.get(serviceD)).echo("Hello"));
+        Assert.assertSame(serviceD, depD.get(depE.get(serviceD)));
+
     }
 
 }
