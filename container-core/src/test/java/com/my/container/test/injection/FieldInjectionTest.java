@@ -24,9 +24,15 @@ import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
 import com.my.container.test.injection.services.impl.EchoServiceC;
 import com.my.container.test.injection.services.impl.LowerEcho;
+import com.my.container.test.injection.services.impl.LowerEchoProvider;
 import com.my.container.test.injection.services.impl.LowerEchoServiceC;
 import com.my.container.test.injection.services.impl.UpperEchoServiceC;
-import com.my.container.test.injection.services.impl.fields.*;
+import com.my.container.test.injection.services.impl.fields.FieldAbstractService;
+import com.my.container.test.injection.services.impl.fields.FieldNamedServiceD;
+import com.my.container.test.injection.services.impl.fields.FieldProviderServiceD;
+import com.my.container.test.injection.services.impl.fields.FieldQualifierServiceD;
+import com.my.container.test.injection.services.impl.fields.FieldServiceAImpl;
+import com.my.container.test.injection.services.impl.fields.FieldServiceBImpl;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -34,7 +40,7 @@ import java.lang.reflect.Field;
 
 
 /**
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public class FieldInjectionTest {
 
@@ -67,7 +73,7 @@ public class FieldInjectionTest {
     }
 
     @Test
-    public void testSuperFieldDependencyInjection() throws NoSuchFieldException, IllegalAccessException {
+    public void testSuperFieldDependencyInjection() {
         Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
@@ -83,33 +89,6 @@ public class FieldInjectionTest {
         Assert.assertNotNull(service);
         Assert.assertNotNull("SuperClass dependency is null", ((FieldAbstractService) service).getServiceC());
         Assert.assertEquals("Hello Injection", service.sayHelloTo("Injection"));
-    }
-
-    @Test
-    public void testCyclicDependencies() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider() {
-            @Override
-            public void configureBindings() {
-                bind(ServiceA.class).to(FieldServiceAImpl.class);
-                bind(ServiceB.class).to(FieldServiceBImpl.class);
-                bind(ServiceC.class).to(EchoServiceC.class);
-                bind(ServiceD.class).to(FieldNamedServiceD.class);
-            }
-        });
-
-        ServiceA serviceA = context.getBean(ServiceA.class);
-
-        //ServiceC dependency
-        Field depB = FieldServiceAImpl.class.getDeclaredField("serviceB");
-        depB.setAccessible(true);
-
-        ServiceB serviceB = (ServiceB) depB.get(serviceA);
-        Field depA = FieldServiceBImpl.class.getDeclaredField("serviceA");
-        depA.setAccessible(true);
-
-        Assert.assertNotNull(serviceA);
-        Assert.assertNotNull(serviceB);
-        Assert.assertSame("The objects have not the same reference in the cycle", serviceA, depA.get(serviceB));
     }
 
     @Test
@@ -142,7 +121,7 @@ public class FieldInjectionTest {
     }
 
     @Test
-    public void testNamedBindingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
+    public void testNamedFieldInjection() {
         Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
@@ -158,7 +137,7 @@ public class FieldInjectionTest {
     }
 
     @Test
-    public void testQualifiedBindingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
+    public void testQualifiedFieldInjection() {
         Context context = new ApplicationContext(new BindingProvider() {
             @Override
             public void configureBindings() {
@@ -171,6 +150,65 @@ public class FieldInjectionTest {
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("echo", serviceD.echo("ECHO"));
+    }
+
+    @Test
+    public void testDefaultProviderFieldInjection() {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceC.class).to(UpperEchoServiceC.class);
+                bind(ServiceD.class).to(FieldProviderServiceD.class);
+            }
+        });
+
+        ServiceD serviceD = context.getBean(ServiceD.class);
+
+        Assert.assertNotNull(serviceD);
+        Assert.assertEquals("ECHO", serviceD.echo("echo"));
+    }
+
+    @Test
+    public void testUserProviderFieldInjection() {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceC.class).toProvider(LowerEchoProvider.class);
+                bind(ServiceD.class).to(FieldProviderServiceD.class);
+            }
+        });
+
+        ServiceD serviceD = context.getBean(ServiceD.class);
+
+        Assert.assertNotNull(serviceD);
+        Assert.assertEquals("echo", serviceD.echo("eCho"));
+    }
+
+    @Test
+    public void testCyclicDependencies() throws NoSuchFieldException, IllegalAccessException {
+        Context context = new ApplicationContext(new BindingProvider() {
+            @Override
+            public void configureBindings() {
+                bind(ServiceA.class).to(FieldServiceAImpl.class);
+                bind(ServiceB.class).to(FieldServiceBImpl.class);
+                bind(ServiceC.class).to(EchoServiceC.class);
+                bind(ServiceD.class).to(FieldNamedServiceD.class);
+            }
+        });
+
+        ServiceA serviceA = context.getBean(ServiceA.class);
+
+        //ServiceC dependency
+        Field depB = FieldServiceAImpl.class.getDeclaredField("serviceB");
+        depB.setAccessible(true);
+
+        ServiceB serviceB = (ServiceB) depB.get(serviceA);
+        Field depA = FieldServiceBImpl.class.getDeclaredField("serviceA");
+        depA.setAccessible(true);
+
+        Assert.assertNotNull(serviceA);
+        Assert.assertNotNull(serviceB);
+        Assert.assertSame("The objects have not the same reference in the cycle", serviceA, depA.get(serviceB));
     }
 
 }

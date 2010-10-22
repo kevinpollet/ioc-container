@@ -16,6 +16,7 @@
 package com.my.container.context.beanfactory.injector;
 
 import com.my.container.binding.Binding;
+import com.my.container.binding.ProvidedBinding;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.util.ProxyHelper;
@@ -23,21 +24,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 
 /**
  * Definition an Injector of fields.
- * 
+ *
  * @author Kevin Pollet
  */
 public class FieldInjector {
 
-    /**
-     * Logger.
-     */
     private final Logger logger = LoggerFactory.getLogger(FieldInjector.class);
 
     /**
@@ -63,19 +63,18 @@ public class FieldInjector {
      */
     public void injectFieldsDependencies(final InjectionContext context, final Class<?> clazz, final Object instance) {
 
-        //Inject SuperClass first
         if (clazz.getSuperclass() != null) {
             this.injectFieldsDependencies(context, clazz.getSuperclass(), instance);
         }
 
-        Field[] fieldsOfClass = clazz.getDeclaredFields();
-        for (Field field : fieldsOfClass) {
+        for (Field field : clazz.getDeclaredFields()) {
 
             if (field.isAnnotationPresent(Inject.class)) {
 
-                Binding<?> binding;
+                Object fieldInstance = null;
                 Annotation qualifier = null;
-                boolean isAccessible = !Modifier.isPrivate(field.getModifiers());
+                Binding<?> injectionBinding;
+                Class<?> fieldClass = field.getType();
 
                 if (Modifier.isFinal(field.getModifiers())) {
                     throw new BeanDependencyInjectionException(String.format("Cannot inject final field %s in class %s", field.getName(), field.getDeclaringClass().getName()));
@@ -92,37 +91,39 @@ public class FieldInjector {
                     }
                 }
 
-                //Retrieve binding
-                if (qualifier == null) {
-                    binding = context.getBeanFactory().getBindingHolder().getBindingFor(field.getType());
+                if (fieldClass.isAssignableFrom(Provider.class)) {
+                    if (field.getGenericType() instanceof ParameterizedType) {
+                        Class<?> classToInject = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                        injectionBinding = context.getBeanFactory().getProviderHolder().getBindingFor(classToInject, qualifier);
+                        if (injectionBinding == null) {
+                            fieldInstance = new DefaultInstanceProvider(context.getBeanFactory(), classToInject);
+                        } else {
+                            fieldInstance = this.injector.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
+                        }
+                    }
                 } else {
-                    binding = context.getBeanFactory().getBindingHolder().getBindingFor(field.getType(), qualifier);
+                    injectionBinding = context.getBeanFactory().getBindingHolder().getBindingFor(field.getType(), qualifier);
+                    if (injectionBinding == null) {
+                        throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", field.getType().getName()));
+                    }
+                    fieldInstance = this.injector.constructClass(context, injectionBinding.getImplementation());
                 }
 
-                if (binding == null) {
-                    throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", field.getType().getName()));
-                }
-
-                //Create and set field instance
+                //Set field instance
                 try {
-
-                    if (!isAccessible) {
+                    if (Modifier.isPrivate(field.getModifiers())) {
                         field.setAccessible(true);
                     }
 
-                    field.set(ProxyHelper.getTargetObject(instance), this.injector.constructClass(context, binding.getImplementation()));
-
-                    //Injection is done remove mark
-                    context.getCyclicHandlerMap().remove(instance.getClass());
-
-                } catch (IllegalAccessException ex) {
+                    field.set(ProxyHelper.getTargetObject(instance), fieldInstance);
+                }
+                catch (IllegalAccessException ex) {
                     throw new BeanDependencyInjectionException(String.format("The field %s is not accessible and cannot be injected", field.getName()), ex);
                 }
 
+                context.getCyclicHandlerMap().remove(instance.getClass());
             }
-
         }
-
     }
 
 }
