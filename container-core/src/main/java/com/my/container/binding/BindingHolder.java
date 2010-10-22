@@ -30,6 +30,7 @@ public interface BindingHolder {
      * Put a bindings in this binding collection.
      *
      * @param binding the binding
+     * @throws IllegalArgumentException if binding is null
      */
     public void put(final Binding<?> binding);
 
@@ -47,6 +48,7 @@ public interface BindingHolder {
      * @param clazz the class
      * @param <T> the type of the binding
      * @return null if none or the binding list
+     * @throws IllegalArgumentException if clazz is null
      */
     public <T>  Binding<T> getBindingFor(final Class<T> clazz);
 
@@ -61,6 +63,7 @@ public interface BindingHolder {
      * @param qualifier the binding qualifier
      * @param <Q> the qualifier type
      * @return null if none or the binding
+     * @throws IllegalArgumentException if clazz is null or qualifier is not annotated with @Qualifier
      */
     public <Q extends Annotation> Binding<?> getBindingFor(final Class<?> clazz, final Q qualifier);
 
@@ -80,6 +83,7 @@ public interface BindingHolder {
      * @param qualifier the qualifier
      * @param <Q> the qualifier type
      * @return null if none or the biding removed
+     * @throws IllegalArgumentException if clazz is null or qualifier is not annotated with @Qualifier or null
      */
     public <Q extends Annotation> Binding<?> removeQualifiedBindingFor(final Class<?> clazz, final Q qualifier);
 
