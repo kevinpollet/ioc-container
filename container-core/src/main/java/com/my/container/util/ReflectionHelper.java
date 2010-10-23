@@ -68,29 +68,28 @@ public final class ReflectionHelper {
      * This method permits to know if a method is
      * overridden by subclass.
      *
-     * @param targetClass the child bean class
+     * @param clazz the child bean class in hierarchy
      * @param method the method to test
      * @return true is the method is overridden in subclass
      */
-    public static boolean isOverridden(final Class<?> targetClass, final Method method) {
-
-        if (!method.getDeclaringClass().equals(targetClass)) {
-            Class<?> currentClass = targetClass;
-
-            do {
-
-               try {
-
-                    currentClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
-                    return true;
-
-                } catch (NoSuchMethodException e) {
-                  currentClass = currentClass.getSuperclass();
-                }
-
-            } while (currentClass.getSuperclass() != null);
+    public static boolean isOverridden(final Class<?> clazz, final Method method) {
+        if (method == null) {
+            throw new IllegalArgumentException("The method parameter cannot be null");
         }
 
+        Class<?> currentClass = clazz;
+        Class<?> declaringClass = method.getDeclaringClass();
+
+        while (currentClass != null && !currentClass.equals(declaringClass)) {
+            try {
+                currentClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
+                return true;
+            }
+            catch (NoSuchMethodException e) {
+                //Test if method exist in class hierarchy
+                currentClass = currentClass.getSuperclass();
+            }
+        }
         return false;
     }
 
