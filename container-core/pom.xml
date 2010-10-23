@@ -54,6 +54,11 @@
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject-tck</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <developers>
