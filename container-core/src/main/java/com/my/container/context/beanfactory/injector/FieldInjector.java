@@ -77,7 +77,7 @@ public class FieldInjector {
                 Class<?> fieldClass = field.getType();
 
                 if (Modifier.isFinal(field.getModifiers())) {
-                    throw new BeanDependencyInjectionException(String.format("Cannot inject final field %s in class %s", field.getName(), field.getDeclaringClass().getName()));
+                    throw new BeanDependencyInjectionException(String.format("Cannot inject final field %s in class %s", field.getName(), clazz.getName()));
                 }
 
                 //Class have dependencies mark it
@@ -111,10 +111,9 @@ public class FieldInjector {
 
                 //Set field instance
                 try {
-                    if (Modifier.isPrivate(field.getModifiers())) {
+                    if (!field.isAccessible()) {
                         field.setAccessible(true);
                     }
-
                     field.set(ProxyHelper.getTargetObject(instance), fieldInstance);
                 }
                 catch (IllegalAccessException ex) {

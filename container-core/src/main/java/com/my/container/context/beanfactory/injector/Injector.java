@@ -33,6 +33,7 @@ import javax.inject.Qualifier;
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -44,7 +45,7 @@ import java.lang.reflect.Type;
  * @author Kevin Pollet
  */
 public class Injector {
-     
+
     private final Logger logger = LoggerFactory.getLogger(Injector.class);
 
     private final FieldInjector fieldInjector;
@@ -105,7 +106,7 @@ public class Injector {
                     context.getCyclicHandlerMap().put(clazz, null);
 
                     for (int i = 0; i < parametersTypes.length; i++) {
-                        
+
                         Annotation qualifier = null;
                         Binding injectionBinding = null;
                         Type parameterType = parametersTypes[i];
@@ -128,28 +129,32 @@ public class Injector {
                         } else {
                             injectionBinding = holder.getBindingFor(classToInject, qualifier);
                             if (injectionBinding == null) {
-                               throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
+                                throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
                             }
                         }
 
                         //Create instance of parameter
                         if (injectionBinding == null) {
-                            parameters[i] = new DefaultInstanceProvider(factory, classToInject);                            
+                            parameters[i] = new DefaultInstanceProvider(factory, classToInject);
                         } else if (injectionBinding instanceof ProvidedBinding) {
                             parameters[i] = this.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
                         } else {
-                            parameters[i] = this.constructClass(context, injectionBinding.getImplementation());    
+                            parameters[i] = this.constructClass(context, injectionBinding.getImplementation());
                         }
+                    }
+
+                    if (!Modifier.isPrivate(constructor.getModifiers())
+                        && !constructor.isAccessible()) {
+                        constructor.setAccessible(true);
                     }
 
                     classInstance = clazz.cast(constructor.newInstance(parameters));
                     context.getCyclicHandlerMap().remove(clazz);
                     break;
                 }
-                
+
             }
 
-            //No Inject constructor
             if (classInstance == null) {
                 classInstance = clazz.newInstance();
             }

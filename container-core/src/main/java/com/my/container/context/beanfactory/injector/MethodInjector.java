@@ -129,11 +129,10 @@ public class MethodInjector {
                     //Call method
                     try {
 
-                        if (Modifier.isPrivate(method.getModifiers())) {
+                        if (!method.isAccessible()) {
                             method.setAccessible(true);
                         }
                         method.invoke(ProxyHelper.getTargetObject(instance), parameters);
-
                     }
                     catch (IllegalAccessException ex) {
                         throw new BeanDependencyInjectionException(ex);
