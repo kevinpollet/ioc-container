@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.atinject.tck;
+package com.my.container.test.tck;
 
 import com.my.container.context.ApplicationContext;
 import com.my.container.context.Context;
 import junit.framework.Test;
+import org.atinject.tck.Tck;
 import org.atinject.tck.auto.Car;
 
 /**
+ * JSR-330 TCK.
+ * 
  * @author Kevin Pollet
  */
 public class TckSuiteTest {
 
+    /**
+     * Configure and return the suite.
+     * @return the suite.
+     */
     public static Test suite() {
         Context context = new ApplicationContext(new TckBindingProvider());
         Car car = context.getBean(Car.class);
-
-        return Tck.testsFor(car, false, false);
+        return Tck.testsFor(car, true, true);
     }
 
 }

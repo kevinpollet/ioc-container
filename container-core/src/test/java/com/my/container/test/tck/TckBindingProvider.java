@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.atinject.tck;
+package com.my.container.test.tck;
 
 import com.my.container.binding.provider.BindingProvider;
 import org.atinject.tck.auto.Car;
@@ -29,13 +29,13 @@ import org.atinject.tck.auto.accessories.Cupholder;
 import org.atinject.tck.auto.accessories.SpareTire;
 
 /**
+ * The JSR-330 TCK bindings configuration.
+ * 
  * @author Kevin Pollet
  */
 public class TckBindingProvider extends BindingProvider {
-
     @Override
     public void configureBindings() {
-
         bind(Car.class).to(Convertible.class);
         bind(Seat.class).to(DriversSeat.class).qualifiedBy(Drivers.class);
         bind(Seat.class).to(Seat.class);
@@ -45,7 +45,5 @@ public class TckBindingProvider extends BindingProvider {
         bindClass(Cupholder.class);
         bindClass(SpareTire.class);
         bindClass(FuelTank.class);
-
     }
-
 }
