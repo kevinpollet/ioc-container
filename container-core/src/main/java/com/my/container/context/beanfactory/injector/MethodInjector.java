@@ -20,6 +20,8 @@ import com.my.container.binding.ProvidedBinding;
 import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.util.ProxyHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -40,9 +42,8 @@ import static com.my.container.util.ReflectionHelper.isOverridden;
  */
 public class MethodInjector {
 
-    /**
-     * The Logger.
-     */
+    private final Logger logger = LoggerFactory.getLogger(MethodInjector.class);
+
     private final Injector injector;
 
     /**
@@ -63,11 +64,7 @@ public class MethodInjector {
      * @param instance the instance injected
      */
     public void injectMethodsDependencies(final InjectionContext context, final Class<?> clazz, final Object instance) {
-
-        //Inject SuperClass first
-        if (clazz.getSuperclass() != null) {
-            this.injectMethodsDependencies(context, clazz.getSuperclass(), instance);
-        }
+        this.logger.debug("Inject methods of class {}", clazz.getName());
 
         for (Method method : clazz.getDeclaredMethods()) {
 
@@ -82,7 +79,7 @@ public class MethodInjector {
                     Class<?>[] parametersClass = method.getParameterTypes();
                     Object[] parameters = new Object[parametersClass.length];
                     Type[] parametersType = method.getGenericParameterTypes();
-                    Annotation[][] parametersAnnotation = method.getParameterAnnotations();
+                    Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
                     context.getCyclicHandlerMap().put(instance.getClass(), instance);
 
@@ -98,7 +95,7 @@ public class MethodInjector {
                         }
 
                         //Get parameter qualifier
-                        for (Annotation annotation : parametersAnnotation[i]) {
+                        for (Annotation annotation : parameterAnnotations[i]) {
                             if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
                                 qualifier = annotation;
                                 break;

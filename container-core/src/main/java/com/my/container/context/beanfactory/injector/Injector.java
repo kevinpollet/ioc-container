@@ -177,8 +177,7 @@ public class Injector {
                 factory.getPrototypeBeans().add(classInstance);
             }
 
-            //Inject dependencies in this newly created bean
-            this.injectDependencies(context, classInstance);
+            this.injectFieldAndMethod(context, clazz, classInstance);                
 
             //Hold created bean
             context.getNewlyCreatedBeans().add(classInstance);
@@ -198,8 +197,26 @@ public class Injector {
      */
     public void injectDependencies(final InjectionContext context, final Object bean) {
         this.logger.debug("Inject dependencies in instance of class {}", bean.getClass().getSimpleName());
-        this.fieldInjector.injectFieldsDependencies(context, bean.getClass(), bean);
-        this.methodInjector.injectMethodsDependencies(context, bean.getClass(), bean);
+        this.injectFieldAndMethod(context, bean.getClass(), bean);
+    }
+
+    /**
+     * Inject fields and method in a bean instance. Fields and Methods
+     * in SuperClass are injected first.
+     *
+     * @param context the injection context
+     * @param clazz the current class injected
+     * @param instance the instance where values are injected
+     */
+    private void injectFieldAndMethod(final InjectionContext context, final Class<?> clazz, final Object instance) {
+        Class<?> superClass = clazz.getSuperclass();
+          
+        if (!superClass.equals(Object.class)) {
+            this.injectFieldAndMethod(context, superClass, instance);
+        }
+
+        this.fieldInjector.injectFieldsDependencies(context, clazz, instance);
+        this.methodInjector.injectMethodsDependencies(context, clazz, instance);
     }
 
 }

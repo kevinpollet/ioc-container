@@ -63,10 +63,6 @@ public class FieldInjector {
      */
     public void injectFieldsDependencies(final InjectionContext context, final Class<?> clazz, final Object instance) {
 
-        if (clazz.getSuperclass() != null) {
-            this.injectFieldsDependencies(context, clazz.getSuperclass(), instance);
-        }
-
         for (Field field : clazz.getDeclaredFields()) {
 
             if (field.isAnnotationPresent(Inject.class)) {
