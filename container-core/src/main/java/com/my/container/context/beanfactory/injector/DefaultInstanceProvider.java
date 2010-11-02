@@ -16,6 +16,7 @@
 package com.my.container.context.beanfactory.injector;
 
 import com.my.container.context.beanfactory.BeanFactory;
+import com.my.container.util.ReflectionHelper;
 
 import javax.inject.Provider;
 
@@ -29,24 +30,34 @@ import javax.inject.Provider;
 public class DefaultInstanceProvider<T> implements Provider<T> {
 
     private final BeanFactory factory;
-    
-    private final Class<T> classToCreate;
+
+    private final Injector injector;
+
+    private final Class<T> classToProvide;
 
     /**
      * Construct an instance of default provider.
      *
-     * @param factory the factory to create the injected instance
-     * @param classToCreate the bean class to create on each {@link javax.inject.Provider#get()} method call
+     * @param factory       the factory to create the injected instance
+     * @param classToProvide the bean class to create on each {@link javax.inject.Provider#get()} method call
      */
-    public DefaultInstanceProvider(final BeanFactory factory, final Class<T> classToCreate) {
+    public DefaultInstanceProvider(final BeanFactory factory, final Class<T> classToProvide) {
+        this.injector = new Injector();
         this.factory = factory;
-        this.classToCreate = classToCreate;
+        this.classToProvide = classToProvide;
     }
 
     /**
      * {@inheritDoc}
      */
     public T get() {
-        return factory.getBean(this.classToCreate);
+
+        InjectionContext context = new InjectionContext(factory);
+        T instance = injector.constructClass(context, classToProvide);
+
+        ReflectionHelper.invokePostConstructCallback(context.getNewlyCreatedBeans().toArray());
+
+        return instance;
     }
+
 }

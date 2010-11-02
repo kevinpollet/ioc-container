@@ -92,7 +92,11 @@ public class FieldInjector {
                         Class<?> classToInject = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
                         injectionBinding = context.getBeanFactory().getProviderHolder().getBindingFor(classToInject, qualifier);
                         if (injectionBinding == null) {
-                            fieldInstance = new DefaultInstanceProvider(context.getBeanFactory(), classToInject);
+                            injectionBinding = context.getBeanFactory().getBindingHolder().getBindingFor(classToInject, qualifier);
+                            if (injectionBinding == null) {
+                                throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
+                            }
+                            fieldInstance = new DefaultInstanceProvider(context.getBeanFactory(), injectionBinding.getImplementation());
                         } else {
                             fieldInstance = this.injector.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
                         }

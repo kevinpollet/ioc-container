@@ -17,6 +17,7 @@ package com.my.container.context.beanfactory.injector;
 
 import com.my.container.context.beanfactory.BeanFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +28,9 @@ import java.util.Map;
  */
 public class InjectionContext {
 
-    private BeanFactory beanFactory;
+    private final BeanFactory beanFactory;
 
-    private List<Object> newlyCreatedBeans;
+    private final List<Object> newlyCreatedBeans;
 
     /**
      * A map to handle cyclic dependencies
@@ -41,11 +42,10 @@ public class InjectionContext {
      * Construct an InjectionContext.
      *
      * @param beanFactory the bean factory.
-     * @param newlyCreatedBeans the list of newly created bean
      */
-    public InjectionContext(final BeanFactory beanFactory, final List<Object> newlyCreatedBeans) {
+    public InjectionContext(final BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
-        this.newlyCreatedBeans = newlyCreatedBeans;
+        this.newlyCreatedBeans = new ArrayList<Object>();
         this.cyclicHandlerMap = new HashMap<Class<?>, Object>();
     }
 

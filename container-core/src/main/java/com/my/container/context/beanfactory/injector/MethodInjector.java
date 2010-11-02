@@ -108,7 +108,11 @@ public class MethodInjector {
                                 Class<?> classToInject = (Class<?>) ((ParameterizedType) parametersType[i]).getActualTypeArguments()[0];
                                 injectionBinding = context.getBeanFactory().getProviderHolder().getBindingFor(classToInject, qualifier);
                                 if (injectionBinding == null) {
-                                    parameters[i] = new DefaultInstanceProvider(context.getBeanFactory(), classToInject);
+                                    injectionBinding = context.getBeanFactory().getBindingHolder().getBindingFor(classToInject, qualifier);
+                                    if (injectionBinding == null) {
+                                        throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
+                                    }
+                                    parameters[i] = new DefaultInstanceProvider(context.getBeanFactory(), injectionBinding.getImplementation());
                                 } else {
                                     parameters[i] = this.injector.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
                                 }

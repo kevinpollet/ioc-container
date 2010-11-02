@@ -120,31 +120,38 @@ public class Injector {
                             }
                         }
 
-                        //Retrieve corresponding binding
+                        //Provider Injection
                         if (classToInject.isAssignableFrom(Provider.class)) {
+
                             if (parameterType instanceof ParameterizedType) {
                                 classToInject = (Class<?>) ((ParameterizedType) parameterType).getActualTypeArguments()[0];
+
+                                //Check if user provider
                                 injectionBinding = providerHolder.getBindingFor(classToInject, qualifier);
+                                if (injectionBinding == null) {
+                                    injectionBinding = holder.getBindingFor(classToInject, qualifier);
+                                    if (injectionBinding == null) {
+                                        throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
+                                    }
+                                    parameters[i] = new DefaultInstanceProvider(factory, injectionBinding.getImplementation());
+
+                                } else {
+                                    parameters[i] = this.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
+                                }
                             }
+
+                        //Normal injection
                         } else {
                             injectionBinding = holder.getBindingFor(classToInject, qualifier);
                             if (injectionBinding == null) {
                                 throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
                             }
-                        }
-
-                        //Create instance of parameter
-                        if (injectionBinding == null) {
-                            parameters[i] = new DefaultInstanceProvider(factory, classToInject);
-                        } else if (injectionBinding instanceof ProvidedBinding) {
-                            parameters[i] = this.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
-                        } else {
                             parameters[i] = this.constructClass(context, injectionBinding.getImplementation());
                         }
                     }
 
                     if (!Modifier.isPrivate(constructor.getModifiers())
-                        && !constructor.isAccessible()) {
+                            && !constructor.isAccessible()) {
                         constructor.setAccessible(true);
                     }
 
@@ -177,7 +184,7 @@ public class Injector {
                 factory.getPrototypeBeans().add(classInstance);
             }
 
-            this.injectFieldAndMethod(context, clazz, classInstance);                
+            this.injectFieldAndMethod(context, clazz, classInstance);
 
             //Hold created bean
             context.getNewlyCreatedBeans().add(classInstance);
@@ -204,13 +211,13 @@ public class Injector {
      * Inject fields and method in a bean instance. Fields and Methods
      * in SuperClass are injected first.
      *
-     * @param context the injection context
-     * @param clazz the current class injected
+     * @param context  the injection context
+     * @param clazz    the current class injected
      * @param instance the instance where values are injected
      */
     private void injectFieldAndMethod(final InjectionContext context, final Class<?> clazz, final Object instance) {
         Class<?> superClass = clazz.getSuperclass();
-          
+
         if (!superClass.equals(Object.class)) {
             this.injectFieldAndMethod(context, superClass, instance);
         }

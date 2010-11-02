@@ -23,17 +23,13 @@ import com.my.container.context.beanfactory.exceptions.CallbackInvocationExcepti
 import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.context.beanfactory.injector.InjectionContext;
 import com.my.container.context.beanfactory.injector.Injector;
-import com.my.container.util.ProxyHelper;
 import com.my.container.spi.BeanProcessor;
 import com.my.container.spi.loader.ServiceLoader;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,14 +117,11 @@ public final class BeanFactory {
             return clazz.cast(this.singletonsBean.get(toClass));
         }
 
-        List<Object> newlyCreatedBean = new ArrayList<Object>();
-        InjectionContext context = new InjectionContext(this, newlyCreatedBean);
-
-        //Resolve dependencies
+        InjectionContext context = new InjectionContext(this);
         createdBean = injector.constructClass(context, toClass);
 
         //Call PostConstruct method on newly created bean
-        this.invokePostConstructCallback(newlyCreatedBean);
+        ReflectionHelper.invokePostConstructCallback(context.getNewlyCreatedBeans().toArray());
 
         return createdBean;
     }
@@ -142,13 +135,11 @@ public final class BeanFactory {
      */
     public void resolveDependencies(final Object bean) {
 
-        List<Object> newlyCreatedBean = new ArrayList<Object>();
-        InjectionContext context = new InjectionContext(this, newlyCreatedBean);
-
+        InjectionContext context = new InjectionContext(this);
         this.injector.injectDependencies(context, bean);
 
         //Call PostConstruct method on newly created bean
-        this.invokePostConstructCallback(newlyCreatedBean);
+        ReflectionHelper.invokePostConstructCallback(context.getNewlyCreatedBeans().toArray());
     }
 
     /**
@@ -167,15 +158,8 @@ public final class BeanFactory {
 
         try {
 
-            for (Object bean : allBeans) {
-                ReflectionHelper.invokeDeclaredMethodWith(PreDestroy.class, ProxyHelper.getTargetObject(bean));
-            }
+            ReflectionHelper.invokePreDestroyCallback(allBeans.toArray());
 
-
-        } catch (InvocationTargetException e) {
-            throw new CallbackInvocationException(e);
-        } catch (IllegalAccessException e) {
-            throw new CallbackInvocationException(e);
         } finally {
             allBeans.clear();
             this.prototypesBean.clear();
@@ -226,22 +210,6 @@ public final class BeanFactory {
      */
     public BindingHolder getProviderHolder() {
         return this.providerHolder;
-    }
-    
-    /**
-     * Call PostConstruct callback on a list of bean.
-     *
-     * @param beans the beans
-     */
-    private void invokePostConstructCallback(final List<Object> beans) {
-        for (Object instance : beans) {
-            try {
-                ReflectionHelper.invokeDeclaredMethodWith(PostConstruct.class, ProxyHelper.getTargetObject(instance));
-            } catch (Exception ex) {
-                throw new CallbackInvocationException("Error during invocation of a bean PostConstruct callback", ex);
-            }
-        }
-
     }
 
 }
