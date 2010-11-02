@@ -15,11 +15,14 @@
  */
 package com.my.container.util;
 
+import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,13 +52,13 @@ public final class ReflectionHelper {
      */
     public static boolean isCallbackMethod(final Class<?> clazz) {
         if (clazz == null) {
-            throw new IllegalArgumentException("The clazz parameter cannot be null");
+            throw new NullPointerException("The clazz parameter cannot be null");
         }
 
         Method[] methods = clazz.getDeclaredMethods();
-        for(Method method : methods) {
+        for (Method method : methods) {
             if (method.isAnnotationPresent(PostConstruct.class) ||
-                method.isAnnotationPresent(PreDestroy.class)) {
+                    method.isAnnotationPresent(PreDestroy.class)) {
 
                 return true;
             }
@@ -63,34 +66,81 @@ public final class ReflectionHelper {
 
         return false;
     }
-    
+
+    /**
+     * Call PostConstruct callback on a list of bean.
+     *
+     * @param beans the beans
+     */
+    public static void invokePostConstructCallback(final Object... beans) {
+        if (beans != null) {
+            for (Object instance : beans) {
+                try {
+                    invokeDeclaredMethodWith(PostConstruct.class, ProxyHelper.getTargetObject(instance));
+                } catch (Exception ex) {
+                    throw new CallbackInvocationException("Error during invocation of a bean PostConstruct callback", ex);
+                }
+            }
+        }
+    }
+
+    /**
+     * Call PreDestroy callback on a list of bean.
+     *
+     * @param beans the beans
+     */
+    public static void invokePreDestroyCallback(final Object... beans) {
+        if (beans != null) {
+            for (Object instance : beans) {
+                try {
+                    invokeDeclaredMethodWith(PreDestroy.class, ProxyHelper.getTargetObject(instance));
+                } catch (Exception ex) {
+                    throw new CallbackInvocationException("Error during invocation of a bean PreDestroy callback", ex);
+                }
+            }
+        }
+    }
+
     /**
      * This method permits to know if a method is
      * overridden by subclass.
      *
-     * @param clazz the child bean class in hierarchy
+     * @param clazz  the child bean class in hierarchy
      * @param method the method to test
      * @return true is the method is overridden in subclass
      */
     public static boolean isOverridden(final Class<?> clazz, final Method method) {
+        if (clazz == null) {
+            throw new NullPointerException("The clazz parameter cannot be null");
+        }
         if (method == null) {
-            throw new IllegalArgumentException("The method parameter cannot be null");
+            throw new NullPointerException("The method parameter cannot be null");
         }
 
-        Class<?> currentClass = clazz;
-        Class<?> declaringClass = method.getDeclaringClass();
+        String classPackage = clazz.getPackage().getName();
+        String declaringClassPackage = method.getDeclaringClass().getPackage().getName();
 
-        while (currentClass != null && !currentClass.equals(declaringClass)) {
-            try {
-                currentClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
+        //A private method cannot be overridden
+        if (clazz.equals(method.getDeclaringClass()) || Modifier.isPrivate(method.getModifiers())) {
+            return false;
+        }
+
+        try {
+
+            Method overriddenMethod = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
+
+            //A package private method can only be overridden in the same package
+            if (method.getModifiers() == 0 && !classPackage.equals(declaringClassPackage)) {
+                return isOverridden(clazz.getSuperclass(), method);
+            } else {
                 return true;
             }
-            catch (NoSuchMethodException e) {
-                //Test if method exist in class hierarchy
-                currentClass = currentClass.getSuperclass();
-            }
+
         }
-        return false;
+        catch (NoSuchMethodException e) {
+            //Test if method exist in class hierarchy
+            return isOverridden(clazz.getSuperclass(), method);
+        }
     }
 
     /**
