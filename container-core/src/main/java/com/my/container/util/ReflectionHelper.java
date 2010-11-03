@@ -127,20 +127,18 @@ public final class ReflectionHelper {
 
         try {
 
-            Method overriddenMethod = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
+            clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
 
             //A package private method can only be overridden in the same package
-            if (method.getModifiers() == 0 && !classPackage.equals(declaringClassPackage)) {
-                return isOverridden(clazz.getSuperclass(), method);
-            } else {
-                return true;
+            if (method.getModifiers() != 0 || classPackage.equals(declaringClassPackage)) {
+                return  true;
             }
 
         }
         catch (NoSuchMethodException e) {
-            //Test if method exist in class hierarchy
-            return isOverridden(clazz.getSuperclass(), method);
+            //Ignore - try to find it in the class hierarchy    
         }
+        return isOverridden(clazz.getSuperclass(), method);
     }
 
     /**
