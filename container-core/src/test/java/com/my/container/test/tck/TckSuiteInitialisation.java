@@ -28,6 +28,7 @@ import org.junit.runners.Suite;
  * 
  * @author Kevin Pollet
  */
+//TODO provide static injection
 public class TckSuiteInitialisation {
 
     /**
@@ -37,7 +38,7 @@ public class TckSuiteInitialisation {
     public static Test suite() {
         Context context = new ApplicationContext( new TckBindingProvider() );
         Car car = context.getBean( Car.class );
-        return Tck.testsFor( car, true, true );
+        return Tck.testsFor( car, false, true );
     }
 
 }
