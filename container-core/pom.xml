@@ -11,10 +11,10 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.my.container</groupId>
     <artifactId>container-core</artifactId>
-    <version>0.1-SNAPSHOT</version>
-    <name>IOC-Container :: core</name>
+
+    <name>IOC-Container :: CoreModule</name>
+    <description>Implementation of JSR 330</description>
 
     <dependencies>
         <!--

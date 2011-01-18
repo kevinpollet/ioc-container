@@ -11,10 +11,8 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.my.container</groupId>
     <artifactId>container-aop</artifactId>
-    <version>0.1-SNAPSHOT</version>
-    <name>IOC-Container :: aop</name>
+    <name>IOC-Container :: AopModule</name>
 
     <dependencies>
         <!--
