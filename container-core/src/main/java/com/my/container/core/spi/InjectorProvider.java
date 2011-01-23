@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core;
+package com.my.container.core.spi;
+
+import com.my.container.core.Configuration;
 
 /**
  * @author Kevin Pollet

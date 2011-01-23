@@ -16,7 +16,7 @@
 package com.my.container.core.impl;
 
 import com.my.container.core.Configuration;
-import com.my.container.core.InjectorProvider;
+import com.my.container.core.spi.InjectorProvider;
 
 /**
  * @author Kevin Pollet

@@ -21,7 +21,6 @@ import java.util.List;
 import com.my.container.binding.provider.BindingProvider;
 import com.my.container.core.Configuration;
 import com.my.container.core.Injector;
-import com.my.container.core.InjectorProvider;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
