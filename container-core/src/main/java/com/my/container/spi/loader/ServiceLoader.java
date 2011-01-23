@@ -56,7 +56,7 @@ public final class ServiceLoader<S> implements Iterable<S> {
 
 	/**
 	 * Folder where service providers can
-	 * add their configuration file.
+	 * put their configuration files.
 	 */
 	private static final String PREFIX = "META-INF/services/";
 
@@ -83,8 +83,10 @@ public final class ServiceLoader<S> implements Iterable<S> {
 
 	/**
 	 * The default constructor.
+	 *
+	 * @param contract the contract class.
 	 */
-	private ServiceLoader(final Class<S> contract) {
+	private ServiceLoader(Class<S> contract) {
 		this.contract = contract;
 		this.providers = new ArrayList<S>();
 		this.load();
@@ -100,8 +102,25 @@ public final class ServiceLoader<S> implements Iterable<S> {
 	 *
 	 * @return the service loader
 	 */
-	public static <S> ServiceLoader<S> load(final Class<S> contract) {
+	public static <S> ServiceLoader<S> load(Class<S> contract) {
 		return new ServiceLoader<S>( contract );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Iterator<S> iterator() {
+		return providers.iterator();
+	}
+
+	/**
+	 * Return if the Service Loader have load
+	 * service implementation.
+	 *
+	 * @return true if at least one service has been loaded
+	 */
+	public boolean isServiceLoaded() {
+		return providers.isEmpty();
 	}
 
 	/**
@@ -109,7 +128,7 @@ public final class ServiceLoader<S> implements Iterable<S> {
 	 */
 	private void load() {
 
-		this.logger.info( "Load the service provider implementation of contract {}", contract.getName() );
+		logger.info( "Load the service provider implementation of contract {}", contract.getName() );
 
 		try {
 
@@ -136,9 +155,9 @@ public final class ServiceLoader<S> implements Iterable<S> {
 						// Load provider implementation
 						try {
 
-							this.logger.info( "Load provider implementation {}", className );
-							Class<? extends S> clazz = (Class<? extends S>) classLoader.loadClass( className );
-							this.providers.add( contract.cast( clazz.newInstance() ) );
+							logger.info( "Load provider implementation {}", className );
+							Class<?> clazz = classLoader.loadClass( className );
+							providers.add( contract.cast( clazz.newInstance() ) );
 
 						}
 						catch ( ClassNotFoundException ex ) {
@@ -171,17 +190,9 @@ public final class ServiceLoader<S> implements Iterable<S> {
 
 		}
 		catch ( IOException ex ) {
-			this.logger.error( "Error when reading service provider files of contract {}", contract.getName() );
+			logger.error( "Error when reading service provider files of contract {}", contract.getName() );
 			throw new ServiceLoaderException( "Error when reading service provider files", ex );
 		}
 
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Iterator<S> iterator() {
-		return providers.iterator();
-	}
-
 }

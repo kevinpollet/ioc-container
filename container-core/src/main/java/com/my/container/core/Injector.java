@@ -24,14 +24,35 @@ import com.my.container.spi.loader.ServiceLoader;
  */
 public abstract class Injector {
 
-	public static Configuration configure() {
-		Configuration config = null;
+	/**
+	 * Hold an instance of the first
+	 * loaded injector provider.
+	 */
+	private static InjectorProvider injectorProvider;
+
+	//Load first injector provider
+	static {
 		ServiceLoader<InjectorProvider> providers = ServiceLoader.load( InjectorProvider.class );
-		for ( InjectorProvider provider : providers ) {
-			config = provider.configure();
-			break;
+		if ( providers.isServiceLoaded() ) {
+			throw new InjectorProviderNotFoundException( "There is no provider injection in the classpath" );
 		}
-		return config;
+		else {
+			for ( InjectorProvider provider : providers ) {
+				injectorProvider = provider;
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Create a configuration object to set properties
+	 * on an injector. This injector can be build from
+	 * this configuration object.
+	 *
+	 * @return the configuration object
+	 */
+	public static Configuration configure() {
+		return injectorProvider.configure();
 	}
 
 	/**
