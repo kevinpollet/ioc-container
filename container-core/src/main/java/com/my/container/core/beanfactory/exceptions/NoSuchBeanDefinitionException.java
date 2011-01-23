@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory.exceptions;
+package com.my.container.core.beanfactory.exceptions;
 
 
 /**
  * The exception throws when the bean definition
- * is not found in the context.
+ * is not found in the core.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public class NoSuchBeanDefinitionException extends BeanInstantiationException {
 
-    public NoSuchBeanDefinitionException(final String message) {
-        super(message);
-    }
+	public NoSuchBeanDefinitionException(final String message) {
+		super( message );
+	}
 
-    public NoSuchBeanDefinitionException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+	public NoSuchBeanDefinitionException(final String message, final Throwable cause) {
+		super( message, cause );
+	}
 
-    public NoSuchBeanDefinitionException(final Throwable cause) {
-        super(cause);
-    }
+	public NoSuchBeanDefinitionException(final Throwable cause) {
+		super( cause );
+	}
 }

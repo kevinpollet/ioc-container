@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory.proxy;
+package com.my.container.core.beanfactory.proxy;
 
 import java.lang.reflect.InvocationHandler;
 
@@ -22,29 +22,28 @@ import java.lang.reflect.InvocationHandler;
  * contains the proxied instance
  * and permits to retrieve it.
  *
- * @author kevinpollet
- *         Date: 22 août 2010
+ * @author Kevin Pollet
  */
 public abstract class AbstractBeanAwareInvocationHandler implements InvocationHandler {
 
-    private final Object proxiedInstance;
+	private final Object proxiedInstance;
 
-    /**
-     * The AbstractBeanInvocationHandler constructor.
-     *
-     * @param proxiedInstance the instance to be proxied
-     */
-    public AbstractBeanAwareInvocationHandler(final Object proxiedInstance) {
-        this.proxiedInstance = proxiedInstance;
-    }
+	/**
+	 * The AbstractBeanInvocationHandler constructor.
+	 *
+	 * @param proxiedInstance the instance to be proxied
+	 */
+	public AbstractBeanAwareInvocationHandler(final Object proxiedInstance) {
+		this.proxiedInstance = proxiedInstance;
+	}
 
-    /**
-     * Get the current proxied Instance.
-     *
-     * @return the proxied instance
-     */
-    public Object getProxiedInstance() {
-        return this.proxiedInstance;
-    }
+	/**
+	 * Get the current proxied Instance.
+	 *
+	 * @return the proxied instance
+	 */
+	public Object getProxiedInstance() {
+		return this.proxiedInstance;
+	}
 
 }

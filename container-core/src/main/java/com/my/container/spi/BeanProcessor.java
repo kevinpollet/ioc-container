@@ -20,27 +20,29 @@ package com.my.container.spi;
  * contract must be implemented by
  * extensions.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public interface BeanProcessor {
 
-    /**
-     * Check if the bean is processable.
-     *
-     * @param bean the bean to process
-     * @return true if the bean is processable or false otherwise
-     */
-    public boolean isProcessable(final Object bean);
+	/**
+	 * Check if the bean is processable.
+	 *
+	 * @param bean the bean to process
+	 *
+	 * @return true if the bean is processable or false otherwise
+	 */
+	boolean isProcessable(final Object bean);
 
-    /**
-     * Process the bean in parameter. <b>This method
-     * must never return null.</b>
-     *
-     * @param bean the bean to process
-     * @param <T> the type of the bean
-     * @return the bean processed
-     * @throws Exception if an exception occurs during the bean processing
-     */
-    public <T> T processBean(final T bean) throws Exception;
-
+	/**
+	 * Process the bean in parameter. <b>This method
+	 * must never return null.</b>
+	 *
+	 * @param bean the bean to process
+	 * @param <T> the type of the bean
+	 *
+	 * @return the bean processed
+	 *
+	 * @throws Exception if an exception occurs during the bean processing
+	 */
+	<T> T processBean(final T bean) throws Exception;
 }

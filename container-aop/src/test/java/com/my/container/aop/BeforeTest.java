@@ -16,8 +16,7 @@
 package com.my.container.aop;
 
 import com.my.container.binding.provider.BindingProvider;
-import com.my.container.context.ApplicationContext;
-import com.my.container.context.Context;
+import com.my.container.core.Injector;
 import com.my.container.aop.services.impl.HelloServiceWithInterceptor;
 import com.my.container.aop.services.impl.MockInterceptor;
 import com.my.container.aop.services.HelloService;
@@ -35,16 +34,16 @@ import java.lang.reflect.Proxy;
  */
 public class BeforeTest {
 
-    private Context context;
+    private Injector context;
 
     @Before
     public void setUp() {
-        this.context = new ApplicationContext(new BindingProvider(){
+        this.context = Injector.configure().addBindingProvider( new BindingProvider(){
             @Override
             public void configureBindings() {
                 bind(HelloService.class).to(HelloServiceWithInterceptor.class);
             }
-        });
+        }).buildInjector();
     }
 
     @Test

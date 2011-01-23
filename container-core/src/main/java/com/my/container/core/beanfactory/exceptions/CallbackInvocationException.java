@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory.exceptions;
+package com.my.container.core.beanfactory.exceptions;
 
 /**
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public class CallbackInvocationException extends BeanInstantiationException {
 
-    public CallbackInvocationException(final String message) {
-        super(message);
-    }
+	public CallbackInvocationException(final String message) {
+		super( message );
+	}
 
-    public CallbackInvocationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public CallbackInvocationException(String message, Throwable cause) {
+		super( message, cause );
+	}
 
-    public CallbackInvocationException(Throwable cause) {
-        super(cause);
-    }
+	public CallbackInvocationException(Throwable cause) {
+		super( cause );
+	}
 }

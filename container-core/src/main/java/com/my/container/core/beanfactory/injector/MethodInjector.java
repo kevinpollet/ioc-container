@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory.injector;
+package com.my.container.core.beanfactory.injector;
 
 import com.my.container.binding.Binding;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.context.beanfactory.exceptions.BeanDependencyInjectionException;
-import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
+import com.my.container.core.beanfactory.exceptions.BeanDependencyInjectionException;
+import com.my.container.core.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.util.ProxyHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class MethodInjector {
      * Inject method parameters of methods
      * annotated by @Inject annotation.
      *
-     * @param context  the injection context
+     * @param context  the injection core
      * @param clazz    the current class injected
      * @param instance the instance injected
      */

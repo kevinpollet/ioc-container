@@ -13,4 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context;
+package com.my.container.core;
+
+import com.my.container.binding.provider.BindingProvider;
+
+/**
+ * @author Kevin Pollet
+ */
+public interface Configuration {
+
+	<T extends BindingProvider> Configuration addBindingProvider(T provider);
+
+	Configuration addXmlBindingProvider(String fileLocation);
+
+	Configuration enableShutDownHook(boolean enable);
+
+	Injector buildInjector();
+}

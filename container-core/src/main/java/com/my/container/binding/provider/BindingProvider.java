@@ -29,143 +29,147 @@ import java.util.List;
  * The BindingProvider class. A Binding
  * provider is responsible to share the
  * bean bindings.
+ *
+ * @author Kevin Pollet
  */
 public abstract class BindingProvider {
 
-    /**
-     * The bindings list.
-     */
-    private final List<Binding<?>> bindings;
+	/**
+	 * The bindings list.
+	 */
+	private final List<Binding<?>> bindings;
 
-    /**
-     * Create a binding provider.
-     */
-    protected BindingProvider() {
-        this.bindings = new ArrayList<Binding<?>>();
-    }
+	/**
+	 * Create a binding provider.
+	 */
+	protected BindingProvider() {
+		this.bindings = new ArrayList<Binding<?>>();
+	}
 
-    /**
-     * Get the binding provider list.
-     */
-    public final List<Binding<?>> getBindings() {
-        return Collections.unmodifiableList(bindings);
-    }
+	/**
+	 * Get the binding provider list.
+	 */
+	public final List<Binding<?>> getBindings() {
+		return Collections.unmodifiableList( bindings );
+	}
 
-    /**
-     * Bind a class.
-     *
-     * @param clazz the class to bind
-     */
-    protected final void bindClass(final Class<?> clazz) {
-        this.bindings.add(new Binding(clazz));
-    }
+	/**
+	 * Bind a class.
+	 *
+	 * @param clazz the class to bind
+	 */
+	protected final void bindClass(final Class<?> clazz) {
+		this.bindings.add( new Binding( clazz ) );
+	}
 
-    /**
-     * Create a binding.
-     *
-     * @param clazz the binding class
-     * @return the binding builder
-     */
-    protected final <T> BindingBuilder<T> bind(final Class<T> clazz) {
-        return this.new BindingBuilder(clazz);
-    }
+	/**
+	 * Create a binding.
+	 *
+	 * @param clazz the binding class
+	 *
+	 * @return the binding builder
+	 */
+	protected final <T> BindingBuilder<T> bind(final Class<T> clazz) {
+		return this.new BindingBuilder( clazz );
+	}
 
-    /**
-     * <p>
-     * Configure the binding list provided by this
-     * binding provider. To add a binding you can
-     * use the following code :
-     * <pre>
-     * bindClass(class)
-     * bind(class).to(implementation)
-     * bind(class).to(implementation).named("myName")
-     * bind(class).to(implementation).qualifiedBy(MyQualifier)
-     * </pre>
-     * </p>
-     */
-    public abstract void configureBindings();
+	/**
+	 * <p>
+	 * Configure the binding list provided by this
+	 * binding provider. To add a binding you can
+	 * use the following code :
+	 * <pre>
+	 * bindClass(class)
+	 * bind(class).to(implementation)
+	 * bind(class).to(implementation).named("myName")
+	 * bind(class).to(implementation).qualifiedBy(MyQualifier)
+	 * </pre>
+	 * </p>
+	 */
+	public abstract void configureBindings();
 
-    /**
-     * The basic binding builder inner class.
-     */
-    protected final class BindingBuilder<T> {
+	/**
+	 * The basic binding builder inner class.
+	 */
+	protected final class BindingBuilder<T> {
 
-        /**
-         * The clazz to be bind.
-         */
-        private final Class<T> clazz;
+		/**
+		 * The clazz to be bind.
+		 */
+		private final Class<T> clazz;
 
-        /**
-         * The BasicBindingBuilder constructor.
-         * 
-         * @param clazz the clazz to be bind
-         */
-        private BindingBuilder(final Class<T> clazz) {
-            this.clazz = clazz;
-        }
+		/**
+		 * The BasicBindingBuilder constructor.
+		 *
+		 * @param clazz the clazz to be bind
+		 */
+		private BindingBuilder(final Class<T> clazz) {
+			this.clazz = clazz;
+		}
 
-        /**
-         * The binding implementation.
-         *
-         * @param impl the implementation class
-         */
-        public QualifiedBindingBuilder to(final Class<? extends T> impl) {
-            Binding<T> binding = new Binding<T>(this.clazz, impl);
-            BindingProvider.this.bindings.add(binding);
-            return BindingProvider.this.new QualifiedBindingBuilder(binding);
-        }
+		/**
+		 * The binding implementation.
+		 *
+		 * @param impl the implementation class
+		 */
+		public QualifiedBindingBuilder to(final Class<? extends T> impl) {
+			Binding<T> binding = new Binding<T>( this.clazz, impl );
+			BindingProvider.this.bindings.add( binding );
+			return BindingProvider.this.new QualifiedBindingBuilder( binding );
+		}
 
-        /**
-         * The binding provider
-         *
-         * @param provider the provider class
-         */
-        public QualifiedBindingBuilder toProvider(final Class<? extends Provider<T>> provider) {
-            Binding<T> binding = new ProvidedBinding<T>(this.clazz, provider);
-            BindingProvider.this.bindings.add(binding);
-            return BindingProvider.this.new QualifiedBindingBuilder(binding);
-        }
-        
-    }
+		/**
+		 * The binding provider
+		 *
+		 * @param provider the provider class
+		 */
+		public QualifiedBindingBuilder toProvider(final Class<? extends Provider<T>> provider) {
+			Binding<T> binding = new ProvidedBinding<T>( this.clazz, provider );
+			BindingProvider.this.bindings.add( binding );
+			return BindingProvider.this.new QualifiedBindingBuilder( binding );
+		}
 
-    /**
-     * The qualifier binding builder inner class .
-     */
-    protected final class QualifiedBindingBuilder<T> {
+	}
 
-        /**
-         * The binding to be built.
-         */
-        private final Binding<T> binding;
+	/**
+	 * The qualifier binding builder inner class .
+	 */
+	protected final class QualifiedBindingBuilder<T> {
 
-        /**
-         * Create a QualifierBindingBuilder.
-         *
-         * @param binding the binding to be built.
-         */
-        public QualifiedBindingBuilder(final Binding<T> binding) {
-            this.binding = binding;
-        }
+		/**
+		 * The binding to be built.
+		 */
+		private final Binding<T> binding;
 
-        /**
-         * The binding Named qualifier.
-         * @see javax.inject.Named
-         *
-         * @param named the Named qualifier binding named
-         */
-        public void named(final String named) {
-            this.binding.setNamed(named);
-        }
+		/**
+		 * Create a QualifierBindingBuilder.
+		 *
+		 * @param binding the binding to be built.
+		 */
+		public QualifiedBindingBuilder(final Binding<T> binding) {
+			this.binding = binding;
+		}
 
-        /**
-         * The binding qualifier.
-         *
-         * @param qualifier the class of the qualifier 
-         */
-        public void qualifiedBy(final Class<? extends Annotation> qualifier) {
-            this.binding.setQualifier(qualifier);
-        }
+		/**
+		 * The binding Named qualifier.
+		 *
+		 * @param named the Named qualifier binding named
+		 *
+		 * @see javax.inject.Named
+		 */
+		public void named(final String named) {
+			this.binding.setNamed( named );
+		}
 
-    }
+		/**
+		 * The binding qualifier.
+		 *
+		 * @param qualifier the class of the qualifier
+		 */
+		public void qualifiedBy(final Class<? extends Annotation> qualifier) {
+			this.binding.setQualifier( qualifier );
+		}
+
+	}
 
 }

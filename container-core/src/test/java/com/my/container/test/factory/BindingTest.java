@@ -16,8 +16,8 @@
 package com.my.container.test.factory;
 
 import com.my.container.binding.provider.BindingProvider;
-import com.my.container.context.ApplicationContext;
-import com.my.container.context.Context;
+import com.my.container.core.Configuration;
+import com.my.container.core.Injector;
 import com.my.container.test.factory.services.HelloService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,19 +26,22 @@ import org.junit.Test;
  * @author Kevin Pollet
  */
 public class BindingTest {
-    
-    @Test
-    public void testClassBinding() {
-        Context context = new ApplicationContext(new BindingProvider() {
-            @Override
-            public void configureBindings() {
-                bindClass(HelloService.class);
-            }
-        });
-        HelloService service = context.getBean(HelloService.class);
 
-        Assert.assertNotNull(service);
-        Assert.assertEquals("Hello Container", service.sayHello("Container"));
-    }
+	@Test
+	public void testClassBinding() {
+		Configuration config = Injector.configure();
+		config.addBindingProvider(
+				new BindingProvider() {
+					@Override
+					public void configureBindings() {
+						bindClass( HelloService.class );
+					}
+				}
+		);
+		HelloService service = config.buildInjector().getBean( HelloService.class );
+
+		Assert.assertNotNull( service );
+		Assert.assertEquals( "Hello Container", service.sayHello( "Container" ) );
+	}
 
 }

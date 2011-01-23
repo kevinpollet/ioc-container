@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
  * </p>
  * <p>
  * The JoinPoint class give to interceptor
- * the context of the invocation.
+ * the core of the invocation.
  * </p>
  *
  * @author kevinpollet

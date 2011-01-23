@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context;
+package com.my.container.core.impl;
 
-import com.my.container.context.beanfactory.BeanFactory;
+import com.my.container.core.beanfactory.BeanFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,28 +25,28 @@ import org.slf4j.LoggerFactory;
  * call the PreDestroy method on singleton
  * and prototype bean.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public class CallbackShutdownHook implements Runnable {
 
-    private final Logger logger = LoggerFactory.getLogger(CallbackShutdownHook.class);
-    
-    private final BeanFactory factory;
+	private final Logger logger = LoggerFactory.getLogger( CallbackShutdownHook.class );
 
-    /**
-     * The CallbackShutdown hook factory.
-     *
-     * @param factory the bean factory
-     */
-    public CallbackShutdownHook(final BeanFactory factory) {
-        this.factory = factory;
-    }
+	private final BeanFactory factory;
 
-    /**
-     * {@inheritDoc}
-     */
-    public void run() {
-        logger.info("Shutdown hook called : Call all created bean PreDestroy methods");
-        this.factory.removeAllBeansReferences();
-    }
+	/**
+	 * The CallbackShutdown hook factory.
+	 *
+	 * @param factory the bean factory
+	 */
+	public CallbackShutdownHook(final BeanFactory factory) {
+		this.factory = factory;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void run() {
+		logger.info( "Shutdown hook called : Call all created bean PreDestroy methods" );
+		this.factory.removeAllBeansReferences();
+	}
 }

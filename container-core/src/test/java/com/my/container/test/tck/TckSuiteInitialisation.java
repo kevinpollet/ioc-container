@@ -15,30 +15,30 @@
  */
 package com.my.container.test.tck;
 
-import com.my.container.context.ApplicationContext;
-import com.my.container.context.Context;
+import com.my.container.core.Configuration;
+import com.my.container.core.Injector;
 import junit.framework.Test;
 import org.atinject.tck.Tck;
 import org.atinject.tck.auto.Car;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 /**
  * JSR-330 TCK.
- * 
+ *
  * @author Kevin Pollet
  */
-//TODO provide static injection
 public class TckSuiteInitialisation {
 
-    /**
-     * Configure and return the suite.
-     * @return the suite.
-     */
-    public static Test suite() {
-        Context context = new ApplicationContext( new TckBindingProvider() );
-        Car car = context.getBean( Car.class );
-        return Tck.testsFor( car, false, true );
-    }
+	/**
+	 * Configure and return the suite.
+	 *
+	 * @return the suite.
+	 */
+	public static Test suite() {
+		Configuration config = Injector.configure();
+		Injector injector = config.addBindingProvider( new TckBindingProvider() ).buildInjector();
+
+		Car car = injector.getBean( Car.class );
+		return Tck.testsFor( car, false, true );
+	}
 
 }

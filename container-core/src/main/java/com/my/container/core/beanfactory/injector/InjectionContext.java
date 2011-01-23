@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory.injector;
+package com.my.container.core.beanfactory.injector;
 
-import com.my.container.context.beanfactory.BeanFactory;
+import com.my.container.core.beanfactory.BeanFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Define the injection context.
+ * Define the injection core.
  * @author Kevin Pollet
  */
 public class InjectionContext {

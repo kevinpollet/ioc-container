@@ -16,9 +16,9 @@
 package com.my.container.test.callbacks;
 
 import com.my.container.binding.provider.BindingProvider;
-import com.my.container.context.ApplicationContext;
-import com.my.container.context.Context;
-import com.my.container.context.beanfactory.BeanFactory;
+import com.my.container.core.Configuration;
+import com.my.container.core.Injector;
+import com.my.container.core.beanfactory.BeanFactory;
 import com.my.container.test.callbacks.services.Leaf;
 import com.my.container.test.callbacks.services.Parent;
 import com.my.container.test.callbacks.services.impl.LeafImpl;
@@ -32,36 +32,43 @@ import java.lang.reflect.Field;
 /**
  * The PreDestroy callback test.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public class PreDestroyTest {
 
-    private Context context;
+	private Injector injector;
 
-    @Before
-    public void setUp() {
-        this.context = new ApplicationContext(new BindingProvider() {
-            @Override
-            public void configureBindings() {
-                bind(Parent.class).to(ParentImpl.class);
-                bind(Leaf.class).to(LeafImpl.class);
-            }
-        });
-    }
+	@Before
+	public void setUp() {
+		Configuration config = Injector.configure();
+		config.addBindingProvider(
+				new BindingProvider() {
+					@Override
+					public void configureBindings() {
+						bind( Parent.class ).to( ParentImpl.class );
+						bind( Leaf.class ).to( LeafImpl.class );
+					}
+				}
+		);
 
-    @Test
-    public void testPreDestroy() throws NoSuchFieldException, IllegalAccessException {
-        Parent parent = this.context.getBean(Parent.class);
+		injector = config.buildInjector();
+	}
 
-        //Get the private bean factory
-        Field factoryField = this.context.getClass().getDeclaredField("factory");
-        factoryField.setAccessible(true);
-        BeanFactory factory = (BeanFactory) factoryField.get(this.context);
-        factory.removeAllBeansReferences();
+	@Test
+	public void testPreDestroy() throws NoSuchFieldException, IllegalAccessException {
+		Parent parent = injector.getBean( Parent.class );
 
-        Assert.assertNotNull(parent);
-        Assert.assertNotNull(parent);
-        Assert.assertEquals("PreDestroy method not called or more than one times", 1, ((ParentImpl) parent).getNbCallPreDestroy());
-    }
+		//Get the private bean factory
+		Field factoryField = injector.getClass().getDeclaredField( "factory" );
+		factoryField.setAccessible( true );
+		BeanFactory factory = (BeanFactory) factoryField.get( injector );
+		factory.removeAllBeansReferences();
+
+		Assert.assertNotNull( parent );
+		Assert.assertNotNull( parent );
+		Assert.assertEquals(
+				"PreDestroy method not called or more than one times", 1, ( (ParentImpl) parent ).getNbCallPreDestroy()
+		);
+	}
 
 }

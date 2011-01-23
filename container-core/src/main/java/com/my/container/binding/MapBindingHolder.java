@@ -27,136 +27,138 @@ import java.util.Map;
  * The bindings map implementation
  * with a HashMap.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public class MapBindingHolder implements BindingHolder {
 
-    private Map<Class<?>, List<Binding<?>>> bindings;
+	private Map<Class<?>, List<Binding<?>>> bindings;
 
-    /**
-     * Default constructor. 
-     */
-    public MapBindingHolder() {
-        this.bindings = new HashMap<Class<?>, List<Binding<?>>>();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public MapBindingHolder() {
+		this.bindings = new HashMap<Class<?>, List<Binding<?>>>();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void put(final Binding<?> binding) {
-        if (binding == null) {
-            throw new IllegalArgumentException("The binding parameter cannot be null");
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void put(final Binding<?> binding) {
+		if ( binding == null ) {
+			throw new IllegalArgumentException( "The binding parameter cannot be null" );
+		}
 
-        List<Binding<?>> bindingList = this.bindings.get(binding.getClazz());
-        if (bindingList == null) {
-            bindingList = new ArrayList<Binding<?>>();
-        }
+		List<Binding<?>> bindingList = this.bindings.get( binding.getClazz() );
+		if ( bindingList == null ) {
+			bindingList = new ArrayList<Binding<?>>();
+		}
 
-        bindingList.add(binding);
-        this.bindings.put(binding.getClazz(), bindingList);
-    }
+		bindingList.add( binding );
+		this.bindings.put( binding.getClazz(), bindingList );
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isBindingFor(final Class<?> clazz) {
-        return this.bindings.containsKey(clazz);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isBindingFor(final Class<?> clazz) {
+		return this.bindings.containsKey( clazz );
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public <T> Binding<T> getBindingFor(final Class<T> clazz) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("The clazz parameter cannot be null");
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public <T> Binding<T> getBindingFor(final Class<T> clazz) {
+		if ( clazz == null ) {
+			throw new IllegalArgumentException( "The clazz parameter cannot be null" );
+		}
 
-        Binding<T> result = null;
+		Binding<T> result = null;
 
-        List<Binding<?>> bindingList = this.bindings.get(clazz);
-        if (bindingList != null) {
-            for (Binding b : bindingList) {
-                if (b.getName() == null && b.getQualifier() == null) {
-                    result = b;
-                    break;
-                }
-            }
-        }
+		List<Binding<?>> bindingList = this.bindings.get( clazz );
+		if ( bindingList != null ) {
+			for ( Binding b : bindingList ) {
+				if ( b.getName() == null && b.getQualifier() == null ) {
+					result = b;
+					break;
+				}
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public <Q extends Annotation> Binding<?> getBindingFor(final Class<?> clazz, final Q qualifier) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("The clazz parameter cannot be null");
-        }
-        if (qualifier != null && !qualifier.annotationType().isAnnotationPresent(Qualifier.class)) {
-            throw new IllegalArgumentException("The qualifier must be annotated with @Qualifier");
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public <Q extends Annotation> Binding<?> getBindingFor(final Class<?> clazz, final Q qualifier) {
+		if ( clazz == null ) {
+			throw new IllegalArgumentException( "The clazz parameter cannot be null" );
+		}
+		if ( qualifier != null && !qualifier.annotationType().isAnnotationPresent( Qualifier.class ) ) {
+			throw new IllegalArgumentException( "The qualifier must be annotated with @Qualifier" );
+		}
 
-        Binding<?> result = null;
+		Binding<?> result = null;
 
-        if (qualifier == null) {
-            result = this.getBindingFor(clazz);
-        } else {
-            List<Binding<?>> bindingList = this.bindings.get(clazz);
-            if (bindingList != null) {
-                for (Binding b : bindingList) {
-                    if ((qualifier instanceof Named && ((Named) qualifier).value().equals(b.getName())) ||
-                            qualifier.annotationType().equals(b.getQualifier())) {
-                        result = b;
-                        break;
-                    }
-                }
-            }
-        }
+		if ( qualifier == null ) {
+			result = this.getBindingFor( clazz );
+		}
+		else {
+			List<Binding<?>> bindingList = this.bindings.get( clazz );
+			if ( bindingList != null ) {
+				for ( Binding b : bindingList ) {
+					if ( ( qualifier instanceof Named && ( (Named) qualifier ).value().equals( b.getName() ) ) ||
+							qualifier.annotationType().equals( b.getQualifier() ) ) {
+						result = b;
+						break;
+					}
+				}
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<Binding<?>> removeAllBindingFor(final Class<?> clazz) {
-       return this.bindings.remove(clazz);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<Binding<?>> removeAllBindingFor(final Class<?> clazz) {
+		return this.bindings.remove( clazz );
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public <Q extends Annotation> Binding<?> removeQualifiedBindingFor(final Class<?> clazz, final Q qualifier) {
-        if (clazz == null) {
-            throw new IllegalArgumentException("The clazz parameter cannot be null");
-        } else if (qualifier == null || !qualifier.annotationType().isAnnotationPresent(Qualifier.class)) {
-            throw new IllegalArgumentException("The qualifier cannot be null or must be annotated with @Qualifier");
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	public <Q extends Annotation> Binding<?> removeQualifiedBindingFor(final Class<?> clazz, final Q qualifier) {
+		if ( clazz == null ) {
+			throw new IllegalArgumentException( "The clazz parameter cannot be null" );
+		}
+		else if ( qualifier == null || !qualifier.annotationType().isAnnotationPresent( Qualifier.class ) ) {
+			throw new IllegalArgumentException( "The qualifier cannot be null or must be annotated with @Qualifier" );
+		}
 
-        Binding<?> result = null;
+		Binding<?> result = null;
 
-        List<Binding<?>> bindingList = this.bindings.get(clazz);
-        if (bindingList != null) {
-            for (Binding b : bindingList) {
-                if ((qualifier instanceof Named && ((Named) qualifier).value().equals(b.getName())) ||
-                    qualifier.annotationType().equals(b.getQualifier())) {
-                    result = b;
-                    break;
-                }
-            }
-        }
+		List<Binding<?>> bindingList = this.bindings.get( clazz );
+		if ( bindingList != null ) {
+			for ( Binding b : bindingList ) {
+				if ( ( qualifier instanceof Named && ( (Named) qualifier ).value().equals( b.getName() ) ) ||
+						qualifier.annotationType().equals( b.getQualifier() ) ) {
+					result = b;
+					break;
+				}
+			}
+		}
 
-        bindingList.remove(result);
-        return result;
-    }
+		bindingList.remove( result );
+		return result;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void removeAllBindings() {
-        this.bindings.clear();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeAllBindings() {
+		this.bindings.clear();
+	}
 
 }

@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory.exceptions;
+package com.my.container.core.beanfactory.exceptions;
+
 
 /**
- * The abstract bean exception class. This class is the upper class
- * of all the exception relative to bean. 
+ * This exception is thrown when the
+ * bean factory cannot instantiate the bean.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
-public abstract class BeanException extends RuntimeException {
+public class BeanInstantiationException extends BeanException {
 
-    protected BeanException(final String message) {
-        super(message);
-    }
+	public BeanInstantiationException(String message) {
+		super( message );
+	}
 
-    protected BeanException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+	public BeanInstantiationException(final String message, final Throwable cause) {
+		super( message, cause );
+	}
 
-    protected BeanException(final Throwable cause) {
-        super(cause);
-    }
+	public BeanInstantiationException(final Throwable cause) {
+		super( cause );
+	}
 }

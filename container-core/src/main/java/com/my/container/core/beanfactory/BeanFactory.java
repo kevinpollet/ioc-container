@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory;
+package com.my.container.core.beanfactory;
 
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.MapBindingHolder;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.context.beanfactory.exceptions.CallbackInvocationException;
-import com.my.container.context.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.context.beanfactory.injector.InjectionContext;
-import com.my.container.context.beanfactory.injector.Injector;
+import com.my.container.core.beanfactory.exceptions.CallbackInvocationException;
+import com.my.container.core.beanfactory.exceptions.NoSuchBeanDefinitionException;
+import com.my.container.core.beanfactory.injector.InjectionContext;
+import com.my.container.core.beanfactory.injector.Injector;
 import com.my.container.spi.BeanProcessor;
 import com.my.container.spi.loader.ServiceLoader;
 import com.my.container.util.ReflectionHelper;

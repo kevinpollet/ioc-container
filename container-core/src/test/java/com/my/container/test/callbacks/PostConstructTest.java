@@ -16,8 +16,8 @@
 package com.my.container.test.callbacks;
 
 import com.my.container.binding.provider.BindingProvider;
-import com.my.container.context.ApplicationContext;
-import com.my.container.context.Context;
+import com.my.container.core.Configuration;
+import com.my.container.core.Injector;
 import com.my.container.test.callbacks.services.Leaf;
 import com.my.container.test.callbacks.services.Parent;
 import com.my.container.test.callbacks.services.impl.LeafImpl;
@@ -29,38 +29,47 @@ import org.junit.Test;
 /**
  * Test the PostConstruct callback.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
 public class PostConstructTest {
 
-    private Context context;
+	private Injector injector;
 
-    @Before
-    public void setUp() {
-        this.context = new ApplicationContext(new BindingProvider() {
-            @Override
-            public void configureBindings() {
-                bind(Parent.class).to(ParentImpl.class);
-                bind(Leaf.class).to(LeafImpl.class);
-            }
-        });
-    }
+	@Before
+	public void setUp() {
+		Configuration config = Injector.configure();
+		config.addBindingProvider(
+				new BindingProvider() {
+					@Override
+					public void configureBindings() {
+						bind( Parent.class ).to( ParentImpl.class );
+						bind( Leaf.class ).to( LeafImpl.class );
+					}
+				}
+		);
 
-    @Test
-    public void testPostConstruct() {
-        Parent parent = this.context.getBean(Parent.class);
+		injector = config.buildInjector();
+	}
 
-        Assert.assertNotNull(parent);
-        Assert.assertEquals("PostConstruct method not called or more than one times", 1, ((ParentImpl) parent).getNbCallPostConstruct());
-    }
+	@Test
+	public void testPostConstruct() {
+		Parent parent = injector.getBean( Parent.class );
 
-    @Test
-    public void testPostConstructCalledAfterAllInjections() {
-        Parent parent = this.context.getBean(Parent.class);
+		Assert.assertNotNull( parent );
+		Assert.assertEquals(
+				"PostConstruct method not called or more than one times",
+				1,
+				( (ParentImpl) parent ).getNbCallPostConstruct()
+		);
+	}
 
-        Assert.assertNotNull(parent);
-        Assert.assertEquals("Parent", parent.getName());
-        Assert.assertEquals("Leaf", parent.getLeafName());
-    }
+	@Test
+	public void testPostConstructCalledAfterAllInjections() {
+		Parent parent = injector.getBean( Parent.class );
+
+		Assert.assertNotNull( parent );
+		Assert.assertEquals( "Parent", parent.getName() );
+		Assert.assertEquals( "Leaf", parent.getLeafName() );
+	}
 
 }

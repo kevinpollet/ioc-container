@@ -26,71 +26,80 @@ import java.util.List;
  */
 public interface BindingHolder {
 
-    /**
-     * Put a bindings in this binding collection.
-     *
-     * @param binding the binding
-     * @throws IllegalArgumentException if binding is null
-     */
-    public void put(final Binding<?> binding);
+	/**
+	 * Put a bindings in this binding collection.
+	 *
+	 * @param binding the binding
+	 *
+	 * @throws IllegalArgumentException if binding is null
+	 */
+	void put(final Binding<?> binding);
 
-    /**
-     * There is a binding for the given class.
-     *
-     * @param clazz the class
-     * @return true if one, false otherwise
-     */
-    public boolean isBindingFor(final Class<?> clazz);
+	/**
+	 * There is a binding for the given class.
+	 *
+	 * @param clazz the class
+	 *
+	 * @return true if one, false otherwise
+	 */
+	boolean isBindingFor(final Class<?> clazz);
 
-    /**
-     * Retrieve all binding defined to the given class.
-     *
-     * @param clazz the class
-     * @param <T> the type of the binding
-     * @return null if none or the binding list
-     * @throws IllegalArgumentException if clazz is null
-     */
-    public <T>  Binding<T> getBindingFor(final Class<T> clazz);
+	/**
+	 * Retrieve all binding defined to the given class.
+	 *
+	 * @param clazz the class
+	 * @param <T> the type of the binding
+	 *
+	 * @return null if none or the binding list
+	 *
+	 * @throws IllegalArgumentException if clazz is null
+	 */
+	<T> Binding<T> getBindingFor(final Class<T> clazz);
 
-    /**
-     * Get the binding defined for the given class with
-     * the given qualifier. if the qualifier parameter
-     * is null have the same effect of calling the
-     * {@link com.my.container.binding.BindingHolder#getBindingFor(Class)}
-     * method.
-     *
-     * @param clazz the class
-     * @param qualifier the binding qualifier
-     * @param <Q> the qualifier type
-     * @return null if none or the binding
-     * @throws IllegalArgumentException if clazz is null or qualifier is not annotated with @Qualifier
-     */
-    public <Q extends Annotation> Binding<?> getBindingFor(final Class<?> clazz, final Q qualifier);
+	/**
+	 * Get the binding defined for the given class with
+	 * the given qualifier. if the qualifier parameter
+	 * is null have the same effect of calling the
+	 * {@link com.my.container.binding.BindingHolder#getBindingFor(Class)}
+	 * method.
+	 *
+	 * @param clazz the class
+	 * @param qualifier the binding qualifier
+	 * @param <Q> the qualifier type
+	 *
+	 * @return null if none or the binding
+	 *
+	 * @throws IllegalArgumentException if clazz is null or qualifier is not annotated with @Qualifier
+	 */
+	<Q extends Annotation> Binding<?> getBindingFor(final Class<?> clazz, final Q qualifier);
 
-    /**
-     * Remove all the bindings for the given class.
-     *
-     * @param clazz the class
-     * @return null if none or the list removed
-     */
-    public List<Binding<?>> removeAllBindingFor(final Class<?> clazz);
+	/**
+	 * Remove all the bindings for the given class.
+	 *
+	 * @param clazz the class
+	 *
+	 * @return null if none or the list removed
+	 */
+	List<Binding<?>> removeAllBindingFor(final Class<?> clazz);
 
-    /**
-     * Remove the qualified binding for
-     * the given class.
-     *
-     * @param clazz the class
-     * @param qualifier the qualifier
-     * @param <Q> the qualifier type
-     * @return null if none or the biding removed
-     * @throws IllegalArgumentException if clazz is null or qualifier is not annotated with @Qualifier or null
-     */
-    public <Q extends Annotation> Binding<?> removeQualifiedBindingFor(final Class<?> clazz, final Q qualifier);
+	/**
+	 * Remove the qualified binding for
+	 * the given class.
+	 *
+	 * @param clazz the class
+	 * @param qualifier the qualifier
+	 * @param <Q> the qualifier type
+	 *
+	 * @return null if none or the biding removed
+	 *
+	 * @throws IllegalArgumentException if clazz is null or qualifier is not annotated with @Qualifier or null
+	 */
+	<Q extends Annotation> Binding<?> removeQualifiedBindingFor(final Class<?> clazz, final Q qualifier);
 
-    /**
-     * Remove all bindings contains
-     * in this Collection.
-     */
-    public void removeAllBindings();
+	/**
+	 * Remove all bindings contains
+	 * in this Collection.
+	 */
+	void removeAllBindings();
 
 }

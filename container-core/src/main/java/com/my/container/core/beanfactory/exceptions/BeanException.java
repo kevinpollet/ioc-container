@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.context.beanfactory.exceptions;
-
+package com.my.container.core.beanfactory.exceptions;
 
 /**
- * This exception is thrown when the
- * bean factory cannot inject a bean
- * dependency.
+ * The abstract bean exception class. This class is the upper class
+ * of all the exception relative to bean.
  *
- * @author kevinpollet
+ * @author Kevin Pollet
  */
-public class BeanDependencyInjectionException extends BeanInstantiationException {
+public abstract class BeanException extends RuntimeException {
 
-    public BeanDependencyInjectionException(String message) {
-        super(message);
-    }
+	protected BeanException(final String message) {
+		super( message );
+	}
 
-    public BeanDependencyInjectionException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+	protected BeanException(final String message, final Throwable cause) {
+		super( message, cause );
+	}
 
-    public BeanDependencyInjectionException(final Throwable cause) {
-        super(cause);
-    }
+	protected BeanException(final Throwable cause) {
+		super( cause );
+	}
 }

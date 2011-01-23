@@ -16,8 +16,7 @@
 package com.my.container.test.injection;
 
 import com.my.container.binding.provider.BindingProvider;
-import com.my.container.context.ApplicationContext;
-import com.my.container.context.Context;
+import com.my.container.core.Injector;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
 import com.my.container.test.injection.services.ServiceC;
@@ -46,7 +45,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testFieldDependencyInjection() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider() {
+        Injector injector = Injector.configure().addBindingProvider( new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
@@ -54,9 +53,9 @@ public class FieldInjectionTest {
                 bind(ServiceC.class).to(EchoServiceC.class);
                 bind(ServiceD.class).to(FieldNamedServiceD.class);
             }
-        });
+        }).buildInjector();
 
-        ServiceA service = context.getBean(ServiceA.class);
+        ServiceA service = injector.getBean(ServiceA.class);
 
         //Get dependency
         Field depB = service.getClass().getDeclaredField("serviceB");
@@ -74,7 +73,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testSuperFieldDependencyInjection() {
-        Context context = new ApplicationContext(new BindingProvider() {
+        Injector injector = Injector.configure().addBindingProvider( new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
@@ -82,9 +81,9 @@ public class FieldInjectionTest {
                 bind(ServiceC.class).to(EchoServiceC.class);
                 bind(ServiceD.class).to(FieldNamedServiceD.class);
             }
-        });
+        }).buildInjector();
 
-        ServiceA service = context.getBean(ServiceA.class);
+        ServiceA service = injector.getBean(ServiceA.class);
 
         Assert.assertNotNull(service);
         Assert.assertNotNull("SuperClass dependency is null", ((FieldAbstractService) service).getServiceC());
@@ -93,7 +92,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testExistingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider() {
+        Injector injector = Injector.configure().addBindingProvider( new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
@@ -101,10 +100,10 @@ public class FieldInjectionTest {
                 bind(ServiceC.class).to(EchoServiceC.class);
                 bind(ServiceD.class).to(FieldNamedServiceD.class);
             }
-        });
+        }).buildInjector();
 
         ServiceA service = new FieldServiceAImpl();
-        context.resolveBeanDependencies(service);
+        injector.injectDependencies( service );
 
         //Get dependency
         Field depB = service.getClass().getDeclaredField("serviceB");
@@ -122,15 +121,15 @@ public class FieldInjectionTest {
 
     @Test
     public void testNamedFieldInjection() {
-        Context context = new ApplicationContext(new BindingProvider() {
+        Injector injector = Injector.configure().addBindingProvider( new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceC.class).to(UpperEchoServiceC.class).named("upperEchoService");
                 bind(ServiceD.class).to(FieldNamedServiceD.class);
             }
-        });
+        }).buildInjector();
 
-        ServiceD serviceD = context.getBean(ServiceD.class);
+        ServiceD serviceD = injector.getBean(ServiceD.class);
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("ECHO", serviceD.echo("echo"));
@@ -138,15 +137,15 @@ public class FieldInjectionTest {
 
     @Test
     public void testQualifiedFieldInjection() {
-        Context context = new ApplicationContext(new BindingProvider() {
+        Injector injector = Injector.configure().addBindingProvider( new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceC.class).to(LowerEchoServiceC.class).qualifiedBy(LowerEcho.class);
                 bind(ServiceD.class).to(FieldQualifierServiceD.class);
             }
-        });
+        }).buildInjector();
 
-        ServiceD serviceD = context.getBean(ServiceD.class);
+        ServiceD serviceD = injector.getBean(ServiceD.class);
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("echo", serviceD.echo("ECHO"));
@@ -154,15 +153,15 @@ public class FieldInjectionTest {
 
     @Test
     public void testDefaultProviderFieldInjection() {
-        Context context = new ApplicationContext(new BindingProvider() {
+        Injector injector = Injector.configure().addBindingProvider( new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceC.class).to(UpperEchoServiceC.class);
                 bind(ServiceD.class).to(FieldProviderServiceD.class);
             }
-        });
+        }).buildInjector();
 
-        ServiceD serviceD = context.getBean(ServiceD.class);
+        ServiceD serviceD = injector.getBean(ServiceD.class);
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("ECHO", serviceD.echo("echo"));
@@ -170,15 +169,15 @@ public class FieldInjectionTest {
 
     @Test
     public void testUserProviderFieldInjection() {
-        Context context = new ApplicationContext(new BindingProvider() {
+        Injector injector = Injector.configure().addBindingProvider( new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceC.class).toProvider(LowerEchoProvider.class);
                 bind(ServiceD.class).to(FieldProviderServiceD.class);
             }
-        });
+        }).buildInjector();
 
-        ServiceD serviceD = context.getBean(ServiceD.class);
+        ServiceD serviceD = injector.getBean(ServiceD.class);
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("echo", serviceD.echo("eCho"));
@@ -186,7 +185,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testCyclicDependencies() throws NoSuchFieldException, IllegalAccessException {
-        Context context = new ApplicationContext(new BindingProvider() {
+        Injector injector = Injector.configure().addBindingProvider( new BindingProvider() {
             @Override
             public void configureBindings() {
                 bind(ServiceA.class).to(FieldServiceAImpl.class);
@@ -194,9 +193,9 @@ public class FieldInjectionTest {
                 bind(ServiceC.class).to(EchoServiceC.class);
                 bind(ServiceD.class).to(FieldNamedServiceD.class);
             }
-        });
+        }).buildInjector();
 
-        ServiceA serviceA = context.getBean(ServiceA.class);
+        ServiceA serviceA = injector.getBean(ServiceA.class);
 
         //ServiceC dependency
         Field depB = FieldServiceAImpl.class.getDeclaredField("serviceB");
