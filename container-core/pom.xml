@@ -16,6 +16,13 @@
     <name>IOC-Container :: CoreModule</name>
     <description>Implementation of JSR 330</description>
 
+    <developers>
+        <developer>
+            <name>Kevin Pollet</name>
+            <email>pollet.kevin@gmail.com</email>
+        </developer>
+    </developers>
+
     <dependencies>
         <!--
             JSR 330
@@ -60,16 +67,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <developers>
-        <developer>
-            <name>Kevin Pollet</name>
-            <roles>
-                <role>project owner</role>
-                <role>developer</role>
-            </roles>
-            <email>pollet.kevin@gmail.com</email>
-        </developer>
-    </developers>
-
 </project>

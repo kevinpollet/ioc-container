@@ -14,6 +14,13 @@
     <artifactId>container-aop</artifactId>
     <name>IOC-Container :: AopModule</name>
 
+    <developers>
+        <developer>
+            <name>Kevin Pollet</name>
+            <email>pollet.kevin@gmail.com</email>
+        </developer>
+    </developers>
+
     <dependencies>
         <!--
             Dependency on core of container
@@ -46,16 +53,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <developers>
-        <developer>
-            <name>Kevin Pollet</name>
-            <roles>
-                <role>project owner</role>
-                <role>developer</role>
-            </roles>
-            <email>pollet.kevin@gmail.com</email>
-        </developer>
-    </developers>
-
 </project>

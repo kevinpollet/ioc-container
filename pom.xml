@@ -27,6 +27,13 @@
         <module>container-aop</module>
     </modules>
 
+    <developers>
+        <developer>
+            <name>Kevin Pollet</name>
+            <email>pollet.kevin@gmail.com</email>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -112,16 +119,4 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <developers>
-        <developer>
-            <name>Kevin Pollet</name>
-            <roles>
-                <role>project owner</role>
-                <role>developer</role>
-            </roles>
-            <email>pollet.kevin@gmail.com</email>
-        </developer>
-    </developers>
-
 </project>
