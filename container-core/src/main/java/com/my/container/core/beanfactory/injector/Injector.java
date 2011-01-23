@@ -22,7 +22,7 @@ import com.my.container.core.beanfactory.BeanFactory;
 import com.my.container.core.beanfactory.exceptions.BeanDependencyInjectionException;
 import com.my.container.core.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.core.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.spi.BeanProcessor;
+import com.my.container.core.beanfactory.spi.BeanProcessor;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.spi.loader;
+package com.my.container.util.loader;
 
 /**
  * This exception was thrown when service
