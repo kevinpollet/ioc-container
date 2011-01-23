@@ -8,8 +8,9 @@
     <groupId>com.my.container</groupId>
     <artifactId>container</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <name>IOC-Container :: parent</name>
     <packaging>pom</packaging>
+
+    <name>IOC-Container :: parent</name>
 
     <distributionManagement>
         <repository>
@@ -23,6 +24,7 @@
     </distributionManagement>
 
     <modules>
+        <module>container-api</module>
         <module>container-core</module>
         <module>container-aop</module>
     </modules>
