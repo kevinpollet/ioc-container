@@ -25,19 +25,12 @@
 
     <dependencies>
         <!--
-            JSR 330
+            IOC-Container API
         -->
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>
-
-        <!--
-            JSR 250
-        -->
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>jsr250-api</artifactId>
+            <groupId>com.my.container</groupId>
+            <artifactId>container-api</artifactId>
+            <version>0.1-SNAPSHOT</version>
         </dependency>
 
         <!--
