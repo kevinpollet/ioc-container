@@ -116,36 +116,41 @@
                         <target>1.5</target>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>com.mycila.maven-license-plugin</groupId>
-                    <artifactId>maven-license-plugin</artifactId>
-                    <version>1.9.0</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <header>${basedir}/licence.txt</header>
-                        <failIfMissing>true</failIfMissing>
-                        <quiet>false</quiet>
-                        <excludes>
-                            <exclude>**/pom.xml</exclude>
-                            <exclude>.gitignore</exclude>
-                            <exclude>**/logback-test.xml</exclude>
-                        </excludes>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
-        <!-- Default plugin for child projects -->
         <plugins>
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
-                <inherited>true</inherited>
+                <version>1.9.0</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>check-licence</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <header>${basedir}/licence.txt</header>
+                    <strictCheck>true</strictCheck>
+                    <failIfMissing>true</failIfMissing>
+                    <aggregate>true</aggregate>
+                    <quiet>false</quiet>
+                    <excludes>
+                        <exclude>.gitignore</exclude>
+                        <exclude>Readme.textile</exclude>
+                        <exclude>etc/javaLicenceHeader.xml</exclude>
+                        <exclude>**/pom.xml</exclude>
+                        <exclude>**/licence.txt</exclude>
+                        <exclude>**/logback-test.xml</exclude>
+                    </excludes>
+                    <headerDefinitions>
+                        <headerDefinition>${basedir}/etc/javaLicenceHeader.xml</headerDefinition>
+                    </headerDefinitions>
+                </configuration>
             </plugin>
         </plugins>
     </build>
