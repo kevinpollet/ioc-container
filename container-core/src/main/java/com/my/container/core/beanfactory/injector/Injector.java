@@ -27,12 +27,15 @@ import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -198,14 +201,21 @@ public class Injector {
 			if ( clazz.isAnnotationPresent( Singleton.class ) ) {
 				factory.getSingletonBeans().put( clazz, classInstance );
 			}
-			else if ( ReflectionHelper.isCallbackMethod( clazz ) ) {
+			else if ( ReflectionHelper.isMethodAnnotatedWith( PreDestroy.class, clazz ) ) {
 				factory.getPrototypeBeans().add( classInstance );
 			}
 
 			this.injectFieldAndMethod( context, clazz, classInstance );
 
-			//Hold created bean
-			context.getNewlyCreatedBeans().add( classInstance );
+
+			//Dependency injection is done call PostContruct method if one
+			Method postConstruct = ReflectionHelper.getMethodAnnotatedWith( PostConstruct.class, clazz );
+			if ( postConstruct != null ) {
+				if ( !postConstruct.isAccessible() ) {
+					postConstruct.setAccessible( true );
+				}
+				postConstruct.invoke( classInstance );
+			}
 
 		}
 		catch ( Exception ex ) {

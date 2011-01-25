@@ -15,9 +15,12 @@
  */
 package com.my.container.core.beanfactory.injector;
 
+import java.lang.reflect.Method;
+
 import com.my.container.core.beanfactory.BeanFactory;
 import com.my.container.util.ReflectionHelper;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 /**
@@ -55,7 +58,18 @@ public class DefaultInstanceProvider<T> implements Provider<T> {
 		InjectionContext context = new InjectionContext( factory );
 		T instance = injector.constructClass( context, classToProvide );
 
-		ReflectionHelper.invokePostConstructCallback( context.getNewlyCreatedBeans().toArray() );
+		Method postConstruct = ReflectionHelper.getMethodAnnotatedWith( PostConstruct.class, classToProvide );
+		if ( postConstruct != null ) {
+			if ( !postConstruct.isAccessible() ) {
+				postConstruct.setAccessible( true );
+			}
+			try {
+			postConstruct.invoke( instance );
+			}
+			catch ( Exception ex ) {
+
+			}
+		}
 
 		return instance;
 	}

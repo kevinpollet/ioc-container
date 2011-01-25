@@ -15,21 +15,16 @@
  */
 package com.my.container.util;
 
-import com.my.container.core.beanfactory.exceptions.CallbackInvocationException;
+import com.my.container.core.beanfactory.exceptions.BeanException;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
- * Helper who provides useful
- * methods for reflection.
+ * Helper who provides useful to deal with reflection.
  *
  * @author Kevin Pollet
  */
@@ -42,74 +37,6 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Check if there is callback method in the
-	 * given clazz. A callback method is a method
-	 * annotated by {link PostConstruct} or {link PreDestroy}.
-	 *
-	 * @param clazz the clazz
-	 *
-	 * @return true if one, false otherwise
-	 *
-	 * @throws IllegalArgumentException if clazz parameter is null
-	 */
-	public static boolean isCallbackMethod(final Class<?> clazz) {
-		if ( clazz == null ) {
-			throw new NullPointerException( "The clazz parameter cannot be null" );
-		}
-
-		Method[] methods = clazz.getDeclaredMethods();
-		for ( Method method : methods ) {
-			if ( method.isAnnotationPresent( PostConstruct.class ) ||
-					method.isAnnotationPresent( PreDestroy.class ) ) {
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Call PostConstruct callback on a list of bean.
-	 *
-	 * @param beans the beans
-	 */
-	public static void invokePostConstructCallback(final Object... beans) {
-		if ( beans != null ) {
-			for ( Object instance : beans ) {
-				try {
-					invokeDeclaredMethodWith( PostConstruct.class, ProxyHelper.getTargetObject( instance ) );
-				}
-				catch ( Exception ex ) {
-					throw new CallbackInvocationException(
-							"Error during invocation of a bean PostConstruct callback", ex
-					);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Call PreDestroy callback on a list of bean.
-	 *
-	 * @param beans the beans
-	 */
-	public static void invokePreDestroyCallback(final Object... beans) {
-		if ( beans != null ) {
-			for ( Object instance : beans ) {
-				try {
-					invokeDeclaredMethodWith( PreDestroy.class, ProxyHelper.getTargetObject( instance ) );
-				}
-				catch ( Exception ex ) {
-					throw new CallbackInvocationException(
-							"Error during invocation of a bean PreDestroy callback", ex
-					);
-				}
-			}
-		}
-	}
-
-	/**
 	 * This method permits to know if a method is
 	 * overridden by subclass.
 	 *
@@ -118,7 +45,7 @@ public final class ReflectionHelper {
 	 *
 	 * @return true is the method is overridden in subclass
 	 */
-	public static boolean isOverridden(final Class<?> clazz, final Method method) {
+	public static boolean isOverridden(Class<?> clazz, Method method) {
 		if ( clazz == null ) {
 			throw new NullPointerException( "The clazz parameter cannot be null" );
 		}
@@ -151,54 +78,70 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Get all methods declared in the class
-	 * who are annotated by this annotation.
+	 * Check if the given class have a declared method annotated with
+	 * the given annotation.
+	 *
+	 * @param annotation the annotation
+	 * @param clazz the class
+	 *
+	 * @return true if there is a corresponding method.
+	 */
+	public static boolean isMethodAnnotatedWith(Class<? extends Annotation> annotation, Class<?> clazz) {
+		return getMethodAnnotatedWith( annotation, clazz ) != null;
+	}
+
+	/**
+	 * Get the method declared in the class who is annotated by the given annotation.
 	 *
 	 * @param annotation the annotation class
 	 * @param clazz the class
 	 *
-	 * @return the list of method
-	 *
-	 * @see Class#getDeclaredMethods()
+	 * @return the method or null if none
 	 */
-	public static List<Method> getDeclaredMethodsAnnotatedWith(final Class<? extends Annotation> annotation, final Class<?> clazz) {
-		List<Method> methodList = new ArrayList<Method>();
-		for ( Method m : clazz.getDeclaredMethods() ) {
-			if ( m.isAnnotationPresent( annotation ) ) {
-				methodList.add( m );
-			}
-		}
+	public static Method getMethodAnnotatedWith(Class<? extends Annotation> annotation, Class<?> clazz) {
+		Method annotatedMethod = null;
 
-		return methodList;
-	}
-
-	/**
-	 * Call the first declared method with the given
-	 * annotation. This method called only the declared
-	 * public, private and protected method in the given
-	 * class.
-	 *
-	 * @param annotation the annotation
-	 * @param instance the instance to call on
-	 * @param params the method parameter
-	 *
-	 * @return the method result
-	 */
-	public static Object invokeDeclaredMethodWith(final Class<? extends Annotation> annotation, final Object instance, final Object... params)
-			throws InvocationTargetException, IllegalAccessException {
-		Object result = null;
-
-		for ( Method m : instance.getClass().getDeclaredMethods() ) {
-			if ( m.isAnnotationPresent( annotation ) ) {
-				if ( !m.isAccessible() ) {
-					m.setAccessible( true );
-				}
-				result = m.invoke( instance, params );
+		for ( Method method : clazz.getDeclaredMethods() ) {
+			if ( method.isAnnotationPresent( annotation ) ) {
+				annotatedMethod = method;
 				break;
 			}
 		}
+		return annotatedMethod;
+	}
 
-		return result;
+	/**
+	 * Invoke the given method on the given object with the given args.
+	 *
+	 * @param object the object to call method on
+	 * @param method the method to call
+	 * @param args the method args
+	 *
+	 * @return the result of the invocation
+	 * @throws BeanException if invocation of method failed
+	 */
+	public static Object invokeMethod(Object object, Method method, Object... args) {
+		try {
+			return method.invoke( object, args );
+		}
+		catch ( InvocationTargetException e ) {
+			throw new BeanException(
+					String.format(
+							"The invocation of method %s on class %s failed",
+							method.getName(),
+							object.getClass().getName()
+					), e
+			);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new BeanException(
+					String.format(
+							"The invocation of method %s on class %s failed due to illegal access",
+							method.getName(),
+							object.getClass().getName()
+					), e
+			);
+		}
 	}
 
 }

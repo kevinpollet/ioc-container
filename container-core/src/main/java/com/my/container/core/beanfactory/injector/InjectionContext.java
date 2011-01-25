@@ -30,11 +30,8 @@ public class InjectionContext {
 
     private final BeanFactory beanFactory;
 
-    private final List<Object> newlyCreatedBeans;
-
     /**
-     * A map to handle cyclic dependencies
-     * during injection.
+     * A map to handle cyclic dependencies during injection.
      */
     private Map<Class<?>, Object> cyclicHandlerMap;
 
@@ -45,7 +42,6 @@ public class InjectionContext {
      */
     public InjectionContext(final BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
-        this.newlyCreatedBeans = new ArrayList<Object>();
         this.cyclicHandlerMap = new HashMap<Class<?>, Object>();
     }
 
@@ -65,15 +61,6 @@ public class InjectionContext {
      */
     public Map<Class<?>, Object> getCyclicHandlerMap() {
         return this.cyclicHandlerMap;
-    }
-
-    /**
-     * Get the newly created bean.
-     *
-     * @return the newly created bean
-     */
-    public List<Object> getNewlyCreatedBeans() { 
-        return this.newlyCreatedBeans; 
     }
 
 }

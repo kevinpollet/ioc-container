@@ -24,7 +24,6 @@ import com.my.container.core.spi.InjectorProvider;
 public class InjectorProviderImpl implements InjectorProvider {
 
 	public Configuration configure() {
-		System.out.println("Configuration");
 		return new InjectorConfiguration();
 	}
 }

@@ -21,17 +21,17 @@ package com.my.container.core.beanfactory.exceptions;
  *
  * @author Kevin Pollet
  */
-public abstract class BeanException extends RuntimeException {
+public class BeanException extends RuntimeException {
 
-	protected BeanException(final String message) {
+	public BeanException(final String message) {
 		super( message );
 	}
 
-	protected BeanException(final String message, final Throwable cause) {
+	public BeanException(final String message, final Throwable cause) {
 		super( message, cause );
 	}
 
-	protected BeanException(final Throwable cause) {
+	public BeanException(final Throwable cause) {
 		super( cause );
 	}
 }
