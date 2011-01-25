@@ -15,14 +15,12 @@
  */
 package com.my.container.sample.test;
 
-import com.my.container.binding.provider.BindingProvider;
+import java.util.Locale;
+
 import com.my.container.core.Configuration;
 import com.my.container.core.Injector;
 import com.my.container.sample.GreetingService;
-import com.my.container.sample.HelloService;
-import com.my.container.sample.impl.EnglishHelloService;
-import com.my.container.sample.impl.FrenchHelloService;
-import com.my.container.sample.impl.HelloGreetingService;
+import com.my.container.sample.test.config.LocaleBindingProvider;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,21 +32,11 @@ public class GreetingServiceTest {
 
 	@Test
 	public void testFrenchGreetingService() {
+		Locale.setDefault( Locale.FRENCH );
 
-		//Configure Injection
+		//Get an Injector instance
 		Configuration config = Injector.configure();
-		config.addBindingProvider(
-				new BindingProvider() {
-					@Override
-					public void configureBindings() {
-						bind( GreetingService.class ).to( HelloGreetingService.class );
-						bind( HelloService.class ).to( FrenchHelloService.class );
-					}
-				}
-		);
-
-		//Get Injector
-		Injector injector = config.buildInjector();
+		Injector injector = config.addBindingProvider( new LocaleBindingProvider() ).buildInjector();
 		GreetingService service = injector.getBean( GreetingService.class );
 
 		assertEquals( "Bonjour Kevin !!", service.greet( "Kevin" ) );
@@ -56,20 +44,13 @@ public class GreetingServiceTest {
 
 	@Test
 	public void testEnglishGreetingService() {
+		Locale.setDefault( Locale.ENGLISH );
+
 		//Configure Injection
 		Configuration config = Injector.configure();
-		config.addBindingProvider(
-				new BindingProvider() {
-					@Override
-					public void configureBindings() {
-						bind( GreetingService.class ).to( HelloGreetingService.class );
-						bind( HelloService.class ).to( EnglishHelloService.class );
-					}
-				}
-		);
 
-		//Get Injector
-		Injector injector = config.buildInjector();
+		//Get an Injector instance
+		Injector injector = config.addBindingProvider( new LocaleBindingProvider() ).buildInjector();
 		GreetingService service = injector.getBean( GreetingService.class );
 
 		assertEquals( "Hello Kevin !!", service.greet( "Kevin" ) );
