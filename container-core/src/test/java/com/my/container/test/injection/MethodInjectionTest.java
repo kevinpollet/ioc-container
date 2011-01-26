@@ -17,8 +17,8 @@ package com.my.container.test.injection;
 
 import java.lang.reflect.Field;
 
+import com.my.container.Injector;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Injector;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
@@ -54,7 +54,7 @@ public class MethodInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceD service = injector.getBean( ServiceD.class );
+		ServiceD service = injector.get( ServiceD.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( "Great Method Injection", service.echo( "Great Method Injection" ) );
@@ -73,7 +73,7 @@ public class MethodInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceD service = injector.getBean( ServiceD.class );
+		ServiceD service = injector.get( ServiceD.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( 1, ( (MethodServiceDImpl) service ).getNbCallSetServiceC() );
@@ -92,7 +92,7 @@ public class MethodInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceE service = injector.getBean( ServiceE.class );
+		ServiceE service = injector.get( ServiceE.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( 0, ( (MethodServiceEImpl) service ).getNbCallSetServiceC() );
@@ -132,7 +132,7 @@ public class MethodInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceA service = injector.getBean( ServiceA.class );
+		ServiceA service = injector.get( ServiceA.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( "ECHO", service.echo( "echo" ) );
@@ -152,7 +152,7 @@ public class MethodInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceA service = injector.getBean( ServiceA.class );
+		ServiceA service = injector.get( ServiceA.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( "echo", service.echo( "ECHO" ) );
@@ -170,7 +170,7 @@ public class MethodInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceA service = injector.getBean( ServiceA.class );
+		ServiceA service = injector.get( ServiceA.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( "echo", service.echo( "ECHO" ) );
@@ -188,7 +188,7 @@ public class MethodInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceA service = injector.getBean( ServiceA.class );
+		ServiceA service = injector.get( ServiceA.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( "echo", service.echo( "ECHO" ) );
@@ -207,7 +207,7 @@ public class MethodInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceD serviceD = injector.getBean( ServiceD.class );
+		ServiceD serviceD = injector.get( ServiceD.class );
 
 		//Get depE for serviceD
 		Field depE = MethodServiceDImpl.class.getDeclaredField( "serviceE" );

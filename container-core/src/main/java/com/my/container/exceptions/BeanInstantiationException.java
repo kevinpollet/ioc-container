@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core.impl;
+package com.my.container.exceptions;
 
-import com.my.container.core.Configuration;
-import com.my.container.core.spi.InjectorProvider;
 
 /**
+ * This exception is thrown when the
+ * bean factory cannot instantiate the bean.
+ *
  * @author Kevin Pollet
  */
-public class InjectorProviderImpl implements InjectorProvider {
+public class BeanInstantiationException extends BeanException {
 
-	public Configuration configure() {
-		return new InjectorConfiguration();
+	public BeanInstantiationException(String message) {
+		super( message );
+	}
+
+	public BeanInstantiationException(final String message, final Throwable cause) {
+		super( message, cause );
+	}
+
+	public BeanInstantiationException(final Throwable cause) {
+		super( cause );
 	}
 }

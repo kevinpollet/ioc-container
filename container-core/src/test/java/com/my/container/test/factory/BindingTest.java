@@ -15,9 +15,9 @@
  */
 package com.my.container.test.factory;
 
+import com.my.container.Configuration;
+import com.my.container.Injector;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Configuration;
-import com.my.container.core.Injector;
 import com.my.container.test.factory.services.HelloService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class BindingTest {
 					}
 				}
 		);
-		HelloService service = config.buildInjector().getBean( HelloService.class );
+		HelloService service = config.buildInjector().get( HelloService.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( "Hello Container", service.sayHello( "Container" ) );

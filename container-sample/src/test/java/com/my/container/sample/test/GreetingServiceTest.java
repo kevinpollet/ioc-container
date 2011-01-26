@@ -17,8 +17,8 @@ package com.my.container.sample.test;
 
 import java.util.Locale;
 
-import com.my.container.core.Configuration;
-import com.my.container.core.Injector;
+import com.my.container.Injector;
+import com.my.container.Configuration;
 import com.my.container.sample.GreetingService;
 import com.my.container.sample.test.config.LocaleBindingProvider;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class GreetingServiceTest {
 		//Get an Injector instance
 		Configuration config = Injector.configure();
 		Injector injector = config.addBindingProvider( new LocaleBindingProvider() ).buildInjector();
-		GreetingService service = injector.getBean( GreetingService.class );
+		GreetingService service = injector.get( GreetingService.class );
 
 		assertEquals( "Bonjour Kevin !!", service.greet( "Kevin" ) );
 	}
@@ -51,7 +51,7 @@ public class GreetingServiceTest {
 
 		//Get an Injector instance
 		Injector injector = config.addBindingProvider( new LocaleBindingProvider() ).buildInjector();
-		GreetingService service = injector.getBean( GreetingService.class );
+		GreetingService service = injector.get( GreetingService.class );
 
 		assertEquals( "Hello Kevin !!", service.greet( "Kevin" ) );
 	}

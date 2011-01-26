@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core;
+package com.my.container;
 
 import com.my.container.core.spi.InjectorProvider;
+import com.my.container.exceptions.InjectorProviderNotFoundException;
 import com.my.container.util.loader.ServiceLoader;
 
 /**
@@ -25,6 +26,7 @@ import com.my.container.util.loader.ServiceLoader;
  */
 public abstract class Injector {
 
+	//TODO provide an other bootstrap mechanism
 	/**
 	 * Hold an instance of the first
 	 * loaded injector provider.
@@ -63,7 +65,7 @@ public abstract class Injector {
 	 *
 	 * @return the new bean instance
 	 */
-	public abstract <T> T getBean(Class<T> clazz);
+	public abstract <T> T get(Class<T> clazz);
 
 	/**
 	 * Inject statics member and methods.

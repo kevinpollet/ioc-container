@@ -18,11 +18,11 @@ package com.my.container.aop;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 
+import com.my.container.Injector;
 import com.my.container.aop.services.HelloService;
 import com.my.container.aop.services.impl.HelloServiceWithInterceptor;
 import com.my.container.aop.services.impl.MockInterceptor;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Injector;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class ExcludeMethodTest {
 
     @Test
     public void testExcludeMethodInterceptor() throws NoSuchFieldException, IllegalAccessException {
-        HelloService service = this.context.getBean(HelloService.class);
+        HelloService service = this.context.get( HelloService.class );
 
         Assert.assertNotNull(service);
         Assert.assertTrue(Proxy.isProxyClass(service.getClass()));

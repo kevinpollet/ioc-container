@@ -13,40 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core.impl;
+package com.my.container.core;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.my.container.ContextBeanFactory;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingProvider;
-import com.my.container.core.Configuration;
-import com.my.container.core.Injector;
-import com.my.container.core.beanfactory.BeanFactory;
+import com.my.container.Configuration;
+import com.my.container.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
- * The basic implementation of the
- * core interface.
+ * The basic implementation of the core interface.
  *
  * @author Kevin Pollet
  */
 class InjectorImpl extends Injector {
 
-	private final Logger logger = LoggerFactory.getLogger( InjectorImpl.class );
-
-	private BeanFactory factory;
+	private final ContextBeanFactory context;
 
 	/**
 	 * Construct the core.
 	 *
 	 * @param configuration the configuration object
 	 */
-	//TODO add all bindings is it right ?
 	public InjectorImpl(Configuration configuration) {
-		InjectorConfiguration config = (InjectorConfiguration) configuration;
+		ConfigurationImpl config = (ConfigurationImpl) configuration;
 
 		List<Binding<?>> bindings = new ArrayList<Binding<?>>();
 		for ( BindingProvider provider : config.getBindingProviders() ) {
@@ -54,7 +50,7 @@ class InjectorImpl extends Injector {
 			bindings.addAll( provider.getBindings() );
 		}
 
-		this.factory = new BeanFactory( bindings );
+		this.context = new ContextBeanFactoryImpl( bindings );
 		if ( config.isShutDownHookEnable() ) {
 			registerShutdownHook();
 		}
@@ -63,8 +59,8 @@ class InjectorImpl extends Injector {
 	/**
 	 * {@inheritDoc}
 	 */
-	public <T> T getBean(final Class<T> clazz) {
-		return this.factory.getBean( clazz );
+	public <T> T get(Class<T> clazz) {
+		return context.constructBean( clazz );
 	}
 
 	/**
@@ -77,35 +73,35 @@ class InjectorImpl extends Injector {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void injectDependencies(final Object bean) {
-		this.factory.resolveDependencies( bean );
+	public void injectDependencies(Object bean) {
+		context.injectExistingBean( bean );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	private void registerShutdownHook() {
-		Thread thread = new Thread( this.new CallbackShutdownHook( this.factory ) );
+		Thread thread = new Thread( this.new CallbackShutdownHook( this.context ) );
 		Runtime.getRuntime().addShutdownHook( thread );
 	}
 
 
 	/**
-	 * Shutdown hook class.
+	 * Shutdown hook inner class.
 	 */
 	private class CallbackShutdownHook implements Runnable {
 
 		private final Logger logger = LoggerFactory.getLogger( CallbackShutdownHook.class );
 
-		private final BeanFactory factory;
+		private final ContextBeanFactory context;
 
 		/**
-		 * The CallbackShutdown hook factory.
+		 * The CallbackShutdown hook context.
 		 *
-		 * @param factory the bean factory
+		 * @param context the bean context
 		 */
-		public CallbackShutdownHook(BeanFactory factory) {
-			this.factory = factory;
+		public CallbackShutdownHook(ContextBeanFactory context) {
+			this.context = context;
 		}
 
 		/**
@@ -113,7 +109,7 @@ class InjectorImpl extends Injector {
 		 */
 		public void run() {
 			logger.info( "Shutdown hook called : Call all created bean PreDestroy methods" );
-			this.factory.removeAllBeansReferences();
+			context.destroy();
 		}
 	}
 

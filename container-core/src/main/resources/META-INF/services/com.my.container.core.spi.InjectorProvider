@@ -1,2 +1,2 @@
 # Default injector provider
-com.my.container.core.impl.InjectorProviderImpl
+com.my.container.core.InjectorProviderImpl

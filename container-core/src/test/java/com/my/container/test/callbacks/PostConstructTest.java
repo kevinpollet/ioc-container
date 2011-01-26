@@ -15,9 +15,9 @@
  */
 package com.my.container.test.callbacks;
 
+import com.my.container.Injector;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Configuration;
-import com.my.container.core.Injector;
+import com.my.container.Configuration;
 import com.my.container.test.callbacks.services.Leaf;
 import com.my.container.test.callbacks.services.Parent;
 import com.my.container.test.callbacks.services.impl.LeafImpl;
@@ -53,7 +53,7 @@ public class PostConstructTest {
 
 	@Test
 	public void testPostConstruct() {
-		Parent parent = injector.getBean( Parent.class );
+		Parent parent = injector.get( Parent.class );
 
 		Assert.assertNotNull( parent );
 		Assert.assertEquals(
@@ -65,7 +65,7 @@ public class PostConstructTest {
 
 	@Test
 	public void testPostConstructCalledAfterAllInjections() {
-		Parent parent = injector.getBean( Parent.class );
+		Parent parent = injector.get( Parent.class );
 
 		Assert.assertNotNull( parent );
 		Assert.assertEquals( "Parent", parent.getName() );

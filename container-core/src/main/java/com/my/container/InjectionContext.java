@@ -13,32 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.test.tck;
+package com.my.container;
 
-import com.my.container.Injector;
-import com.my.container.Configuration;
-import junit.framework.Test;
-import org.atinject.tck.Tck;
-import org.atinject.tck.auto.Car;
+import java.util.Map;
 
 /**
- * JSR-330 TCK.
+ * The injection context used during the injection
+ * mechanism.
  *
  * @author Kevin Pollet
  */
-public class TckSuiteInitialisation {
+public interface InjectionContext {
 
-	/**
-	 * Configure and return the suite.
-	 *
-	 * @return the suite.
-	 */
-	public static Test suite() {
-		Configuration config = Injector.configure();
-		Injector injector = config.addBindingProvider( new TckBindingProvider() ).buildInjector();
+	ContextBeanFactory getContextBeanFactory();
 
-		Car car = injector.get( Car.class );
-		return Tck.testsFor( car, false, true );
-	}
+	Map<Class<?>, Object> getAlreadyInjectedBean();
 
 }

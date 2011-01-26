@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core.beanfactory.exceptions;
-
+package com.my.container;
 
 /**
- * This exception is thrown when the
- * bean factory cannot inject a bean
- * dependency.
- *
  * @author Kevin Pollet
  */
-public class BeanDependencyInjectionException extends BeanInstantiationException {
+public interface ContextBeanFactory {
 
-	public BeanDependencyInjectionException(String message) {
-		super( message );
-	}
+	 <T> T constructBean(Class<T> beanClass);
 
-	public BeanDependencyInjectionException(final String message, final Throwable cause) {
-		super( message, cause );
-	}
+	 void injectExistingBean(Object bean);
 
-	public BeanDependencyInjectionException(final Throwable cause) {
-		super( cause );
-	}
+	 void destroy();
 }

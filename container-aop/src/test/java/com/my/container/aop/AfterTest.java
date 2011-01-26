@@ -22,7 +22,7 @@ import com.my.container.aop.services.HelloService;
 import com.my.container.aop.services.impl.HelloServiceWithInterceptor;
 import com.my.container.aop.services.impl.MockInterceptor;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Injector;
+import com.my.container.Injector;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class AfterTest {
 
     @Test
     public void testAfterInterceptor() throws NoSuchFieldException, IllegalAccessException {
-        HelloService service = this.injector.getBean(HelloService.class);
+        HelloService service = this.injector.get( HelloService.class );
 
         Assert.assertNotNull(service);
         Assert.assertTrue(Proxy.isProxyClass(service.getClass()));

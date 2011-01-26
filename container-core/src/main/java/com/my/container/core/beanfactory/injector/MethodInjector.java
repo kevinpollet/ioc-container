@@ -15,10 +15,14 @@
  */
 package com.my.container.core.beanfactory.injector;
 
+import com.my.container.InjectionContext;
+import com.my.container.core.ContextBeanFactoryImpl;
+import com.my.container.core.InjectionContextImpl;
+import com.my.container.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.binding.Binding;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.core.beanfactory.exceptions.BeanDependencyInjectionException;
-import com.my.container.core.beanfactory.exceptions.NoSuchBeanDefinitionException;
+import com.my.container.exceptions.BeanDependencyInjectionException;
+import com.my.container.core.provider.GenericProvider;
 import com.my.container.util.ProxyHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +85,7 @@ public class MethodInjector {
                     Type[] parametersType = method.getGenericParameterTypes();
                     Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
-                    context.getCyclicHandlerMap().put(instance.getClass(), instance);
+                    context.getAlreadyInjectedBean().put( instance.getClass(), instance );
 
                     for (int i = 0; i < parametersClass.length; i++) {
 
@@ -106,19 +110,19 @@ public class MethodInjector {
                         if (parameterClass.isAssignableFrom(Provider.class)) {
                             if (parametersType[i] instanceof ParameterizedType) {
                                 Class<?> classToInject = (Class<?>) ((ParameterizedType) parametersType[i]).getActualTypeArguments()[0];
-                                injectionBinding = context.getBeanFactory().getProviderHolder().getBindingFor(classToInject, qualifier);
+                                injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory()).getProviderHolder().getBindingFor(classToInject, qualifier);
                                 if (injectionBinding == null) {
-                                    injectionBinding = context.getBeanFactory().getBindingHolder().getBindingFor(classToInject, qualifier);
+                                    injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory()).getBindingHolder().getBindingFor(classToInject, qualifier);
                                     if (injectionBinding == null) {
                                         throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
                                     }
-                                    parameters[i] = new DefaultInstanceProvider(context.getBeanFactory(), injectionBinding.getImplementation());
+                                    parameters[i] = new GenericProvider(((ContextBeanFactoryImpl) context.getContextBeanFactory()), injectionBinding.getImplementation());
                                 } else {
                                     parameters[i] = this.injector.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
                                 }
                             }
                         } else {
-                            injectionBinding = context.getBeanFactory().getBindingHolder().getBindingFor(parameterClass, qualifier);
+                            injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory()).getBindingHolder().getBindingFor(parameterClass, qualifier);
                             if (injectionBinding == null) {
                                 throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", parameterClass.getName()));
                             }
@@ -143,7 +147,7 @@ public class MethodInjector {
                     }
 
                     //Remove mark
-                    context.getCyclicHandlerMap().remove(instance.getClass());
+                    context.getAlreadyInjectedBean().remove(instance.getClass());
 
                 }
             }

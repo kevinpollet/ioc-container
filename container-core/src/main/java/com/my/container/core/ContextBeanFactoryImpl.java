@@ -13,40 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core.beanfactory;
+package com.my.container.core;
 
-import com.my.container.binding.Binding;
-import com.my.container.binding.BindingHolder;
-import com.my.container.binding.holder.MapBindingHolder;
-import com.my.container.binding.ProvidedBinding;
-import com.my.container.core.beanfactory.exceptions.NoSuchBeanDefinitionException;
-import com.my.container.core.beanfactory.injector.InjectionContext;
-import com.my.container.core.beanfactory.injector.Injector;
-import com.my.container.core.beanfactory.spi.BeanProcessor;
-import com.my.container.util.loader.ServiceLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.PreDestroy;
-import javax.inject.Singleton;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PreDestroy;
+import javax.inject.Singleton;
 
-import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
+import com.my.container.ContextBeanFactory;
+import com.my.container.binding.Binding;
+import com.my.container.binding.BindingHolder;
+import com.my.container.binding.ProvidedBinding;
+import com.my.container.binding.holder.MapBindingHolder;
+import com.my.container.core.beanfactory.injector.Injector;
+import com.my.container.core.beanfactory.spi.BeanProcessor;
+import com.my.container.exceptions.NoSuchBeanDefinitionException;
+import com.my.container.util.loader.ServiceLoader;
+
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
 import static com.my.container.util.ReflectionHelper.invokeMethod;
+import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
 
 /**
  * The factory of bean class
  *
  * @author kevinpollet
  */
-public final class BeanFactory {
-
-	private final Logger logger = LoggerFactory.getLogger( BeanFactory.class );
+public final class ContextBeanFactoryImpl implements ContextBeanFactory {
 
 	private final BindingHolder holder;
 
@@ -65,7 +61,7 @@ public final class BeanFactory {
 	 *
 	 * @param list the binding list
 	 */
-	public BeanFactory(final List<Binding<?>> list) {
+	public ContextBeanFactoryImpl(final List<Binding<?>> list) {
 		this.holder = new MapBindingHolder();
 		this.providerHolder = new MapBindingHolder();
 
@@ -98,35 +94,35 @@ public final class BeanFactory {
 	 * Get a bean defined by this class.
 	 * This class mut be the interface of the binding.
 	 *
-	 * @param clazz the bean class
+	 * @param beanClass the bean class
 	 *
 	 * @return the bean instance
 	 *
 	 * @throws NoSuchBeanDefinitionException if there is no binding implementation for this bean contract
 	 * @throws IllegalArgumentException if the clazz argument is null
 	 */
-	public <T> T getBean(final Class<T> clazz) {
-		if ( clazz == null ) {
+	public <T> T constructBean(Class<T> beanClass) {
+		if ( beanClass == null ) {
 			throw new IllegalArgumentException( "The clazz parameter cannot be null" );
 		}
-		else if ( !this.holder.isBindingFor( clazz ) ) {
+		else if ( !this.holder.isBindingFor( beanClass ) ) {
 			throw new NoSuchBeanDefinitionException(
 					String.format(
-							"The class %s have no binding defined", clazz.getSimpleName()
+							"The class %s have no binding defined", beanClass.getSimpleName()
 					)
 			);
 		}
 
 		T createdBean;
-		Binding<T> binding = this.holder.getBindingFor( clazz );
+		Binding<T> binding = this.holder.getBindingFor( beanClass );
 		Class<? extends T> toClass = binding.getImplementation();
 
 		if ( binding.getImplementation().isAnnotationPresent( Singleton.class ) && this.singletonsBean
-				.containsKey( clazz ) ) {
-			return clazz.cast( this.singletonsBean.get( toClass ) );
+				.containsKey( beanClass ) ) {
+			return beanClass.cast( this.singletonsBean.get( toClass ) );
 		}
 
-		InjectionContext context = new InjectionContext( this );
+		InjectionContextImpl context = new InjectionContextImpl( this );
 		createdBean = injector.constructClass( context, toClass );
 
 		return createdBean;
@@ -139,8 +135,8 @@ public final class BeanFactory {
 	 *
 	 * @param bean the existing bean
 	 */
-	public void resolveDependencies(final Object bean) {
-		InjectionContext context = new InjectionContext( this );
+	public void injectExistingBean(Object bean) {
+		InjectionContextImpl context = new InjectionContextImpl( this );
 		injector.injectDependencies( context, bean );
 	}
 
@@ -149,7 +145,7 @@ public final class BeanFactory {
 	 * memorised by the singleton for PreDestroy
 	 * CallBack and Singleton scope.
 	 */
-	public void removeAllBeansReferences() {
+	public void destroy() {
 		List<Object> createdBean = new ArrayList<Object>();
 		createdBean.addAll( prototypesBean );
 		createdBean.addAll( singletonsBean.values() );
@@ -177,7 +173,7 @@ public final class BeanFactory {
 	 * @return the singleton map
 	 */
 	public Map<Class<?>, Object> getSingletonBeans() {
-		return this.singletonsBean;
+		return singletonsBean;
 	}
 
 	/**
@@ -186,7 +182,7 @@ public final class BeanFactory {
 	 * @return the list of prototype bean
 	 */
 	public List<Object> getPrototypeBeans() {
-		return this.prototypesBean;
+		return prototypesBean;
 	}
 
 	/**
@@ -195,7 +191,7 @@ public final class BeanFactory {
 	 * @return the bean processors list
 	 */
 	public List<BeanProcessor> getBeanProcessors() {
-		return this.beanProcessors;
+		return beanProcessors;
 	}
 
 	/**
@@ -204,7 +200,7 @@ public final class BeanFactory {
 	 * @return the binding holder
 	 */
 	public BindingHolder getBindingHolder() {
-		return this.holder;
+		return holder;
 	}
 
 	/**
@@ -213,7 +209,7 @@ public final class BeanFactory {
 	 * @return the provided binding holder
 	 */
 	public BindingHolder getProviderHolder() {
-		return this.providerHolder;
+		return providerHolder;
 	}
 
 }

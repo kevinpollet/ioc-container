@@ -15,9 +15,9 @@
  */
 package com.my.container.test.injection;
 
+import com.my.container.exceptions.BeanInstantiationException;
+import com.my.container.Injector;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Injector;
-import com.my.container.core.beanfactory.exceptions.BeanInstantiationException;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
 import com.my.container.test.injection.services.ServiceC;
@@ -56,7 +56,7 @@ public class ConstructorInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceC serviceC = injector.getBean( ServiceC.class );
+		ServiceC serviceC = injector.get( ServiceC.class );
 
 		Assert.assertNotNull( serviceC );
 		Assert.assertEquals( "Echo", serviceC.echo( "Echo" ) );
@@ -74,7 +74,7 @@ public class ConstructorInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceD serviceD = injector.getBean( ServiceD.class );
+		ServiceD serviceD = injector.get( ServiceD.class );
 
 		Assert.assertNotNull( serviceD );
 		Assert.assertEquals( "Hello", serviceD.echo( "Hello" ) );
@@ -93,7 +93,7 @@ public class ConstructorInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceE serviceE = injector.getBean( ServiceE.class );
+		ServiceE serviceE = injector.get( ServiceE.class );
 
 		Assert.assertNotNull( serviceE );
 		Assert.assertEquals( "ECHO", serviceE.echo( "echo" ) );
@@ -112,7 +112,7 @@ public class ConstructorInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceE serviceE = injector.getBean( ServiceE.class );
+		ServiceE serviceE = injector.get( ServiceE.class );
 
 		Assert.assertNotNull( serviceE );
 		Assert.assertEquals( "ECHO", serviceE.echo( "echo" ) );
@@ -130,7 +130,7 @@ public class ConstructorInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceE serviceE = injector.getBean( ServiceE.class );
+		ServiceE serviceE = injector.get( ServiceE.class );
 
 		Assert.assertNotNull( serviceE );
 		Assert.assertEquals( "echo", serviceE.echo( "ECHO" ) );
@@ -148,7 +148,7 @@ public class ConstructorInjectionTest {
 				}
 		).buildInjector();
 
-		ServiceE serviceE = injector.getBean( ServiceE.class );
+		ServiceE serviceE = injector.get( ServiceE.class );
 
 		Assert.assertNotNull( serviceE );
 		Assert.assertEquals( "echo", serviceE.echo( "ECHO" ) );
@@ -166,7 +166,7 @@ public class ConstructorInjectionTest {
 				}
 		).buildInjector();
 
-		injector.getBean( ServiceA.class );
+		injector.get( ServiceA.class );
 	}
 
 }

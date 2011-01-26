@@ -15,11 +15,16 @@
  */
 package com.my.container.core.beanfactory.injector;
 
+import com.my.container.InjectionContext;
+import com.my.container.core.ContextBeanFactoryImpl;
+import com.my.container.core.InjectionContextImpl;
+import com.my.container.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.binding.Binding;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.core.beanfactory.exceptions.BeanDependencyInjectionException;
-import com.my.container.core.beanfactory.exceptions.NoSuchBeanDefinitionException;
+import com.my.container.exceptions.BeanDependencyInjectionException;
+import com.my.container.core.provider.GenericProvider;
 import com.my.container.util.ProxyHelper;
+import com.sun.xml.internal.bind.v2.ContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +86,7 @@ public class FieldInjector {
 				}
 
 				//Class have dependencies mark it
-				context.getCyclicHandlerMap().put( instance.getClass(), instance );
+				context.getAlreadyInjectedBean().put( instance.getClass(), instance );
 
 				//Get qualifier
 				for ( Annotation annotation : field.getAnnotations() ) {
@@ -94,11 +99,11 @@ public class FieldInjector {
 				if ( fieldClass.isAssignableFrom( Provider.class ) ) {
 					if ( field.getGenericType() instanceof ParameterizedType ) {
 						Class<?> classToInject = (Class<?>) ( (ParameterizedType) field.getGenericType() ).getActualTypeArguments()[0];
-						injectionBinding = context.getBeanFactory()
+						injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory())
 								.getProviderHolder()
 								.getBindingFor( classToInject, qualifier );
 						if ( injectionBinding == null ) {
-							injectionBinding = context.getBeanFactory()
+							injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory())
 									.getBindingHolder()
 									.getBindingFor( classToInject, qualifier );
 							if ( injectionBinding == null ) {
@@ -108,8 +113,8 @@ public class FieldInjector {
 										)
 								);
 							}
-							fieldInstance = new DefaultInstanceProvider(
-									context.getBeanFactory(), injectionBinding.getImplementation()
+							fieldInstance = new GenericProvider(
+									((ContextBeanFactoryImpl) context.getContextBeanFactory()), injectionBinding.getImplementation()
 							);
 						}
 						else {
@@ -119,7 +124,7 @@ public class FieldInjector {
 					}
 				}
 				else {
-					injectionBinding = context.getBeanFactory()
+					injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory())
 							.getBindingHolder()
 							.getBindingFor( field.getType(), qualifier );
 					if ( injectionBinding == null ) {
@@ -147,7 +152,7 @@ public class FieldInjector {
 					);
 				}
 
-				context.getCyclicHandlerMap().remove( instance.getClass() );
+				context.getAlreadyInjectedBean().remove( instance.getClass() );
 			}
 		}
 	}

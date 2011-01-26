@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core;
+package com.my.container.exceptions;
+
 
 /**
+ * This exception is thrown when the
+ * bean factory cannot inject a bean
+ * dependency.
+ *
  * @author Kevin Pollet
  */
-public class InjectorProviderNotFoundException extends RuntimeException {
+public class BeanDependencyInjectionException extends BeanInstantiationException {
 
-	public InjectorProviderNotFoundException(String message) {
+	public BeanDependencyInjectionException(String message) {
 		super( message );
 	}
 
-	public InjectorProviderNotFoundException(String message, Throwable cause) {
+	public BeanDependencyInjectionException(final String message, final Throwable cause) {
 		super( message, cause );
 	}
 
-	public InjectorProviderNotFoundException(Throwable cause) {
+	public BeanDependencyInjectionException(final Throwable cause) {
 		super( cause );
 	}
 }

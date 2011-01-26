@@ -17,10 +17,10 @@ package com.my.container.test.callbacks;
 
 import java.lang.reflect.Field;
 
+import com.my.container.Configuration;
+import com.my.container.Injector;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Configuration;
-import com.my.container.core.Injector;
-import com.my.container.core.beanfactory.BeanFactory;
+import com.my.container.core.ContextBeanFactoryImpl;
 import com.my.container.test.callbacks.services.Leaf;
 import com.my.container.test.callbacks.services.Parent;
 import com.my.container.test.callbacks.services.impl.LeafImpl;
@@ -56,13 +56,13 @@ public class PreDestroyTest {
 
 	@Test
 	public void testPreDestroy() throws NoSuchFieldException, IllegalAccessException {
-		Parent parent = injector.getBean( Parent.class );
+		Parent parent = injector.get( Parent.class );
 
 		//Get the private bean factory
-		Field factoryField = injector.getClass().getDeclaredField( "factory" );
+		Field factoryField = injector.getClass().getDeclaredField( "context" );
 		factoryField.setAccessible( true );
-		BeanFactory factory = (BeanFactory) factoryField.get( injector );
-		factory.removeAllBeansReferences();
+		ContextBeanFactoryImpl factory = (ContextBeanFactoryImpl) factoryField.get( injector );
+		factory.destroy();
 
 		Assert.assertNotNull( parent );
 		Assert.assertNotNull( parent );

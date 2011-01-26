@@ -17,8 +17,8 @@ package com.my.container.test.injection;
 
 import java.lang.reflect.Field;
 
+import com.my.container.Injector;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Injector;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
 import com.my.container.test.injection.services.ServiceC;
@@ -57,7 +57,7 @@ public class FieldInjectionTest {
 				}
 		).buildInjector();
 
-        ServiceA service = injector.getBean(ServiceA.class);
+        ServiceA service = injector.get( ServiceA.class );
 
         //Get dependency
         Field depB = service.getClass().getDeclaredField("serviceB");
@@ -87,7 +87,7 @@ public class FieldInjectionTest {
 				}
 		).buildInjector();
 
-        ServiceA service = injector.getBean(ServiceA.class);
+        ServiceA service = injector.get( ServiceA.class );
 
         Assert.assertNotNull(service);
         Assert.assertNotNull("SuperClass dependency is null", ((FieldAbstractService) service).getServiceC());
@@ -137,7 +137,7 @@ public class FieldInjectionTest {
 				}
 		).buildInjector();
 
-        ServiceD serviceD = injector.getBean(ServiceD.class);
+        ServiceD serviceD = injector.get( ServiceD.class );
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("ECHO", serviceD.echo("echo"));
@@ -155,7 +155,7 @@ public class FieldInjectionTest {
 				}
 		).buildInjector();
 
-        ServiceD serviceD = injector.getBean(ServiceD.class);
+        ServiceD serviceD = injector.get( ServiceD.class );
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("echo", serviceD.echo("ECHO"));
@@ -173,7 +173,7 @@ public class FieldInjectionTest {
 				}
 		).buildInjector();
 
-        ServiceD serviceD = injector.getBean(ServiceD.class);
+        ServiceD serviceD = injector.get( ServiceD.class );
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("ECHO", serviceD.echo("echo"));
@@ -191,7 +191,7 @@ public class FieldInjectionTest {
 				}
 		).buildInjector();
 
-        ServiceD serviceD = injector.getBean(ServiceD.class);
+        ServiceD serviceD = injector.get( ServiceD.class );
 
         Assert.assertNotNull(serviceD);
         Assert.assertEquals("echo", serviceD.echo("eCho"));
@@ -211,7 +211,7 @@ public class FieldInjectionTest {
 				}
 		).buildInjector();
 
-        ServiceA serviceA = injector.getBean(ServiceA.class);
+        ServiceA serviceA = injector.get( ServiceA.class );
 
         //ServiceC dependency
         Field depB = FieldServiceAImpl.class.getDeclaredField("serviceB");

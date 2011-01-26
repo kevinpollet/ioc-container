@@ -15,14 +15,17 @@
  */
 package com.my.container.core.beanfactory.injector;
 
+import com.my.container.InjectionContext;
+import com.my.container.core.InjectionContextImpl;
+import com.my.container.exceptions.BeanDependencyInjectionException;
+import com.my.container.exceptions.BeanInstantiationException;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.core.beanfactory.BeanFactory;
-import com.my.container.core.beanfactory.exceptions.BeanDependencyInjectionException;
-import com.my.container.core.beanfactory.exceptions.BeanInstantiationException;
-import com.my.container.core.beanfactory.exceptions.NoSuchBeanDefinitionException;
+import com.my.container.core.ContextBeanFactoryImpl;
+import com.my.container.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.core.beanfactory.spi.BeanProcessor;
+import com.my.container.core.provider.GenericProvider;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,18 +84,18 @@ public class Injector {
 		this.logger.debug( "Construct an instance of class {}", clazz.getSimpleName() );
 
 		T classInstance = null;
-		BeanFactory factory = context.getBeanFactory();
+		ContextBeanFactoryImpl factory = (ContextBeanFactoryImpl) context.getContextBeanFactory();
 		BindingHolder holder = factory.getBindingHolder();
 		BindingHolder providerHolder = factory.getProviderHolder();
 
 		//Check if bean is a singleton and have been already created
 		if ( factory.getSingletonBeans().containsKey( clazz ) ) {
-			return clazz.cast( context.getBeanFactory().getSingletonBeans().get( clazz ) );
+			return clazz.cast( factory.getSingletonBeans().get( clazz ) );
 		}
 
 		//Check if there is a cyclic dependency reference
-		if ( context.getCyclicHandlerMap().containsKey( clazz ) ) {
-			Object objectRef = context.getCyclicHandlerMap().get( clazz );
+		if ( context.getAlreadyInjectedBean().containsKey( clazz ) ) {
+			Object objectRef = context.getAlreadyInjectedBean().get( clazz );
 			if ( objectRef == null ) {
 				throw new BeanDependencyInjectionException( "Cyclic dependencies in constructor are not valid." );
 			}
@@ -111,7 +114,7 @@ public class Injector {
 					Object[] parameters = new Object[parametersTypes.length];
 					Annotation[][] parametersAnnotations = constructor.getParameterAnnotations();
 
-					context.getCyclicHandlerMap().put( clazz, null );
+					context.getAlreadyInjectedBean().put( clazz, null );
 
 					for ( int i = 0; i < parametersTypes.length; i++ ) {
 
@@ -146,7 +149,7 @@ public class Injector {
 												)
 										);
 									}
-									parameters[i] = new DefaultInstanceProvider(
+									parameters[i] = new GenericProvider(
 											factory, injectionBinding.getImplementation()
 									);
 
@@ -179,7 +182,7 @@ public class Injector {
 					}
 
 					classInstance = clazz.cast( constructor.newInstance( parameters ) );
-					context.getCyclicHandlerMap().remove( clazz );
+					context.getAlreadyInjectedBean().remove( clazz );
 					break;
 				}
 

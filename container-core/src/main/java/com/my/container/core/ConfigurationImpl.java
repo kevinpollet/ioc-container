@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core.impl;
+package com.my.container.core;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.my.container.Configuration;
+import com.my.container.Injector;
 import com.my.container.binding.BindingProvider;
-import com.my.container.core.Configuration;
-import com.my.container.core.Injector;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * @author Kevin Pollet
  */
-class InjectorConfiguration implements Configuration {
+class ConfigurationImpl implements Configuration {
 
 	private boolean shutDownHookEnable;
 
 	private List<BindingProvider> providers;
 
-	public InjectorConfiguration() {
+	public ConfigurationImpl() {
 		this.shutDownHookEnable = false;
 		this.providers = new ArrayList<BindingProvider>();
 	}
@@ -42,7 +41,7 @@ class InjectorConfiguration implements Configuration {
 		return this;
 	}
 
-	public Configuration enableShutDownHook(boolean enable) {
+	public Configuration shutDownHook(boolean enable) {
 		shutDownHookEnable = enable;
 		return this;
 	}

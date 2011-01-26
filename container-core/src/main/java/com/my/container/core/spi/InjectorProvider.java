@@ -15,7 +15,7 @@
  */
 package com.my.container.core.spi;
 
-import com.my.container.core.Configuration;
+import com.my.container.Configuration;
 
 /**
  * @author Kevin Pollet

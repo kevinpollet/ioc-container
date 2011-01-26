@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core;
-
-import com.my.container.binding.BindingProvider;
+package com.my.container.exceptions;
 
 /**
  * @author Kevin Pollet
  */
-public interface Configuration {
+public class InjectorProviderNotFoundException extends RuntimeException {
 
-	<T extends BindingProvider> Configuration addBindingProvider(T provider);
+	public InjectorProviderNotFoundException(String message) {
+		super( message );
+	}
 
-	Configuration enableShutDownHook(boolean enable);
+	public InjectorProviderNotFoundException(String message, Throwable cause) {
+		super( message, cause );
+	}
 
-	Injector buildInjector();
+	public InjectorProviderNotFoundException(Throwable cause) {
+		super( cause );
+	}
 }

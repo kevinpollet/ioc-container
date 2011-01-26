@@ -18,7 +18,7 @@ package com.my.container.aop;
 import com.my.container.aop.services.HelloService;
 import com.my.container.aop.services.impl.HelloServiceWithAroundInvoke;
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Injector;
+import com.my.container.Injector;
 import com.my.container.util.ProxyHelper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class AroundInvokeTest {
 
     @Test
     public void testAroundInvokeInterceptor() {
-        HelloService service = this.context.getBean(HelloService.class);
+        HelloService service = this.context.get( HelloService.class );
 
         Assert.assertNotNull(service);
         Assert.assertEquals("Hello", service.sayHello());

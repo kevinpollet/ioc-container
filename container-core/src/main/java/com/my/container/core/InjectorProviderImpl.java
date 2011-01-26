@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core.beanfactory.exceptions;
+package com.my.container.core;
+
+import com.my.container.Configuration;
+import com.my.container.core.spi.InjectorProvider;
 
 /**
- * The abstract bean exception class. This class is the upper class
- * of all the exception relative to bean.
- *
  * @author Kevin Pollet
  */
-public class BeanException extends RuntimeException {
+public class InjectorProviderImpl implements InjectorProvider {
 
-	public BeanException(final String message) {
-		super( message );
-	}
-
-	public BeanException(final String message, final Throwable cause) {
-		super( message, cause );
-	}
-
-	public BeanException(final Throwable cause) {
-		super( cause );
+	public Configuration configure() {
+		return new ConfigurationImpl();
 	}
 }

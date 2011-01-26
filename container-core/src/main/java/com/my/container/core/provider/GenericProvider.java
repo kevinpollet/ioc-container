@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core.beanfactory.injector;
+package com.my.container.core.provider;
 
-import java.lang.reflect.Method;
-
-import com.my.container.core.beanfactory.BeanFactory;
-import com.my.container.util.ReflectionHelper;
-
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
+
+import com.my.container.core.ContextBeanFactoryImpl;
+import com.my.container.core.InjectionContextImpl;
+import com.my.container.core.beanfactory.injector.Injector;
 
 /**
  * The default provider. This provider is used
@@ -30,11 +28,9 @@ import javax.inject.Provider;
  *
  * @author Kevin Pollet
  */
-public class DefaultInstanceProvider<T> implements Provider<T> {
+public class GenericProvider<T> implements Provider<T> {
 
-	private final BeanFactory factory;
-
-	private final Injector injector;
+	private final ContextBeanFactoryImpl factory;
 
 	private final Class<T> classToProvide;
 
@@ -44,8 +40,7 @@ public class DefaultInstanceProvider<T> implements Provider<T> {
 	 * @param factory the factory to create the injected instance
 	 * @param classToProvide the bean class to create on each {@link javax.inject.Provider#get()} method call
 	 */
-	public DefaultInstanceProvider(final BeanFactory factory, final Class<T> classToProvide) {
-		this.injector = new Injector();
+	public GenericProvider(ContextBeanFactoryImpl factory, Class<T> classToProvide) {
 		this.factory = factory;
 		this.classToProvide = classToProvide;
 	}
@@ -54,24 +49,8 @@ public class DefaultInstanceProvider<T> implements Provider<T> {
 	 * {@inheritDoc}
 	 */
 	public T get() {
-
-		InjectionContext context = new InjectionContext( factory );
-		T instance = injector.constructClass( context, classToProvide );
-
-		Method postConstruct = ReflectionHelper.getMethodAnnotatedWith( PostConstruct.class, classToProvide );
-		if ( postConstruct != null ) {
-			if ( !postConstruct.isAccessible() ) {
-				postConstruct.setAccessible( true );
-			}
-			try {
-			postConstruct.invoke( instance );
-			}
-			catch ( Exception ex ) {
-
-			}
-		}
-
-		return instance;
+		InjectionContextImpl context = new InjectionContextImpl( factory );
+		return new Injector().constructClass( context, classToProvide );
 	}
 
 }

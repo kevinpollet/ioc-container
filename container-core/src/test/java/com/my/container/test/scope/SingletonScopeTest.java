@@ -16,8 +16,8 @@
 package com.my.container.test.scope;
 
 import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.core.Configuration;
-import com.my.container.core.Injector;
+import com.my.container.Configuration;
+import com.my.container.Injector;
 import com.my.container.test.scope.services.HelloService;
 import com.my.container.test.scope.services.impl.SingletonHelloService;
 import org.junit.Assert;
@@ -49,8 +49,8 @@ public class SingletonScopeTest {
 
 	@Test
 	public void testSingletonScope() {
-		HelloService firstInstance = injector.getBean( HelloService.class );
-		HelloService secondInstance = injector.getBean( HelloService.class );
+		HelloService firstInstance = injector.get( HelloService.class );
+		HelloService secondInstance = injector.get( HelloService.class );
 
 		Assert.assertNotNull( firstInstance );
 		Assert.assertNotNull( secondInstance );
