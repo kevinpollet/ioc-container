@@ -42,6 +42,7 @@ import java.lang.reflect.Type;
 
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
 import static com.my.container.util.ReflectionHelper.invokeMethod;
+import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
 
 /**
  * Definition of an injector. This injector
@@ -221,7 +222,7 @@ public class Injector {
 
 		//Dependency injection is done call PostContruct method
 		Method postConstructMethod = getMethodAnnotatedWith( PostConstruct.class, clazz );
-		if ( postConstructMethod != null ) {
+		if ( postConstructMethod != null && isValidCallbackMethod( postConstructMethod ) ) {
 			if ( !postConstructMethod.isAccessible() ) {
 				postConstructMethod.setAccessible( true );
 			}

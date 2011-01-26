@@ -36,6 +36,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
+import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
+import static com.my.container.util.ReflectionHelper.invokeMethod;
+
 /**
  * The factory of bean class
  *
@@ -151,13 +155,19 @@ public final class BeanFactory {
 		createdBean.addAll( prototypesBean );
 		createdBean.addAll( singletonsBean.values() );
 
+		//Call PreDestroy callbacks
 		for ( Object bean : createdBean ) {
-			Method method = ReflectionHelper.getMethodAnnotatedWith( PreDestroy.class, bean.getClass() );
-			if ( method!= null ) {
+			Method method = getMethodAnnotatedWith( PreDestroy.class, bean.getClass() );
+			if ( method!= null && isValidCallbackMethod( method ) ) {
 				if ( !method.isAccessible() ) {
 					method.setAccessible( true );
 				}
-				ReflectionHelper.invokeMethod( bean, method );
+				try {
+					invokeMethod( bean, method );
+				}
+				catch ( RuntimeException ex ) {
+					//ignore runtime exception - see JSR250 PreDestroy method
+				}
 			}
 		}
 	}
