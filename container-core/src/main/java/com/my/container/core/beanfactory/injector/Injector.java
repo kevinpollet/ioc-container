@@ -40,6 +40,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
+import static com.my.container.util.ReflectionHelper.invokeMethod;
+
 /**
  * Definition of an injector. This injector
  * can create an instance class and inject
@@ -207,16 +210,6 @@ public class Injector {
 
 			this.injectFieldAndMethod( context, clazz, classInstance );
 
-
-			//Dependency injection is done call PostContruct method if one
-			Method postConstruct = ReflectionHelper.getMethodAnnotatedWith( PostConstruct.class, clazz );
-			if ( postConstruct != null ) {
-				if ( !postConstruct.isAccessible() ) {
-					postConstruct.setAccessible( true );
-				}
-				postConstruct.invoke( classInstance );
-			}
-
 		}
 		catch ( Exception ex ) {
 			throw new BeanInstantiationException(
@@ -224,6 +217,15 @@ public class Injector {
 							"The %s class cannot be instantiated", clazz.getName()
 					), ex
 			);
+		}
+
+		//Dependency injection is done call PostContruct method
+		Method postConstructMethod = getMethodAnnotatedWith( PostConstruct.class, clazz );
+		if ( postConstructMethod != null ) {
+			if ( !postConstructMethod.isAccessible() ) {
+				postConstructMethod.setAccessible( true );
+			}
+			invokeMethod( classInstance, postConstructMethod );
 		}
 
 		return classInstance;
