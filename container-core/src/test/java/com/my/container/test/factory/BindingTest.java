@@ -15,7 +15,7 @@
  */
 package com.my.container.test.factory;
 
-import com.my.container.binding.provider.BindingProvider;
+import com.my.container.binding.provider.FluentBindingProvider;
 import com.my.container.core.Configuration;
 import com.my.container.core.Injector;
 import com.my.container.test.factory.services.HelloService;
@@ -31,7 +31,7 @@ public class BindingTest {
 	public void testClassBinding() {
 		Configuration config = Injector.configure();
 		config.addBindingProvider(
-				new BindingProvider() {
+				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
 						bindClass( HelloService.class );

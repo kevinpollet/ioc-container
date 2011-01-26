@@ -17,7 +17,7 @@ package com.my.container.sample.test.config;
 
 import java.util.Locale;
 
-import com.my.container.binding.provider.BindingProvider;
+import com.my.container.binding.provider.FluentBindingProvider;
 import com.my.container.sample.GreetingService;
 import com.my.container.sample.HelloService;
 import com.my.container.sample.impl.EnglishHelloService;
@@ -27,7 +27,7 @@ import com.my.container.sample.impl.HelloGreetingService;
 /**
  * @author Kevin Pollet
  */
-public class LocaleBindingProvider extends BindingProvider {
+public class LocaleBindingProvider extends FluentBindingProvider {
 	@Override
 	public void configureBindings() {
 		bind( GreetingService.class ).to( HelloGreetingService.class );

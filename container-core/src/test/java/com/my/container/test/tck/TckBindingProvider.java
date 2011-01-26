@@ -15,7 +15,7 @@
  */
 package com.my.container.test.tck;
 
-import com.my.container.binding.provider.BindingProvider;
+import com.my.container.binding.provider.FluentBindingProvider;
 import org.atinject.tck.auto.Car;
 import org.atinject.tck.auto.Convertible;
 import org.atinject.tck.auto.Drivers;
@@ -33,7 +33,7 @@ import org.atinject.tck.auto.accessories.SpareTire;
  * 
  * @author Kevin Pollet
  */
-public class TckBindingProvider extends BindingProvider {
+public class TckBindingProvider extends FluentBindingProvider {
     @Override
     public void configureBindings() {
         bind(Car.class).to(Convertible.class);

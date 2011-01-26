@@ -17,14 +17,13 @@ package com.my.container.core.beanfactory;
 
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
-import com.my.container.binding.MapBindingHolder;
+import com.my.container.binding.holder.MapBindingHolder;
 import com.my.container.binding.ProvidedBinding;
 import com.my.container.core.beanfactory.exceptions.NoSuchBeanDefinitionException;
 import com.my.container.core.beanfactory.injector.InjectionContext;
 import com.my.container.core.beanfactory.injector.Injector;
 import com.my.container.core.beanfactory.spi.BeanProcessor;
 import com.my.container.util.loader.ServiceLoader;
-import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

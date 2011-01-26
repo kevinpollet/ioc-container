@@ -18,7 +18,7 @@ package com.my.container.core.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.my.container.binding.provider.BindingProvider;
+import com.my.container.binding.BindingProvider;
 import com.my.container.core.Configuration;
 import com.my.container.core.Injector;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -40,10 +40,6 @@ class InjectorConfiguration implements Configuration {
 	public <T extends BindingProvider> Configuration addBindingProvider(T provider) {
 		providers.add( provider );
 		return this;
-	}
-
-	public Configuration addXmlBindingProvider(String providerFileLocation) {
-		throw new NotImplementedException();
 	}
 
 	public Configuration enableShutDownHook(boolean enable) {

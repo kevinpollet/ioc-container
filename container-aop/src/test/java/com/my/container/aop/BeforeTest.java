@@ -15,17 +15,17 @@
  */
 package com.my.container.aop;
 
-import com.my.container.binding.provider.BindingProvider;
-import com.my.container.core.Injector;
+import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
+
+import com.my.container.aop.services.HelloService;
 import com.my.container.aop.services.impl.HelloServiceWithInterceptor;
 import com.my.container.aop.services.impl.MockInterceptor;
-import com.my.container.aop.services.HelloService;
+import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.core.Injector;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Proxy;
 
 /**
  * The injectservice before test.
@@ -38,7 +38,7 @@ public class BeforeTest {
 
     @Before
     public void setUp() {
-        this.context = Injector.configure().addBindingProvider( new BindingProvider(){
+        this.context = Injector.configure().addBindingProvider( new FluentBindingProvider(){
             @Override
             public void configureBindings() {
                 bind(HelloService.class).to(HelloServiceWithInterceptor.class);

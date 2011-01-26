@@ -16,11 +16,10 @@
 package com.my.container.core.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.my.container.binding.Binding;
-import com.my.container.binding.provider.BindingProvider;
+import com.my.container.binding.BindingProvider;
 import com.my.container.core.Configuration;
 import com.my.container.core.Injector;
 import com.my.container.core.beanfactory.BeanFactory;

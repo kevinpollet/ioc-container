@@ -13,18 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.core;
+package com.my.container.binding.provider;
 
 import com.my.container.binding.BindingProvider;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * @author Kevin Pollet
  */
-public interface Configuration {
+public class XMLBindingProvider extends BindingProvider {
 
-	<T extends BindingProvider> Configuration addBindingProvider(T provider);
+	private final String bindingFileLocation;
 
-	Configuration enableShutDownHook(boolean enable);
+	public XMLBindingProvider(String bindingFileLocation) {
+		this.bindingFileLocation = bindingFileLocation;
+	}
 
-	Injector buildInjector();
+	@Override
+	public void configureBindings() {
+		//TODO load bindings from the given class
+		throw new NotImplementedException();
+	}
+
 }

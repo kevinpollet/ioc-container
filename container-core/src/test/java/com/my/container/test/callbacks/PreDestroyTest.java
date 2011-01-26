@@ -15,7 +15,9 @@
  */
 package com.my.container.test.callbacks;
 
-import com.my.container.binding.provider.BindingProvider;
+import java.lang.reflect.Field;
+
+import com.my.container.binding.provider.FluentBindingProvider;
 import com.my.container.core.Configuration;
 import com.my.container.core.Injector;
 import com.my.container.core.beanfactory.BeanFactory;
@@ -26,8 +28,6 @@ import com.my.container.test.callbacks.services.impl.ParentImpl;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.lang.reflect.Field;
 
 /**
  * The PreDestroy callback test.
@@ -42,7 +42,7 @@ public class PreDestroyTest {
 	public void setUp() {
 		Configuration config = Injector.configure();
 		config.addBindingProvider(
-				new BindingProvider() {
+				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
 						bind( Parent.class ).to( ParentImpl.class );

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.binding;
+package com.my.container.binding.holder;
 
 import javax.inject.Named;
 import javax.inject.Qualifier;
@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.my.container.binding.Binding;
+import com.my.container.binding.BindingHolder;
 
 /**
  * The bindings map implementation

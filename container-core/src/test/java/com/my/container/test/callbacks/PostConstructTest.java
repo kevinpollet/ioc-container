@@ -15,7 +15,7 @@
  */
 package com.my.container.test.callbacks;
 
-import com.my.container.binding.provider.BindingProvider;
+import com.my.container.binding.provider.FluentBindingProvider;
 import com.my.container.core.Configuration;
 import com.my.container.core.Injector;
 import com.my.container.test.callbacks.services.Leaf;
@@ -39,7 +39,7 @@ public class PostConstructTest {
 	public void setUp() {
 		Configuration config = Injector.configure();
 		config.addBindingProvider(
-				new BindingProvider() {
+				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
 						bind( Parent.class ).to( ParentImpl.class );
