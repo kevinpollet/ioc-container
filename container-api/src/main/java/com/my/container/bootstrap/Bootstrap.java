@@ -33,15 +33,17 @@ public final class Bootstrap {
 	 *
 	 * @return the container provider instance
 	 */
-	public static ContainerProvider loadProvider() {
-	   ServiceLoader<ContainerProvider> providers = ServiceLoader.load( ContainerProvider.class );
-		if ( providers.isServiceLoaded() ) {
-			throw new ProviderNotFoundException( "There is no container provider in the classpath" );
-		}
-		else {
-			for ( ContainerProvider provider : providers ) {
-				loadedProvider = provider;
-				break;
+	public synchronized static ContainerProvider loadProvider() {
+		if ( loadedProvider == null ) {
+			ServiceLoader<ContainerProvider> providers = ServiceLoader.load( ContainerProvider.class );
+			if ( providers.isServiceLoaded() ) {
+				throw new ProviderNotFoundException( "There is no container provider in the classpath" );
+			}
+			else {
+				for ( ContainerProvider provider : providers ) {
+					loadedProvider = provider;
+					break;
+				}
 			}
 		}
 		return loadedProvider;
@@ -52,7 +54,7 @@ public final class Bootstrap {
 	 *
 	 * @return the container provider
 	 */
-	public static ContainerProvider currentContainerProvider() {
+	public synchronized static ContainerProvider currentContainerProvider() {
 		return loadedProvider;
 	}
 }
