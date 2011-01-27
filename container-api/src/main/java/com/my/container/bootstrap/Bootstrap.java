@@ -15,7 +15,7 @@
  */
 package com.my.container.bootstrap;
 
-import com.my.container.ProviderNotFoundException;
+import com.my.container.NotContainerProviderFoundException;
 import com.my.container.util.ServiceLoader;
 import com.my.container.spi.ContainerProvider;
 
@@ -37,7 +37,7 @@ public final class Bootstrap {
 		if ( loadedProvider == null ) {
 			ServiceLoader<ContainerProvider> providers = ServiceLoader.load( ContainerProvider.class );
 			if ( providers.isServiceLoaded() ) {
-				throw new ProviderNotFoundException( "There is no container provider in the classpath" );
+				throw new NotContainerProviderFoundException( "There is no container provider in the classpath" );
 			}
 			else {
 				for ( ContainerProvider provider : providers ) {

@@ -15,7 +15,7 @@
  */
 package com.my.container.util;
 
-import com.my.container.BeanException;
+import com.my.container.ContainerException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -118,14 +118,14 @@ public final class ReflectionHelper {
 	 * @param args the method args
 	 *
 	 * @return the result of the invocation
-	 * @throws BeanException if invocation of method failed
+	 * @throws com.my.container.ContainerException if invocation of method failed
 	 */
 	public static Object invokeMethod(Object object, Method method, Object... args) {
 		try {
 			return method.invoke( object, args );
 		}
 		catch ( InvocationTargetException e ) {
-			throw new BeanException(
+			throw new ContainerException(
 					String.format(
 							"The invocation of method %s on class %s failed",
 							method.getName(),
@@ -134,7 +134,7 @@ public final class ReflectionHelper {
 			);
 		}
 		catch ( IllegalAccessException e ) {
-			throw new BeanException(
+			throw new ContainerException(
 					String.format(
 							"The invocation of method %s on class %s failed due to illegal access",
 							method.getName(),

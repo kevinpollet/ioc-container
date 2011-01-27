@@ -15,15 +15,13 @@
  */
 package com.my.container;
 
-
 /**
- * This exception is thrown when the
- * bean factory cannot inject a bean
+ * This exception is thrown when the bean factory cannot inject a bean
  * dependency.
  *
  * @author Kevin Pollet
  */
-public class BeanDependencyInjectionException extends BeanInstantiationException {
+public class BeanDependencyInjectionException extends ContainerException {
 
 	public BeanDependencyInjectionException(String message) {
 		super( message );

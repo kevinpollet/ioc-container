@@ -17,12 +17,11 @@ package com.my.container;
 
 
 /**
- * This exception is thrown when the
- * bean factory cannot instantiate the bean.
+ * This exception is thrown when the bean factory cannot instantiate the bean.
  *
  * @author Kevin Pollet
  */
-public class BeanInstantiationException extends BeanException {
+public class BeanInstantiationException extends ContainerException {
 
 	public BeanInstantiationException(String message) {
 		super( message );

@@ -22,7 +22,7 @@ package com.my.container;
  *
  * @author Kevin Pollet
  */
-public class NoSuchBeanDefinitionException extends BeanInstantiationException {
+public class NoSuchBeanDefinitionException extends ContainerException {
 
 	public NoSuchBeanDefinitionException(final String message) {
 		super( message );

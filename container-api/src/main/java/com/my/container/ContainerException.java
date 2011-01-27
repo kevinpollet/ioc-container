@@ -16,19 +16,22 @@
 package com.my.container;
 
 /**
+ * The abstract bean exception class. This class is the upper class
+ * of all the exception relative to bean.
+ *
  * @author Kevin Pollet
  */
-public class ProviderNotFoundException extends RuntimeException {
+public class ContainerException extends RuntimeException {
 
-	public ProviderNotFoundException(String message) {
+	public ContainerException(final String message) {
 		super( message );
 	}
 
-	public ProviderNotFoundException(String message, Throwable cause) {
+	public ContainerException(final String message, final Throwable cause) {
 		super( message, cause );
 	}
 
-	public ProviderNotFoundException(Throwable cause) {
+	public ContainerException(final Throwable cause) {
 		super( cause );
 	}
 }
