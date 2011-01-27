@@ -24,5 +24,8 @@ public interface ContextBeanFactory {
 
 	 void injectExistingBean(Object bean);
 
+	/**
+	 * Destroy this context bean factory.
+	 */
 	 void destroy();
 }

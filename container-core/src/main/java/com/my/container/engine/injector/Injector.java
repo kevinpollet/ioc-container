@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.engine.beanfactory.injector;
+package com.my.container.engine.injector;
 
 import com.my.container.BeanInstantiationException;
 import com.my.container.InjectionContext;
@@ -23,7 +23,7 @@ import com.my.container.binding.BindingHolder;
 import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.ContextBeanFactoryImpl;
 import com.my.container.NoSuchBeanDefinitionException;
-import com.my.container.engine.beanfactory.spi.BeanProcessor;
+import com.my.container.engine.spi.BeanProcessor;
 import com.my.container.engine.provider.GenericProvider;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;

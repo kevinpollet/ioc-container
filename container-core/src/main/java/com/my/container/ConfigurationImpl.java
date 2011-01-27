@@ -23,7 +23,7 @@ import com.my.container.binding.BindingProvider;
 /**
  * @author Kevin Pollet
  */
-class ConfigurationImpl implements Configuration {
+public class ConfigurationImpl extends Configuration {
 
 	private boolean shutDownHookEnable;
 
@@ -52,7 +52,8 @@ class ConfigurationImpl implements Configuration {
 		return providers;
 	}
 
-	public Container buildContainer() {
-		return new ContainerImpl( this );
+	@Override
+	public <T extends Configuration> T unwrap(Class<T> clazz) {
+		return null;  //TODO fix this
 	}
 }

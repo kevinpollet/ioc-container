@@ -25,4 +25,8 @@ public class ContainerProviderImpl implements ContainerProvider {
 	public Configuration configure() {
 		return new ConfigurationImpl();
 	}
+
+	public Container buildContainer(Configuration configuration) {
+		return new ContainerImpl( configuration );
+	}
 }

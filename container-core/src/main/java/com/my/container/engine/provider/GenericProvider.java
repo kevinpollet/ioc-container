@@ -19,7 +19,7 @@ import javax.inject.Provider;
 
 import com.my.container.ContextBeanFactory;
 import com.my.container.engine.InjectionContextImpl;
-import com.my.container.engine.beanfactory.injector.Injector;
+import com.my.container.engine.injector.Injector;
 
 /**
  * The default provider. This provider is used

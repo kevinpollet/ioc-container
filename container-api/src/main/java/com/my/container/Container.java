@@ -15,8 +15,7 @@
  */
 package com.my.container;
 
-import com.my.container.spi.ContainerProvider;
-import com.my.container.loader.ServiceLoader;
+import com.my.container.bootstrap.Bootstrap;
 
 /**
  * The Container provider interface.
@@ -25,36 +24,13 @@ import com.my.container.loader.ServiceLoader;
  */
 public abstract class Container {
 
-	//TODO provide an other bootstrap mechanism
 	/**
-	 * Hold an instance of the first
-	 * loaded container provider.
-	 */
-	private static ContainerProvider provider;
-
-	//Load first injector provider
-	static {
-		ServiceLoader<ContainerProvider> providers = ServiceLoader.load( ContainerProvider.class );
-		if ( providers.isServiceLoaded() ) {
-			throw new ProviderNotFoundException( "There is no provider injection in the classpath" );
-		}
-		else {
-			for ( ContainerProvider provider : providers ) {
-				Container.provider = provider;
-				break;
-			}
-		}
-	}
-
-	/**
-	 * Create a configuration object to set properties
-	 * of a container. The configured container can be built from
-	 * this object.
+	 * Configure an instance of container.
 	 *
-	 * @return the configuration object
+	 * @return the container configuration object.
 	 */
 	public static Configuration configure() {
-		return provider.configure();
+		return Bootstrap.loadProvider().configure();
 	}
 
 	/**
@@ -64,18 +40,20 @@ public abstract class Container {
 	 *
 	 * @return the new bean instance
 	 */
-	public abstract <T> T get(Class<T> clazz);
+	 public abstract <T> T get(Class<T> clazz);
 
 	/**
-	 * Inject statics member and methods.
+	 * Inject statics member and methods of class
+	 * within the container context.
 	 *
 	 * @param clazz The class to be injected
 	 */
-	public abstract void injectStatics(Class<?> clazz);
+	 public abstract void injectStatics(Class<?> clazz);
 
 	/**
 	 * This method is used to inject dependencies in an
-	 * existing bean instance (Method and fields).
+	 * existing bean instance (Method and fields) within
+	 * the container context.
 	 *
 	 * @param bean the instance to be injected
 	 */

@@ -16,16 +16,25 @@
 package com.my.container.spi;
 
 import com.my.container.Configuration;
+import com.my.container.Container;
 
 /**
  * @author Kevin Pollet
  */
 public interface ContainerProvider {
-
 	/**
 	 * Configure a container.
 	 *
 	 * @return a configuration element
 	 */
 	Configuration configure();
+
+	/**
+	 * Get a container instance from this container
+	 * provider with the given configuration.
+	 *
+	 * @param configuration the container configuration
+	 * @return a configured instance of container
+	 */
+	Container buildContainer(Configuration configuration);
 }

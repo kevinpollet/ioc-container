@@ -13,25 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.loader;
-
 /**
- * This exception was thrown when service
- * loader encounter a problem during loading.
- *
- * @author Kevin Pollet
+ * This package contains Helper class.
  */
-public class ServiceLoaderException extends RuntimeException {
-
-	public ServiceLoaderException(final String message) {
-		super( message );
-	}
-
-	public ServiceLoaderException(final String message, final Throwable cause) {
-		super( message, cause );
-	}
-
-	public ServiceLoaderException(final Throwable cause) {
-		super( cause );
-	}
-}
+package com.my.container.util;

@@ -24,14 +24,15 @@ import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 
 import com.my.container.ContextBeanFactory;
+import com.my.container.InjectionContext;
 import com.my.container.NoSuchBeanDefinitionException;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.MapBindingHolder;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.engine.beanfactory.injector.Injector;
-import com.my.container.engine.beanfactory.spi.BeanProcessor;
-import com.my.container.loader.ServiceLoader;
+import com.my.container.engine.injector.Injector;
+import com.my.container.engine.spi.BeanProcessor;
+import com.my.container.util.ServiceLoader;
 
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
 import static com.my.container.util.ReflectionHelper.invokeMethod;
@@ -122,7 +123,7 @@ public final class ContextBeanFactoryImpl implements ContextBeanFactory {
 			return beanClass.cast( this.singletonsBean.get( toClass ) );
 		}
 
-		InjectionContextImpl context = new InjectionContextImpl( this, false );
+		InjectionContext context = new InjectionContextImpl( this, false );
 		createdBean = injector.constructClass( context, toClass );
 
 		return createdBean;

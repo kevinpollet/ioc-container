@@ -17,7 +17,7 @@ package com.my.container.aop;
 
 import com.my.container.aop.annotations.AroundInvoke;
 import com.my.container.aop.annotations.Interceptors;
-import com.my.container.engine.beanfactory.spi.BeanProcessor;
+import com.my.container.engine.spi.BeanProcessor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

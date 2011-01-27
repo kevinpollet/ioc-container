@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.engine.beanfactory.spi;
+package com.my.container.engine.spi;
 
 /**
  * The bean processor contract. This
