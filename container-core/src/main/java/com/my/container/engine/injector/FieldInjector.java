@@ -18,7 +18,7 @@ package com.my.container.engine.injector;
 import com.my.container.BeanDependencyInjectionException;
 import com.my.container.InjectionContext;
 import com.my.container.NoSuchBeanDefinitionException;
-import com.my.container.engine.ContextBeanFactoryImpl;
+import com.my.container.engine.ContextBeanStoreImpl;
 import com.my.container.binding.Binding;
 import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.provider.GenericProvider;
@@ -46,14 +46,14 @@ public class FieldInjector {
 	/**
 	 * The parent injector.
 	 */
-	private final Injector injector;
+	private final ConstructorInjector injector;
 
 	/**
 	 * Create a fields injector
 	 *
 	 * @param injector the parent injector
 	 */
-	public FieldInjector(final Injector injector) {
+	public FieldInjector(final ConstructorInjector injector) {
 		this.injector = injector;
 	}
 
@@ -97,11 +97,11 @@ public class FieldInjector {
 				if ( fieldClass.isAssignableFrom( Provider.class ) ) {
 					if ( field.getGenericType() instanceof ParameterizedType ) {
 						Class<?> classToInject = (Class<?>) ( (ParameterizedType) field.getGenericType() ).getActualTypeArguments()[0];
-						injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory())
+						injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore())
 								.getProviderHolder()
 								.getBindingFor( classToInject, qualifier );
 						if ( injectionBinding == null ) {
-							injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory())
+							injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore())
 									.getBindingHolder()
 									.getBindingFor( classToInject, qualifier );
 							if ( injectionBinding == null ) {
@@ -112,7 +112,7 @@ public class FieldInjector {
 								);
 							}
 							fieldInstance = new GenericProvider(
-									((ContextBeanFactoryImpl) context.getContextBeanFactory()), injectionBinding.getImplementation()
+									((ContextBeanStoreImpl) context.getContextBeanStore()), injectionBinding.getImplementation()
 							);
 						}
 						else {
@@ -122,7 +122,7 @@ public class FieldInjector {
 					}
 				}
 				else {
-					injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory())
+					injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore())
 							.getBindingHolder()
 							.getBindingFor( field.getType(), qualifier );
 					if ( injectionBinding == null ) {

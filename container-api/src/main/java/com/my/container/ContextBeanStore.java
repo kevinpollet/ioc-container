@@ -18,17 +18,26 @@ package com.my.container;
 /**
  * @author Kevin Pollet
  */
-public class NotContainerProviderFoundException extends RuntimeException {
+public interface ContextBeanStore {
+	/**
+	 * Get the ben instance stored in this bean store.
+	 * If none this store have to created the bean
+	 * with an Injector.
+	 *
+	 * @param clazz
+	 * @param <T>
+	 */
+	<T> T get(Class<T> clazz);
 
-	public NotContainerProviderFoundException(String message) {
-		super( message );
-	}
+	/**
+	 * Get this bean store injector.
+	 *
+	 * @return the injector
+	 */
+	Injector getInjector();
 
-	public NotContainerProviderFoundException(String message, Throwable cause) {
-		super( message, cause );
-	}
-
-	public NotContainerProviderFoundException(Throwable cause) {
-		super( cause );
-	}
+	/**
+	 * Destroy this context bean store.
+	 */
+	void destroy();
 }

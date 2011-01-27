@@ -20,7 +20,8 @@ import java.util.List;
 
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingProvider;
-import com.my.container.engine.ContextBeanFactoryImpl;
+import com.my.container.engine.ContextBeanStoreImpl;
+import com.my.container.engine.InjectionContextImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -32,7 +33,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class ContainerImpl extends Container {
 
-	private final ContextBeanFactory context;
+	private final ContextBeanStore beanStore;
 
 	/**
 	 * Construct the engine.
@@ -48,7 +49,7 @@ public class ContainerImpl extends Container {
 			bindings.addAll( provider.getBindings() );
 		}
 
-		this.context = new ContextBeanFactoryImpl( bindings );
+		this.beanStore = new ContextBeanStoreImpl( bindings );
 		if ( config.isShutDownHookEnable() ) {
 			registerShutdownHook();
 		}
@@ -58,28 +59,30 @@ public class ContainerImpl extends Container {
 	 * {@inheritDoc}
 	 */
 	public <T> T get(Class<T> clazz) {
-		return context.constructBean( clazz );
+		return beanStore.get( clazz );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void injectStatics(Class<?> clazz) {
-		throw new NotImplementedException();
+		InjectionContext context = new InjectionContextImpl( beanStore, true );
+		beanStore.getInjector().injectStatics( context, clazz );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void injectDependencies(Object bean) {
-		context.injectExistingBean( bean );
+		InjectionContext context = new InjectionContextImpl( beanStore, true );
+		beanStore.getInjector().injectInstance( context, bean );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	private void registerShutdownHook() {
-		Thread thread = new Thread( this.new CallbackShutdownHook( this.context ) );
+		Thread thread = new Thread( this.new CallbackShutdownHook( this.beanStore ) );
 		Runtime.getRuntime().addShutdownHook( thread );
 	}
 
@@ -91,14 +94,14 @@ public class ContainerImpl extends Container {
 
 		private final Logger logger = LoggerFactory.getLogger( CallbackShutdownHook.class );
 
-		private final ContextBeanFactory context;
+		private final ContextBeanStore context;
 
 		/**
-		 * The CallbackShutdown hook context.
+		 * The CallbackShutdown hook beanStore.
 		 *
-		 * @param context the bean context
+		 * @param context the bean beanStore
 		 */
-		public CallbackShutdownHook(ContextBeanFactory context) {
+		public CallbackShutdownHook(ContextBeanStore context) {
 			this.context = context;
 		}
 

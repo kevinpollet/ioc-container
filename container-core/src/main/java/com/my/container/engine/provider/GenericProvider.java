@@ -17,9 +17,9 @@ package com.my.container.engine.provider;
 
 import javax.inject.Provider;
 
-import com.my.container.ContextBeanFactory;
+import com.my.container.ContextBeanStore;
 import com.my.container.engine.InjectionContextImpl;
-import com.my.container.engine.injector.Injector;
+import com.my.container.engine.injector.ConstructorInjector;
 
 /**
  * The default provider. This provider is used
@@ -30,7 +30,7 @@ import com.my.container.engine.injector.Injector;
  */
 public class GenericProvider<T> implements Provider<T> {
 
-	private final ContextBeanFactory contextBeanFactory;
+	private final ContextBeanStore contextBeanFactory;
 
 	private final Class<T> classToProvide;
 
@@ -40,7 +40,7 @@ public class GenericProvider<T> implements Provider<T> {
 	 * @param factory the contextBeanFactory to create the injected instance
 	 * @param classToProvide the bean class to create on each {@link javax.inject.Provider#get()} method call
 	 */
-	public GenericProvider(ContextBeanFactory factory, Class<T> classToProvide) {
+	public GenericProvider(ContextBeanStore factory, Class<T> classToProvide) {
 		this.contextBeanFactory = factory;
 		this.classToProvide = classToProvide;
 	}
@@ -50,7 +50,7 @@ public class GenericProvider<T> implements Provider<T> {
 	 */
 	public T get() {
 		InjectionContextImpl context = new InjectionContextImpl( contextBeanFactory, false );
-		return new Injector().constructClass( context, classToProvide );
+		return new ConstructorInjector().constructClass( context, classToProvide );
 	}
 
 }

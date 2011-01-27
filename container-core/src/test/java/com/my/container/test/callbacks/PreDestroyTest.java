@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 import com.my.container.Configuration;
 import com.my.container.Container;
 import com.my.container.binding.FluentBindingProvider;
-import com.my.container.engine.ContextBeanFactoryImpl;
+import com.my.container.engine.ContextBeanStoreImpl;
 import com.my.container.test.callbacks.services.Leaf;
 import com.my.container.test.callbacks.services.Parent;
 import com.my.container.test.callbacks.services.impl.LeafImpl;
@@ -59,9 +59,9 @@ public class PreDestroyTest {
 		Parent parent = injector.get( Parent.class );
 
 		//Get the private bean factory
-		Field factoryField = injector.getClass().getDeclaredField( "context" );
+		Field factoryField = injector.getClass().getDeclaredField( "beanStore" );
 		factoryField.setAccessible( true );
-		ContextBeanFactoryImpl factory = (ContextBeanFactoryImpl) factoryField.get( injector );
+		ContextBeanStoreImpl factory = (ContextBeanStoreImpl) factoryField.get( injector );
 		factory.destroy();
 
 		Assert.assertNotNull( parent );

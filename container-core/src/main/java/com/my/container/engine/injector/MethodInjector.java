@@ -18,7 +18,7 @@ package com.my.container.engine.injector;
 import com.my.container.BeanDependencyInjectionException;
 import com.my.container.InjectionContext;
 import com.my.container.NoSuchBeanDefinitionException;
-import com.my.container.engine.ContextBeanFactoryImpl;
+import com.my.container.engine.ContextBeanStoreImpl;
 import com.my.container.binding.Binding;
 import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.provider.GenericProvider;
@@ -47,14 +47,14 @@ public class MethodInjector {
 
     private final Logger logger = LoggerFactory.getLogger(MethodInjector.class);
 
-    private final Injector injector;
+    private final ConstructorInjector injector;
 
     /**
      * Construct a Method injector.
      *
      * @param injector the parent injector
      */
-    public MethodInjector(final Injector injector) {
+    public MethodInjector(final ConstructorInjector injector) {
         this.injector = injector;
     }
 
@@ -109,19 +109,19 @@ public class MethodInjector {
                         if (parameterClass.isAssignableFrom(Provider.class)) {
                             if (parametersType[i] instanceof ParameterizedType) {
                                 Class<?> classToInject = (Class<?>) ((ParameterizedType) parametersType[i]).getActualTypeArguments()[0];
-                                injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory()).getProviderHolder().getBindingFor(classToInject, qualifier);
+                                injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore()).getProviderHolder().getBindingFor(classToInject, qualifier);
                                 if (injectionBinding == null) {
-                                    injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory()).getBindingHolder().getBindingFor(classToInject, qualifier);
+                                    injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore()).getBindingHolder().getBindingFor(classToInject, qualifier);
                                     if (injectionBinding == null) {
                                         throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
                                     }
-                                    parameters[i] = new GenericProvider(((ContextBeanFactoryImpl) context.getContextBeanFactory()), injectionBinding.getImplementation());
+                                    parameters[i] = new GenericProvider(((ContextBeanStoreImpl) context.getContextBeanStore()), injectionBinding.getImplementation());
                                 } else {
                                     parameters[i] = this.injector.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
                                 }
                             }
                         } else {
-                            injectionBinding = ((ContextBeanFactoryImpl) context.getContextBeanFactory()).getBindingHolder().getBindingFor(parameterClass, qualifier);
+                            injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore()).getBindingHolder().getBindingFor(parameterClass, qualifier);
                             if (injectionBinding == null) {
                                 throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", parameterClass.getName()));
                             }

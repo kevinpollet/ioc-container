@@ -23,14 +23,15 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 
-import com.my.container.ContextBeanFactory;
+import com.my.container.ContextBeanStore;
 import com.my.container.InjectionContext;
+import com.my.container.Injector;
 import com.my.container.NoSuchBeanDefinitionException;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.MapBindingHolder;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.engine.injector.Injector;
+import com.my.container.engine.injector.ConstructorInjector;
 import com.my.container.engine.spi.BeanProcessor;
 import com.my.container.util.ServiceLoader;
 
@@ -43,7 +44,7 @@ import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
  *
  * @author kevinpollet
  */
-public final class ContextBeanFactoryImpl implements ContextBeanFactory {
+public final class ContextBeanStoreImpl implements ContextBeanStore {
 
 	private final BindingHolder holder;
 
@@ -55,22 +56,18 @@ public final class ContextBeanFactoryImpl implements ContextBeanFactory {
 
 	private final List<BeanProcessor> beanProcessors;
 
-	private final Injector injector;
-
 	/**
 	 * Bean Factory constructor.
 	 *
 	 * @param list the binding list
 	 */
-	public ContextBeanFactoryImpl(final List<Binding<?>> list) {
+	public ContextBeanStoreImpl(final List<Binding<?>> list) {
 		this.holder = new MapBindingHolder();
 		this.providerHolder = new MapBindingHolder();
 
 		this.prototypesBean = new ArrayList<Object>();
 		this.singletonsBean = new HashMap<Class<?>, Object>();
 		this.beanProcessors = new ArrayList<BeanProcessor>();
-
-		this.injector = new Injector();
 
 		//Load Bean processor
 		ServiceLoader<BeanProcessor> loader = ServiceLoader.load( BeanProcessor.class );
@@ -91,54 +88,35 @@ public final class ContextBeanFactoryImpl implements ContextBeanFactory {
 		}
 	}
 
-	/**
-	 * Get a bean defined by this class.
-	 * This class mut be the interface of the binding.
-	 *
-	 * @param beanClass the bean class
-	 *
-	 * @return the bean instance
-	 *
-	 * @throws com.my.container.NoSuchBeanDefinitionException if there is no binding implementation for this bean contract
-	 * @throws IllegalArgumentException if the clazz argument is null
-	 */
-	public <T> T constructBean(Class<T> beanClass) {
-		if ( beanClass == null ) {
+	public <T> T get(Class<T> clazz) {
+        if ( clazz == null ) {
 			throw new IllegalArgumentException( "The clazz parameter cannot be null" );
 		}
-		else if ( !this.holder.isBindingFor( beanClass ) ) {
+		else if ( !this.holder.isBindingFor( clazz ) ) {
 			throw new NoSuchBeanDefinitionException(
 					String.format(
-							"The class %s have no binding defined", beanClass.getSimpleName()
+							"The class %s have no binding defined", clazz.getSimpleName()
 					)
 			);
 		}
 
 		T createdBean;
-		Binding<T> binding = this.holder.getBindingFor( beanClass );
+		Binding<T> binding = this.holder.getBindingFor( clazz );
 		Class<? extends T> toClass = binding.getImplementation();
 
 		if ( binding.getImplementation().isAnnotationPresent( Singleton.class ) && this.singletonsBean
-				.containsKey( beanClass ) ) {
-			return beanClass.cast( this.singletonsBean.get( toClass ) );
+				.containsKey( clazz ) ) {
+			return clazz.cast( this.singletonsBean.get( toClass ) );
 		}
 
 		InjectionContext context = new InjectionContextImpl( this, false );
-		createdBean = injector.constructClass( context, toClass );
+		createdBean = getInjector().constructClass( context, toClass );
 
 		return createdBean;
 	}
 
-	/**
-	 * This method permits to resolve dependencies of an
-	 * existing bean. Generally this bean was created with
-	 * the Java new operator.
-	 *
-	 * @param bean the existing bean
-	 */
-	public void injectExistingBean(Object bean) {
-		InjectionContextImpl context = new InjectionContextImpl( this, false );
-		injector.injectDependencies( context, bean );
+	public Injector getInjector() {
+		return new InjectorImpl();
 	}
 
 	/**

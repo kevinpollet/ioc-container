@@ -18,14 +18,17 @@ package com.my.container;
 /**
  * @author Kevin Pollet
  */
-public interface ContextBeanFactory {
+public class NoContainerProviderFoundException extends RuntimeException {
 
-	 <T> T constructBean(Class<T> beanClass);
+	public NoContainerProviderFoundException(String message) {
+		super( message );
+	}
 
-	 void injectExistingBean(Object bean);
+	public NoContainerProviderFoundException(String message, Throwable cause) {
+		super( message, cause );
+	}
 
-	/**
-	 * Destroy this context bean factory.
-	 */
-	 void destroy();
+	public NoContainerProviderFoundException(Throwable cause) {
+		super( cause );
+	}
 }

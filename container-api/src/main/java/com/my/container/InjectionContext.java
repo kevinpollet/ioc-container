@@ -30,11 +30,11 @@ public interface InjectionContext {
 	boolean isStaticInjection();
 
 	/**
-	 * Get the context bean factory.
+	 * Get the context bean store.
 	 *
-	 * @return the context bean factory
+	 * @return the context bean store
 	 */
-	ContextBeanFactory getContextBeanFactory();
+	ContextBeanStore getContextBeanStore();
 
 	/**
 	 * Check if the given class have been already processed

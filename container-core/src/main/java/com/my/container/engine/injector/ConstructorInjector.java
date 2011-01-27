@@ -21,7 +21,7 @@ import com.my.container.BeanDependencyInjectionException;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.engine.ContextBeanFactoryImpl;
+import com.my.container.engine.ContextBeanStoreImpl;
 import com.my.container.NoSuchBeanDefinitionException;
 import com.my.container.engine.spi.BeanProcessor;
 import com.my.container.engine.provider.GenericProvider;
@@ -53,9 +53,9 @@ import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
  *
  * @author Kevin Pollet
  */
-public class Injector {
+public class ConstructorInjector {
 
-	private final Logger logger = LoggerFactory.getLogger( Injector.class );
+	private final Logger logger = LoggerFactory.getLogger( ConstructorInjector.class );
 
 	private final FieldInjector fieldInjector;
 
@@ -64,7 +64,7 @@ public class Injector {
 	/**
 	 * Construct an Injector instance.
 	 */
-	public Injector() {
+	public ConstructorInjector() {
 		this.fieldInjector = new FieldInjector( this );
 		this.methodInjector = new MethodInjector( this );
 	}
@@ -83,7 +83,7 @@ public class Injector {
 		this.logger.debug( "Construct an instance of class {}", clazz.getSimpleName() );
 
 		T classInstance = null;
-		ContextBeanFactoryImpl factory = (ContextBeanFactoryImpl) context.getContextBeanFactory();
+		ContextBeanStoreImpl factory = (ContextBeanStoreImpl) context.getContextBeanStore();
 		BindingHolder holder = factory.getBindingHolder();
 		BindingHolder providerHolder = factory.getProviderHolder();
 
