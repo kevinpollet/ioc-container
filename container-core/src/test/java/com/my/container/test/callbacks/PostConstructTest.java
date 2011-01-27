@@ -15,8 +15,8 @@
  */
 package com.my.container.test.callbacks;
 
-import com.my.container.Injector;
-import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.Container;
+import com.my.container.binding.FluentBindingProvider;
 import com.my.container.Configuration;
 import com.my.container.test.callbacks.services.Leaf;
 import com.my.container.test.callbacks.services.Parent;
@@ -33,11 +33,11 @@ import org.junit.Test;
  */
 public class PostConstructTest {
 
-	private Injector injector;
+	private Container injector;
 
 	@Before
 	public void setUp() {
-		Configuration config = Injector.configure();
+		Configuration config = Container.configure();
 		config.addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
@@ -48,7 +48,7 @@ public class PostConstructTest {
 				}
 		);
 
-		injector = config.buildInjector();
+		injector = config.buildContainer();
 	}
 
 	@Test

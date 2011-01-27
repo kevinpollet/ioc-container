@@ -15,10 +15,10 @@
  */
 package com.my.container.aop;
 
+import com.my.container.Container;
 import com.my.container.aop.services.HelloService;
 import com.my.container.aop.services.impl.HelloServiceWithAroundInvoke;
-import com.my.container.binding.provider.FluentBindingProvider;
-import com.my.container.Injector;
+import com.my.container.binding.FluentBindingProvider;
 import com.my.container.util.ProxyHelper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,16 +29,16 @@ import org.junit.Test;
  */
 public class AroundInvokeTest {
 
-    private Injector context;
+    private Container context;
 
     @Before
     public void setUp() {
-        this.context = Injector.configure().addBindingProvider(new FluentBindingProvider(){
+        this.context = Container.configure().addBindingProvider(new FluentBindingProvider(){
             @Override
             public void configureBindings() {
                 bind(HelloService.class).to(HelloServiceWithAroundInvoke.class);
             }
-        }).buildInjector();
+        }).buildContainer();
     }
 
     @Test

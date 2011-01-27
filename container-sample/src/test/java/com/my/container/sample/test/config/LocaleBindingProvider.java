@@ -17,7 +17,7 @@ package com.my.container.sample.test.config;
 
 import java.util.Locale;
 
-import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.binding.FluentBindingProvider;
 import com.my.container.sample.GreetingService;
 import com.my.container.sample.HelloService;
 import com.my.container.sample.impl.EnglishHelloService;

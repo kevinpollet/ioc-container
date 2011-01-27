@@ -15,9 +15,9 @@
  */
 package com.my.container.test.injection;
 
-import com.my.container.exceptions.BeanInstantiationException;
-import com.my.container.Injector;
-import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.Container;
+import com.my.container.binding.FluentBindingProvider;
+import com.my.container.BeanInstantiationException;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
 import com.my.container.test.injection.services.ServiceC;
@@ -47,14 +47,14 @@ public class ConstructorInjectionTest {
 
 	@Test
 	public void testEmptyConstructorInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
 						bind( ServiceC.class ).to( ConstructorServiceCImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceC serviceC = injector.get( ServiceC.class );
 
@@ -64,7 +64,7 @@ public class ConstructorInjectionTest {
 
 	@Test
 	public void testConstructorInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -72,7 +72,7 @@ public class ConstructorInjectionTest {
 						bind( ServiceC.class ).to( EchoServiceC.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceD serviceD = injector.get( ServiceD.class );
 
@@ -82,7 +82,7 @@ public class ConstructorInjectionTest {
 
 	@Test
 	public void testNamedConstructorInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -91,7 +91,7 @@ public class ConstructorInjectionTest {
 						bind( ServiceC.class ).to( UpperEchoServiceC.class ).named( "upperEchoService" );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceE serviceE = injector.get( ServiceE.class );
 
@@ -101,7 +101,7 @@ public class ConstructorInjectionTest {
 
 	@Test
 	public void testQualifierConstructorInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -110,7 +110,7 @@ public class ConstructorInjectionTest {
 						bind( ServiceC.class ).to( UpperEchoServiceC.class ).qualifiedBy( LowerEcho.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceE serviceE = injector.get( ServiceE.class );
 
@@ -120,7 +120,7 @@ public class ConstructorInjectionTest {
 
 	@Test
 	public void testUserProviderConstructorInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -128,7 +128,7 @@ public class ConstructorInjectionTest {
 						bind( ServiceC.class ).toProvider( LowerEchoProvider.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceE serviceE = injector.get( ServiceE.class );
 
@@ -138,7 +138,7 @@ public class ConstructorInjectionTest {
 
 	@Test
 	public void testDefaultProviderConstructorInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -146,7 +146,7 @@ public class ConstructorInjectionTest {
 						bind( ServiceC.class ).to( LowerEchoServiceC.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceE serviceE = injector.get( ServiceE.class );
 
@@ -156,7 +156,7 @@ public class ConstructorInjectionTest {
 
 	@Test(expected = BeanInstantiationException.class)
 	public void testCyclicConstructorInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -164,7 +164,7 @@ public class ConstructorInjectionTest {
 						bind( ServiceB.class ).to( ConstructorServiceBImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		injector.get( ServiceA.class );
 	}

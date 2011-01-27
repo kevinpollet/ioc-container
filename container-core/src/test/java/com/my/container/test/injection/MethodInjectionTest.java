@@ -17,8 +17,8 @@ package com.my.container.test.injection;
 
 import java.lang.reflect.Field;
 
-import com.my.container.Injector;
-import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.Container;
+import com.my.container.binding.FluentBindingProvider;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceC;
 import com.my.container.test.injection.services.ServiceD;
@@ -43,7 +43,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testMethodInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -52,7 +52,7 @@ public class MethodInjectionTest {
 						bind( ServiceE.class ).to( MethodServiceEImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceD service = injector.get( ServiceD.class );
 
@@ -62,7 +62,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testInjectOverriddenInjectMethod() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -71,7 +71,7 @@ public class MethodInjectionTest {
 						bind( ServiceE.class ).to( MethodServiceEImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceD service = injector.get( ServiceD.class );
 
@@ -81,7 +81,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testNoInjectOverriddenInjectMethod() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -90,7 +90,7 @@ public class MethodInjectionTest {
 						bind( ServiceE.class ).to( MethodServiceEImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceE service = injector.get( ServiceE.class );
 
@@ -100,7 +100,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testExistingMethodInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -109,7 +109,7 @@ public class MethodInjectionTest {
 						bind( ServiceE.class ).to( MethodServiceEImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceD service = new MethodServiceDImpl();
 		injector.injectDependencies( service );
@@ -120,7 +120,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testNamedMethodInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -130,7 +130,7 @@ public class MethodInjectionTest {
 						bind( ServiceE.class ).to( MethodServiceEImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceA service = injector.get( ServiceA.class );
 
@@ -140,7 +140,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testQualifiedMethodInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -150,7 +150,7 @@ public class MethodInjectionTest {
 						bind( ServiceE.class ).to( MethodServiceEImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceA service = injector.get( ServiceA.class );
 
@@ -160,7 +160,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testDefaultProviderMethodInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -168,7 +168,7 @@ public class MethodInjectionTest {
 						bind( ServiceC.class ).to( LowerEchoServiceC.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceA service = injector.get( ServiceA.class );
 
@@ -178,7 +178,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testUserProviderMethodInjection() {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -186,7 +186,7 @@ public class MethodInjectionTest {
 						bind( ServiceC.class ).toProvider( LowerEchoProvider.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceA service = injector.get( ServiceA.class );
 
@@ -196,7 +196,7 @@ public class MethodInjectionTest {
 
 	@Test
 	public void testCyclicMethodInjection() throws NoSuchFieldException, IllegalAccessException {
-		Injector injector = Injector.configure().addBindingProvider(
+		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -205,7 +205,7 @@ public class MethodInjectionTest {
 						bind( ServiceE.class ).to( MethodServiceEImpl.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
 		ServiceD serviceD = injector.get( ServiceD.class );
 

@@ -15,7 +15,7 @@
  */
 package com.my.container.util;
 
-import com.my.container.core.beanfactory.proxy.AbstractBeanAwareInvocationHandler;
+import com.my.container.engine.beanfactory.proxy.AbstractBeanAwareInvocationHandler;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -41,7 +41,7 @@ public final class ProxyHelper {
 	 * @param proxyInstance the instance of the proxy
 	 *
 	 * @return The proxied instance or the parameter instance if :
-	 *         <ul><li>it doesn't implements {@link com.my.container.core.beanfactory.proxy.AbstractBeanAwareInvocationHandler}</li>
+	 *         <ul><li>it doesn't implements {@link com.my.container.engine.beanfactory.proxy.AbstractBeanAwareInvocationHandler}</li>
 	 *         <li>it's not a Java proxy</li></ul>
 	 *
 	 * @throws IllegalArgumentException if proxy instance parameter is null

@@ -18,11 +18,11 @@ package com.my.container.aop;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 
-import com.my.container.Injector;
+import com.my.container.Container;
 import com.my.container.aop.services.HelloService;
 import com.my.container.aop.services.impl.HelloServiceWithInterceptor;
 import com.my.container.aop.services.impl.MockInterceptor;
-import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.binding.FluentBindingProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,16 +32,16 @@ import org.junit.Test;
  */
 public class ExcludeMethodTest {
 
-    private Injector context;
+    private Container context;
 
     @Before
     public void setUp() {
-        this.context = Injector.configure().addBindingProvider( new FluentBindingProvider(){
+        this.context = Container.configure().addBindingProvider( new FluentBindingProvider(){
             @Override
             public void configureBindings() {
                 bind(HelloService.class).to(HelloServiceWithInterceptor.class);
             }
-        }).buildInjector();
+        }).buildContainer();
     }
 
     @Test

@@ -16,8 +16,8 @@
 package com.my.container.test.factory;
 
 import com.my.container.Configuration;
-import com.my.container.Injector;
-import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.Container;
+import com.my.container.binding.FluentBindingProvider;
 import com.my.container.test.factory.services.HelloService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class BindingTest {
 
 	@Test
 	public void testClassBinding() {
-		Configuration config = Injector.configure();
+		Configuration config = Container.configure();
 		config.addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
@@ -38,7 +38,7 @@ public class BindingTest {
 					}
 				}
 		);
-		HelloService service = config.buildInjector().get( HelloService.class );
+		HelloService service = config.buildContainer().get( HelloService.class );
 
 		Assert.assertNotNull( service );
 		Assert.assertEquals( "Hello Container", service.sayHello( "Container" ) );

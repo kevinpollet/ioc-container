@@ -15,7 +15,7 @@
  */
 package com.my.container.test.tck;
 
-import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.binding.FluentBindingProvider;
 import org.atinject.tck.auto.Car;
 import org.atinject.tck.auto.Convertible;
 import org.atinject.tck.auto.Drivers;

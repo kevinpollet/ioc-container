@@ -23,7 +23,7 @@
 
     <dependencies>
         <!--
-            Dependency on core of container
+            Dependency on engine of container
         -->
         <dependency>
             <groupId>com.my.container</groupId>

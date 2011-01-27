@@ -15,7 +15,7 @@
  */
 package com.my.container.test.tck;
 
-import com.my.container.Injector;
+import com.my.container.Container;
 import com.my.container.Configuration;
 import junit.framework.Test;
 import org.atinject.tck.Tck;
@@ -34,8 +34,8 @@ public class TckSuiteInitialisation {
 	 * @return the suite.
 	 */
 	public static Test suite() {
-		Configuration config = Injector.configure();
-		Injector injector = config.addBindingProvider( new TckBindingProvider() ).buildInjector();
+		Configuration config = Container.configure();
+		Container injector = config.addBindingProvider( new TckBindingProvider() ).buildContainer();
 
 		Car car = injector.get( Car.class );
 		return Tck.testsFor( car, false, true );

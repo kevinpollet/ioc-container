@@ -17,8 +17,8 @@ package com.my.container.test.injection;
 
 import java.lang.reflect.Field;
 
-import com.my.container.Injector;
-import com.my.container.binding.provider.FluentBindingProvider;
+import com.my.container.Container;
+import com.my.container.binding.FluentBindingProvider;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
 import com.my.container.test.injection.services.ServiceC;
@@ -45,7 +45,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testFieldDependencyInjection() throws NoSuchFieldException, IllegalAccessException {
-        Injector injector = Injector.configure().addBindingProvider(
+        Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -55,7 +55,7 @@ public class FieldInjectionTest {
 						bind( ServiceD.class ).to( FieldNamedServiceD.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
         ServiceA service = injector.get( ServiceA.class );
 
@@ -75,7 +75,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testSuperFieldDependencyInjection() {
-        Injector injector = Injector.configure().addBindingProvider(
+        Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -85,7 +85,7 @@ public class FieldInjectionTest {
 						bind( ServiceD.class ).to( FieldNamedServiceD.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
         ServiceA service = injector.get( ServiceA.class );
 
@@ -96,7 +96,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testExistingBeanFieldInjection() throws NoSuchFieldException, IllegalAccessException {
-        Injector injector = Injector.configure().addBindingProvider(
+        Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -106,7 +106,7 @@ public class FieldInjectionTest {
 						bind( ServiceD.class ).to( FieldNamedServiceD.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
         ServiceA service = new FieldServiceAImpl();
         injector.injectDependencies( service );
@@ -127,7 +127,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testNamedFieldInjection() {
-        Injector injector = Injector.configure().addBindingProvider(
+        Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -135,7 +135,7 @@ public class FieldInjectionTest {
 						bind( ServiceD.class ).to( FieldNamedServiceD.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
         ServiceD serviceD = injector.get( ServiceD.class );
 
@@ -145,7 +145,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testQualifiedFieldInjection() {
-        Injector injector = Injector.configure().addBindingProvider(
+        Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -153,7 +153,7 @@ public class FieldInjectionTest {
 						bind( ServiceD.class ).to( FieldQualifierServiceD.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
         ServiceD serviceD = injector.get( ServiceD.class );
 
@@ -163,7 +163,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testDefaultProviderFieldInjection() {
-        Injector injector = Injector.configure().addBindingProvider(
+        Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -171,7 +171,7 @@ public class FieldInjectionTest {
 						bind( ServiceD.class ).to( FieldProviderServiceD.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
         ServiceD serviceD = injector.get( ServiceD.class );
 
@@ -181,7 +181,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testUserProviderFieldInjection() {
-        Injector injector = Injector.configure().addBindingProvider(
+        Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -189,7 +189,7 @@ public class FieldInjectionTest {
 						bind( ServiceD.class ).to( FieldProviderServiceD.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
         ServiceD serviceD = injector.get( ServiceD.class );
 
@@ -199,7 +199,7 @@ public class FieldInjectionTest {
 
     @Test
     public void testCyclicDependencies() throws NoSuchFieldException, IllegalAccessException {
-        Injector injector = Injector.configure().addBindingProvider(
+        Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {
 					@Override
 					public void configureBindings() {
@@ -209,7 +209,7 @@ public class FieldInjectionTest {
 						bind( ServiceD.class ).to( FieldNamedServiceD.class );
 					}
 				}
-		).buildInjector();
+		).buildContainer();
 
         ServiceA serviceA = injector.get( ServiceA.class );
 

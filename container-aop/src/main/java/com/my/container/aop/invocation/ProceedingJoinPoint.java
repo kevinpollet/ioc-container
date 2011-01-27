@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
  * </p>
  * <p>
  * The ProceedingJoinPoint class give to interceptor
- * the core of the invocation and the possibilities to
+ * the engine of the invocation and the possibilities to
  * invoke the method intercepted.
  * </p>
  *

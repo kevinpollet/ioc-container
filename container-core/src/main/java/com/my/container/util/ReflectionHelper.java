@@ -15,7 +15,7 @@
  */
 package com.my.container.util;
 
-import com.my.container.exceptions.BeanException;
+import com.my.container.BeanException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
