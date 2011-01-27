@@ -45,6 +45,7 @@ import java.util.List;
 
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
 import static com.my.container.util.ReflectionHelper.invokeMethod;
+import static com.my.container.util.ReflectionHelper.isMethodAnnotatedWith;
 import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
 
 /**
@@ -87,13 +88,13 @@ public class ConstructorInjector {
 		this.logger.debug( "Construct an instance of class {}", clazz.getSimpleName() );
 
 		T classInstance = null;
-		ContextBeanStoreImpl factory = (ContextBeanStoreImpl) context.getContextBeanStore();
-		BindingHolder holder = factory.getBindingHolder();
-		BindingHolder providerHolder = factory.getProviderHolder();
+		ContextBeanStoreImpl beanStore = (ContextBeanStoreImpl) context.getContextBeanStore();
+		BindingHolder holder = beanStore.getBindingHolder();
+		BindingHolder providerHolder = beanStore.getProviderHolder();
 
 		//Check if bean is a singleton and have been already created
-		if ( factory.getSingletonBeans().containsKey( clazz ) ) {
-			return clazz.cast( factory.getSingletonBeans().get( clazz ) );
+		if ( beanStore.getSingletonBeans().containsKey( clazz ) ) {
+			return clazz.cast( beanStore.getSingletonBeans().get( clazz ) );
 		}
 
 		//Check if there is a cyclic dependency reference
@@ -153,7 +154,7 @@ public class ConstructorInjector {
 										);
 									}
 									parameters[i] = new GenericProvider(
-											factory, injectionBinding.getImplementation()
+											beanStore, injectionBinding.getImplementation()
 									);
 
 								}
@@ -195,23 +196,6 @@ public class ConstructorInjector {
 				classInstance = clazz.newInstance();
 			}
 
-			//apply bean post processor on the newly created bean
-			for ( BeanProcessor processor : beanProcessors ) {
-				if ( processor.isProcessable( classInstance ) ) {
-					classInstance = processor.processBean( classInstance );
-				}
-			}
-
-			//hold singletons and prototypes bean
-			if ( clazz.isAnnotationPresent( Singleton.class ) ) {
-				factory.getSingletonBeans().put( clazz, classInstance );
-			}
-			else if ( ReflectionHelper.isMethodAnnotatedWith( PreDestroy.class, clazz ) ) {
-				factory.getPrototypeBeans().add( classInstance );
-			}
-
-			this.injectFieldAndMethod( context, clazz, classInstance );
-
 		}
 		catch ( Exception ex ) {
 			throw new BeanInstantiationException(
@@ -220,6 +204,21 @@ public class ConstructorInjector {
 					), ex
 			);
 		}
+
+		//apply bean post processor on the newly created bean
+		for ( BeanProcessor processor : beanProcessors ) {
+			if ( processor.isProcessable( classInstance ) ) {
+				classInstance = processor.processBean( classInstance );
+			}
+		}
+
+		//hold singletons and prototypes bean if needed
+		if (clazz.isAnnotationPresent( Singleton.class ) || isMethodAnnotatedWith( PreDestroy.class, clazz ) ) {
+			beanStore.put( clazz, classInstance );
+		}
+
+		//inject fields and method
+		injectFieldAndMethod( context, clazz, classInstance );
 
 		//Dependency injection is done call PostContruct method
 		Method postConstructMethod = getMethodAnnotatedWith( PostConstruct.class, clazz );

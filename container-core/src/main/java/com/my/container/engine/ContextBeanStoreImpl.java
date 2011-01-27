@@ -31,8 +31,6 @@ import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.MapBindingHolder;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.spi.BeanProcessor;
-import com.my.container.util.ServiceLoader;
 
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
 import static com.my.container.util.ReflectionHelper.invokeMethod;
@@ -49,10 +47,9 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 
 	private final BindingHolder providerHolder;
 
-	private final List<Object> prototypesBean;
+	private final List<Object> prototypeBean;
 
-	private final Map<Class<?>, Object> singletonsBean;
-
+	private final Map<Class<?>, Object> singletonBeans;
 
 
 	/**
@@ -64,8 +61,8 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 		this.holder = new MapBindingHolder();
 		this.providerHolder = new MapBindingHolder();
 
-		this.prototypesBean = new ArrayList<Object>();
-		this.singletonsBean = new HashMap<Class<?>, Object>();
+		this.prototypeBean = new ArrayList<Object>();
+		this.singletonBeans = new HashMap<Class<?>, Object>();
 
 		//Populate holder
 		if ( list != null ) {
@@ -96,15 +93,22 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 		Binding<T> binding = this.holder.getBindingFor( clazz );
 		Class<? extends T> toClass = binding.getImplementation();
 
-		if ( binding.getImplementation().isAnnotationPresent( Singleton.class ) && this.singletonsBean
+		if ( binding.getImplementation().isAnnotationPresent( Singleton.class ) && this.singletonBeans
 				.containsKey( clazz ) ) {
-			return clazz.cast( this.singletonsBean.get( toClass ) );
+			return clazz.cast( this.singletonBeans.get( toClass ) );
 		}
 
 		InjectionContext context = new InjectionContextImpl( this, false );
 		createdBean = getInjector().constructClass( context, toClass );
 
 		return createdBean;
+	}
+
+	public <T> void put(Class<T> clazz, T Object) {
+		if ( Object.getClass().isAnnotationPresent( Singleton.class ) ) {
+			singletonBeans.put( clazz, Object );
+		}
+		prototypeBean.add( Object );
 	}
 
 	public Injector getInjector() {
@@ -118,8 +122,8 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 	 */
 	public void destroy() {
 		List<Object> createdBean = new ArrayList<Object>();
-		createdBean.addAll( prototypesBean );
-		createdBean.addAll( singletonsBean.values() );
+		createdBean.addAll( prototypeBean );
+		createdBean.addAll( singletonBeans.values() );
 
 		//Call PreDestroy callbacks
 		for ( Object bean : createdBean ) {
@@ -138,22 +142,9 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 		}
 	}
 
-	/**
-	 * Get the singleton beans map.
-	 *
-	 * @return the singleton map
-	 */
-	public Map<Class<?>, Object> getSingletonBeans() {
-		return singletonsBean;
-	}
 
-	/**
-	 * Get the list of prototypes bean created.
-	 *
-	 * @return the list of prototype bean
-	 */
-	public List<Object> getPrototypeBeans() {
-		return prototypesBean;
+	public  Map<Class<?>, Object> getSingletonBeans() {
+		return singletonBeans;
 	}
 
 	/**

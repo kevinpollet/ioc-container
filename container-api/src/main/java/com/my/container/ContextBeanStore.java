@@ -20,7 +20,7 @@ package com.my.container;
  */
 public interface ContextBeanStore {
 	/**
-	 * Get the ben instance stored in this bean store.
+	 * Get the bean instance stored in this bean store.
 	 * If none this store have to created the bean
 	 * with an Injector.
 	 *
@@ -28,6 +28,15 @@ public interface ContextBeanStore {
 	 * @param <T>
 	 */
 	<T> T get(Class<T> clazz);
+
+	/**
+	 * Store a bean into this bean store.
+	 *
+	 * @param clazz the bean class
+	 * @param Object the bean instance to store
+	 * @param <T> the bean type
+	 */
+	<T> void put(Class<T> clazz, T Object);
 
 	/**
 	 * Get this bean store injector.
