@@ -30,6 +30,15 @@ public interface ContainerProvider {
 	Configuration configure();
 
 	/**
+	 * Use specific provider container configuration.
+	 *
+	 * @param clazz the specific container configuration class
+	 *
+	 * @return the specific container provider configuration
+	 */
+	<T extends Configuration> T useSpecificConfiguration(Class<T> clazz);
+
+	/**
 	 * Get a container instance from this container
 	 * provider with the given configuration.
 	 *

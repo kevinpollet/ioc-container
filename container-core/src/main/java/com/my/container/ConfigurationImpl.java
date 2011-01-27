@@ -19,11 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.my.container.binding.BindingProvider;
+import com.my.container.bootstrap.Bootstrap;
 
 /**
  * @author Kevin Pollet
  */
-public class ConfigurationImpl extends Configuration {
+public class ConfigurationImpl implements SpecificConfiguration {
 
 	private boolean shutDownHookEnable;
 
@@ -34,14 +35,18 @@ public class ConfigurationImpl extends Configuration {
 		this.providers = new ArrayList<BindingProvider>();
 	}
 
-	public <T extends BindingProvider> Configuration addBindingProvider(T provider) {
+	public <T extends BindingProvider> SpecificConfiguration addBindingProvider(T provider) {
 		providers.add( provider );
 		return this;
 	}
 
-	public Configuration shutDownHook(boolean enable) {
+	public SpecificConfiguration shutDownHook(boolean enable) {
 		shutDownHookEnable = enable;
 		return this;
+	}
+
+	public Container buildContainer() {
+		return Bootstrap.currentContainerProvider().buildContainer( this );
 	}
 
 	public boolean isShutDownHookEnable() {
@@ -52,8 +57,4 @@ public class ConfigurationImpl extends Configuration {
 		return providers;
 	}
 
-	@Override
-	public <T extends Configuration> T unwrap(Class<T> clazz) {
-		return null;  //TODO fix this
-	}
 }

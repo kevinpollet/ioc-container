@@ -16,12 +16,11 @@
 package com.my.container;
 
 import com.my.container.binding.BindingProvider;
-import com.my.container.bootstrap.Bootstrap;
 
 /**
  * @author Kevin Pollet
  */
-public abstract class Configuration {
+public interface Configuration<C extends Configuration> {
 	/**
 	 * Add a binding provider
 	 *
@@ -30,34 +29,12 @@ public abstract class Configuration {
 	 *
 	 * @return Configuration interface for fluent configuration
 	 */
-	public abstract <T extends BindingProvider> Configuration addBindingProvider(T provider);
-
-	/**
-	 * Add a shutdown hook. When JVM is destroyed
-	 * the shutdown will called all preDestroy callback.
-	 *
-	 * @param enable true to add a shutdown.
-	 *
-	 * @return Configuration interface for fluent configuration
-	 */
-	public abstract Configuration shutDownHook(boolean enable);
-
-	/**
-	 * Access to provider specific configuration object.
-	 *
-	 * @param clazz the class
-	 * @param <T> the type of the class
-	 *
-	 * @return the provider specific configuration
-	 */
-	public abstract <T extends Configuration> T unwrap(Class<T> clazz);
+	<T extends BindingProvider> C addBindingProvider(T provider);
 
 	/**
 	 * Get a configured instance of a container.
 	 *
 	 * @return a configured instance of container
 	 */
-	public Container buildContainer() {
-		return Bootstrap.currentContainerProvider().buildContainer( this );
-	}
+	Container buildContainer();
 }

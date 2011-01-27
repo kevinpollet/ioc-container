@@ -15,25 +15,17 @@
  */
 package com.my.container;
 
-import com.my.container.spi.ContainerProvider;
-
 /**
  * @author Kevin Pollet
  */
-public class ContainerProviderImpl implements ContainerProvider {
-
-	public Configuration configure() {
-		return new ConfigurationImpl();
-	}
-
-	public <T extends Configuration> T useSpecificConfiguration(Class<T> clazz) {
-		if ( SpecificConfiguration.class.equals( SpecificConfiguration.class ) ) {
-			return clazz.cast( new ConfigurationImpl() );
-		}
-		throw new ContainerException( String.format( "Configuration class %s is not supported", clazz.getName() ) );
-	}
-
-	public Container buildContainer(Configuration configuration) {
-		return new ContainerImpl( configuration );
-	}
+public interface SpecificConfiguration extends Configuration<SpecificConfiguration> {
+	/**
+	 * Add a shutdown hook. When JVM is destroyed
+	 * the shutdown will called all preDestroy callback.
+	 *
+	 * @param enable true to add a shutdown.
+	 *
+	 * @return Configuration interface for fluent configuration
+	 */
+	SpecificConfiguration shutDownHook(boolean enable);
 }

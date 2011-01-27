@@ -23,7 +23,6 @@ import com.my.container.bootstrap.Bootstrap;
  * @author Kevin Pollet
  */
 public abstract class Container {
-
 	/**
 	 * Configure an instance of container.
 	 *
@@ -31,6 +30,17 @@ public abstract class Container {
 	 */
 	public static Configuration configure() {
 		return Bootstrap.loadProvider().configure();
+	}
+
+	/**
+	 * Configure an instance of container.
+	 *
+	 * @param clazz the specific container configuration class.
+	 *
+	 * @return the specific container configuration object.
+	 */
+	public static <T extends Configuration> T useSpecificConfiguration(Class<T> clazz) {
+		return Bootstrap.loadProvider().useSpecificConfiguration( clazz );
 	}
 
 	/**
