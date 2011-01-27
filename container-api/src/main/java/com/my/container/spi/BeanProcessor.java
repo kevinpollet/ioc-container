@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.engine.spi;
+package com.my.container.spi;
 
 /**
  * The bean processor contract. This
@@ -31,7 +31,7 @@ public interface BeanProcessor {
 	 *
 	 * @return true if the bean is processable or false otherwise
 	 */
-	boolean isProcessable(final Object bean);
+	boolean isProcessable(Object bean);
 
 	/**
 	 * Process the bean in parameter. <b>This method
@@ -41,8 +41,6 @@ public interface BeanProcessor {
 	 * @param <T> the type of the bean
 	 *
 	 * @return the bean processed
-	 *
-	 * @throws Exception if an exception occurs during the bean processing
 	 */
-	<T> T processBean(final T bean) throws Exception;
+	<T> T processBean(T bean);
 }

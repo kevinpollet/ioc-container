@@ -23,7 +23,7 @@ import com.my.container.binding.BindingHolder;
 import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.ContextBeanStoreImpl;
 import com.my.container.NoSuchBeanDefinitionException;
-import com.my.container.engine.spi.BeanProcessor;
+import com.my.container.spi.BeanProcessor;
 import com.my.container.engine.provider.GenericProvider;
 import com.my.container.util.ReflectionHelper;
 import org.slf4j.Logger;
@@ -41,6 +41,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
 import static com.my.container.util.ReflectionHelper.invokeMethod;
@@ -57,6 +58,8 @@ public class ConstructorInjector {
 
 	private final Logger logger = LoggerFactory.getLogger( ConstructorInjector.class );
 
+	private final List<BeanProcessor> beanProcessors;
+
 	private final FieldInjector fieldInjector;
 
 	private final MethodInjector methodInjector;
@@ -64,9 +67,10 @@ public class ConstructorInjector {
 	/**
 	 * Construct an Injector instance.
 	 */
-	public ConstructorInjector() {
+	public ConstructorInjector(List<BeanProcessor> beanProcessors) {
 		this.fieldInjector = new FieldInjector( this );
 		this.methodInjector = new MethodInjector( this );
+		this.beanProcessors= beanProcessors;
 	}
 
 	/**
@@ -191,19 +195,14 @@ public class ConstructorInjector {
 				classInstance = clazz.newInstance();
 			}
 
-			//Apply bean post processor
-			try {
-				for ( BeanProcessor processor : factory.getBeanProcessors() ) {
-					if ( processor.isProcessable( classInstance ) ) {
-						classInstance = processor.processBean( classInstance );
-					}
+			//apply bean post processor on the newly created bean
+			for ( BeanProcessor processor : beanProcessors ) {
+				if ( processor.isProcessable( classInstance ) ) {
+					classInstance = processor.processBean( classInstance );
 				}
 			}
-			catch ( Exception ex ) {
-				throw new BeanInstantiationException( "Error when applying bean post processors", ex );
-			}
 
-			//Hold singletons and prototypes bean
+			//hold singletons and prototypes bean
 			if ( clazz.isAnnotationPresent( Singleton.class ) ) {
 				factory.getSingletonBeans().put( clazz, classInstance );
 			}

@@ -17,7 +17,7 @@ package com.my.container.aop;
 
 import com.my.container.aop.annotations.AroundInvoke;
 import com.my.container.aop.annotations.Interceptors;
-import com.my.container.engine.spi.BeanProcessor;
+import com.my.container.spi.BeanProcessor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -42,7 +42,7 @@ public class AOPBeanProcessor implements BeanProcessor {
     /**
      * {@inheritDoc}
      */
-    public <T> T processBean(final T bean) throws Exception {
+    public <T> T processBean(final T bean) {
         Class<?> beanClass = bean.getClass();
 
         List<Object> interceptors = new ArrayList<Object>();

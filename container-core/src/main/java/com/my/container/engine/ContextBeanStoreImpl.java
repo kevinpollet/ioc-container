@@ -31,8 +31,7 @@ import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.MapBindingHolder;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.engine.injector.ConstructorInjector;
-import com.my.container.engine.spi.BeanProcessor;
+import com.my.container.spi.BeanProcessor;
 import com.my.container.util.ServiceLoader;
 
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
@@ -54,7 +53,7 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 
 	private final Map<Class<?>, Object> singletonsBean;
 
-	private final List<BeanProcessor> beanProcessors;
+
 
 	/**
 	 * Bean Factory constructor.
@@ -67,13 +66,6 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 
 		this.prototypesBean = new ArrayList<Object>();
 		this.singletonsBean = new HashMap<Class<?>, Object>();
-		this.beanProcessors = new ArrayList<BeanProcessor>();
-
-		//Load Bean processor
-		ServiceLoader<BeanProcessor> loader = ServiceLoader.load( BeanProcessor.class );
-		for ( BeanProcessor processor : loader ) {
-			this.beanProcessors.add( processor );
-		}
 
 		//Populate holder
 		if ( list != null ) {
@@ -162,15 +154,6 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 	 */
 	public List<Object> getPrototypeBeans() {
 		return prototypesBean;
-	}
-
-	/**
-	 * Get the bean processors list.
-	 *
-	 * @return the bean processors list
-	 */
-	public List<BeanProcessor> getBeanProcessors() {
-		return beanProcessors;
 	}
 
 	/**

@@ -15,9 +15,16 @@
  */
 package com.my.container.engine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.my.container.InjectionContext;
 import com.my.container.Injector;
+import com.my.container.binding.Binding;
+import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.injector.ConstructorInjector;
+import com.my.container.spi.BeanProcessor;
+import com.my.container.util.ServiceLoader;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -25,10 +32,19 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class InjectorImpl implements Injector {
 
-	private ConstructorInjector constructorInjector;
+	private final List<BeanProcessor> beanProcessors;
+
+	private final ConstructorInjector constructorInjector;
 
 	public InjectorImpl() {
-		this.constructorInjector = new ConstructorInjector();
+		this.beanProcessors = new ArrayList<BeanProcessor>();
+		this.constructorInjector = new ConstructorInjector( beanProcessors );
+
+		//populate spi bean processor
+		ServiceLoader<BeanProcessor> loader = ServiceLoader.load( BeanProcessor.class );
+		for ( BeanProcessor processor : loader ) {
+			this.beanProcessors.add( processor );
+		}
 	}
 
 	public <T> T constructClass(InjectionContext context, Class<T> clazz) {
