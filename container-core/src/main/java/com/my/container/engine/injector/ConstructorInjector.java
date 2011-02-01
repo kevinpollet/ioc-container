@@ -128,19 +128,22 @@ public class ConstructorInjector {
 				else {
 					classToInject = (Class<?>) ( (ParameterizedType) parameterType ).getActualTypeArguments()[0];
 
-					//Check if user provider
+					//check if user has defined a custom provider
 					injectionBinding = providerHolder.getBindingFor( classToInject, qualifier );
-					if ( injectionBinding == null ) {
-						injectionBinding = holder.getBindingFor( classToInject, qualifier );
-						if ( injectionBinding == null ) {
-							throw new NoSuchBeanDefinitionException( "There is no binding defined for the class " + classToInject.getName() );
-						}
-						parameters[i] = new DefaultInstanceProvider( beanStore, injectionBinding.getImplementation() );
-					}
-					else {
+					if ( injectionBinding != null ) {
 						parameters[i] = constructClass( context, injectionBinding.getProvider() );
 					}
+					else {
+						injectionBinding = holder.getBindingFor( classToInject, qualifier );
+						if ( injectionBinding != null ) {
+							parameters[i] = new DefaultInstanceProvider( beanStore, injectionBinding.getImplementation() );
+						}
+						else {
+							throw new NoSuchBeanDefinitionException( "There is no binding defined for the class " + classToInject.getName() );
+						}
+					}
 				}
+
 			}
 
 			try {
