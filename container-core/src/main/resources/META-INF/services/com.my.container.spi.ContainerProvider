@@ -1,2 +1,2 @@
 # Default container provider
-com.my.container.ContainerProviderImpl
+com.my.container.IOCContainerProvider

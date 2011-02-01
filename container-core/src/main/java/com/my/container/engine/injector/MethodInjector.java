@@ -18,19 +18,17 @@ package com.my.container.engine.injector;
 import com.my.container.BeanDependencyInjectionException;
 import com.my.container.InjectionContext;
 import com.my.container.NoSuchBeanDefinitionException;
-import com.my.container.engine.ContextBeanStoreImpl;
+import com.my.container.engine.BeanStoreImpl;
 import com.my.container.binding.Binding;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.engine.provider.GenericProvider;
+import com.my.container.engine.DefaultInstanceProvider;
 import com.my.container.util.ProxyHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.my.container.util.ReflectionHelper;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Qualifier;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -45,19 +43,6 @@ import static com.my.container.util.ReflectionHelper.isOverridden;
  */
 public class MethodInjector {
 
-    private final Logger logger = LoggerFactory.getLogger(MethodInjector.class);
-
-    private final ConstructorInjector injector;
-
-    /**
-     * Construct a Method injector.
-     *
-     * @param injector the parent injector
-     */
-    public MethodInjector(final ConstructorInjector injector) {
-        this.injector = injector;
-    }
-
     /**
      * Inject method parameters of methods
      * annotated by @Inject annotation.
@@ -66,10 +51,9 @@ public class MethodInjector {
      * @param clazz    the current class injected
      * @param instance the instance injected
      */
-    public void injectMethodsDependencies(final InjectionContext context, final Class<?> clazz, final Object instance) {
-        this.logger.debug("Inject methods of class {}", clazz.getName());
+    public static void injectMethodsDependencies(InjectionContext context, Class<?> clazz, Object instance) {
 
-        for (Method method : clazz.getDeclaredMethods()) {
+		for (Method method : clazz.getDeclaredMethods()) {
 
             if (method.isAnnotationPresent(Inject.class)) {
 
@@ -109,41 +93,32 @@ public class MethodInjector {
                         if (parameterClass.isAssignableFrom(Provider.class)) {
                             if (parametersType[i] instanceof ParameterizedType) {
                                 Class<?> classToInject = (Class<?>) ((ParameterizedType) parametersType[i]).getActualTypeArguments()[0];
-                                injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore()).getProviderHolder().getBindingFor(classToInject, qualifier);
+                                injectionBinding = ((BeanStoreImpl) context.getBeanStore()).getProviderHolder().getBindingFor(classToInject, qualifier);
                                 if (injectionBinding == null) {
-                                    injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore()).getBindingHolder().getBindingFor(classToInject, qualifier);
+                                    injectionBinding = ((BeanStoreImpl) context.getBeanStore()).getBindingHolder().getBindingFor(classToInject, qualifier);
                                     if (injectionBinding == null) {
                                         throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", classToInject.getName()));
                                     }
-                                    parameters[i] = new GenericProvider(((ContextBeanStoreImpl) context.getContextBeanStore()), injectionBinding.getImplementation());
+                                    parameters[i] = new DefaultInstanceProvider(((BeanStoreImpl) context.getBeanStore()), injectionBinding.getImplementation());
                                 } else {
-                                    parameters[i] = this.injector.constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
+                                    parameters[i] = context.getBeanStore().getInjector().constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
                                 }
                             }
                         } else {
-                            injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore()).getBindingHolder().getBindingFor(parameterClass, qualifier);
+                            injectionBinding = ((BeanStoreImpl) context.getBeanStore()).getBindingHolder().getBindingFor(parameterClass, qualifier);
                             if (injectionBinding == null) {
                                 throw new NoSuchBeanDefinitionException(String.format("There is no binding defined for the class %s", parameterClass.getName()));
                             }
-                            parameters[i] = this.injector.constructClass(context, injectionBinding.getImplementation());
+                            parameters[i] = context.getBeanStore().getInjector().constructClass(context, injectionBinding.getImplementation());
                         }
                     }
 
 
                     //Call method
-                    try {
-
-                        if (!method.isAccessible()) {
-                            method.setAccessible(true);
-                        }
-                        method.invoke(ProxyHelper.getTargetObject(instance), parameters);
-                    }
-                    catch (IllegalAccessException ex) {
-                        throw new BeanDependencyInjectionException(ex);
-                    }
-                    catch (InvocationTargetException ex) {
-                        throw new BeanDependencyInjectionException(ex);
-                    }
+					if ( !method.isAccessible() ) {
+						method.setAccessible( true );
+					}
+					ReflectionHelper.invokeMethod(ProxyHelper.getTargetObject(instance), method, parameters);
 
                     //Remove mark
                     context.removeMarkFor( instance.getClass() );

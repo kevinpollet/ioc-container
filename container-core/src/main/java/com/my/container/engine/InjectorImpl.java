@@ -20,9 +20,9 @@ import java.util.List;
 
 import com.my.container.InjectionContext;
 import com.my.container.Injector;
-import com.my.container.binding.Binding;
-import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.injector.ConstructorInjector;
+import com.my.container.engine.injector.FieldInjector;
+import com.my.container.engine.injector.MethodInjector;
 import com.my.container.spi.BeanProcessor;
 import com.my.container.util.ServiceLoader;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -56,7 +56,18 @@ public class InjectorImpl implements Injector {
 	}
 
 	public void injectInstance(InjectionContext context, Object instance) {
-		constructorInjector.injectDependencies( context, instance );
+		injectFieldsAndMethods( context, instance.getClass(), instance );
+	}
+
+	private void injectFieldsAndMethods(InjectionContext context, Class<?> clazz, Object instance) {
+		Class<?> superClass = clazz.getSuperclass();
+
+		if ( !superClass.equals( Object.class ) ) {
+			this.injectFieldsAndMethods( context, superClass, instance );
+		}
+
+		FieldInjector.injectFieldsDependencies( context, clazz, instance );
+		MethodInjector.injectMethodsDependencies( context, clazz, instance );
 	}
 
 }

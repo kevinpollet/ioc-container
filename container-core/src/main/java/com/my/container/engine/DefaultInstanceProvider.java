@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.engine.provider;
+package com.my.container.engine;
 
 import javax.inject.Provider;
 
-import com.my.container.ContextBeanStore;
-import com.my.container.engine.InjectionContextImpl;
-import com.my.container.engine.injector.ConstructorInjector;
+import com.my.container.BeanStore;
 
 /**
  * The default provider. This provider is used
@@ -28,9 +26,9 @@ import com.my.container.engine.injector.ConstructorInjector;
  *
  * @author Kevin Pollet
  */
-public class GenericProvider<T> implements Provider<T> {
+public class DefaultInstanceProvider<T> implements Provider<T> {
 
-	private final ContextBeanStore beanStore;
+	private final BeanStore beanStore;
 
 	private final Class<T> classToProvide;
 
@@ -40,7 +38,7 @@ public class GenericProvider<T> implements Provider<T> {
 	 * @param beanStore the beanStore to get an instance
 	 * @param classToProvide the bean class to create on each {@link javax.inject.Provider#get()} method call
 	 */
-	public GenericProvider(ContextBeanStore beanStore, Class<T> classToProvide) {
+	public DefaultInstanceProvider(BeanStore beanStore, Class<T> classToProvide) {
 		this.beanStore = beanStore;
 		this.classToProvide = classToProvide;
 	}

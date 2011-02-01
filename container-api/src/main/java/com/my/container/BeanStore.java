@@ -13,26 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container.binding;
-
-import com.my.container.binding.BindingProvider;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+package com.my.container;
 
 /**
  * @author Kevin Pollet
  */
-public class XMLBindingProvider extends BindingProvider {
+public interface BeanStore {
+	/**
+	 * Get the bean instance stored in this bean store.
+	 * If none this store have to created the bean
+	 * with an Injector.
+	 *
+	 * @param clazz
+	 * @param <T>
+	 */
+	<T> T get(Class<T> clazz);
 
-	private final String bindingFileLocation;
+	/**
+	 * Store a bean into this bean store.
+	 *
+	 * @param object the bean instance to store
+	 * @param <T> the bean type
+	 */
+	<T> void put(T object);
 
-	public XMLBindingProvider(String bindingFileLocation) {
-		this.bindingFileLocation = bindingFileLocation;
-	}
+	/**
+	 * Get this bean store injector.
+	 *
+	 * @return the injector
+	 */
+	Injector getInjector();
 
-	@Override
-	public void configureBindings() {
-		//TODO load bindings from the given class
-		throw new NotImplementedException();
-	}
-
+	/**
+	 * Destroy this bean store.
+	 */
+	void destroy();
 }

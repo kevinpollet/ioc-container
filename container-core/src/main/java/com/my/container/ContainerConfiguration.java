@@ -18,7 +18,7 @@ package com.my.container;
 /**
  * @author Kevin Pollet
  */
-public interface SpecificConfiguration extends Configuration<SpecificConfiguration> {
+public interface ContainerConfiguration extends Configuration<ContainerConfiguration> {
 	/**
 	 * Add a shutdown hook. When JVM is destroyed
 	 * the shutdown will called all preDestroy callback.
@@ -27,5 +27,5 @@ public interface SpecificConfiguration extends Configuration<SpecificConfigurati
 	 *
 	 * @return Configuration interface for fluent configuration
 	 */
-	SpecificConfiguration shutDownHook(boolean enable);
+	ContainerConfiguration shutDownHook(boolean enable);
 }

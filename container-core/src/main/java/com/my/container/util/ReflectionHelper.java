@@ -18,9 +18,13 @@ package com.my.container.util;
 import com.my.container.ContainerException;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Set;
+import javax.inject.Inject;
 
 
 /**
@@ -78,16 +82,21 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Check if the given class have a declared method annotated with
-	 * the given annotation.
+	 * Get all declared @Inject constructors in the given class.
 	 *
-	 * @param annotation the annotation
-	 * @param clazz the class
+	 * @param clazz the class parameter
 	 *
-	 * @return true if there is a corresponding method.
+	 * @return all injectable constructor
 	 */
-	public static boolean isMethodAnnotatedWith(Class<? extends Annotation> annotation, Class<?> clazz) {
-		return getMethodAnnotatedWith( annotation, clazz ) != null;
+	public static Set<Constructor<?>> getInjectableConstructors(Class<?> clazz) {
+		Set<Constructor<?>> result = new HashSet<Constructor<?>>(  );
+		for ( Constructor<?> constructor : clazz.getDeclaredConstructors() ) {
+			if ( constructor.isAnnotationPresent( Inject.class ) ) {
+				result.add( constructor );
+			}
+		}
+
+		return result;
 	}
 
 	/**

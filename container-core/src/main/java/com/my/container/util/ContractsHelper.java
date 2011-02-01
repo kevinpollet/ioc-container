@@ -13,40 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container;
+package com.my.container.util;
 
 /**
  * @author Kevin Pollet
  */
-public interface ContextBeanStore {
-	/**
-	 * Get the bean instance stored in this bean store.
-	 * If none this store have to created the bean
-	 * with an Injector.
-	 *
-	 * @param clazz
-	 * @param <T>
-	 */
-	<T> T get(Class<T> clazz);
+public final class ContractsHelper {
 
 	/**
-	 * Store a bean into this bean store.
-	 *
-	 * @param clazz the bean class
-	 * @param Object the bean instance to store
-	 * @param <T> the bean type
+	 * This class cannot be instantiate.
 	 */
-	<T> void put(Class<T> clazz, T Object);
+	private ContractsHelper() {
+	}
 
 	/**
-	 * Get this bean store injector.
+	 * Assert that the given object parameter is not null.
 	 *
-	 * @return the injector
+	 * @param object the object
+	 * @param paramName the parameter name
+	 *
+	 * @throws NullPointerException if object is null
 	 */
-	Injector getInjector();
+	public static void assertNoNull(Object object, String paramName) {
+		if ( object == null ) {
+			throw new NullPointerException( paramName + " cannot be null." );
+		}
+	}
 
-	/**
-	 * Destroy this context bean store.
-	 */
-	void destroy();
 }

@@ -34,7 +34,7 @@ public interface InjectionContext {
 	 *
 	 * @return the context bean store
 	 */
-	ContextBeanStore getContextBeanStore();
+	BeanStore getBeanStore();
 
 	/**
 	 * Check if the given class have been already processed

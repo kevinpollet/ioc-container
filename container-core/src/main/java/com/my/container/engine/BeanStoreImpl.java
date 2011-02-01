@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 
-import com.my.container.ContextBeanStore;
+import com.my.container.BeanStore;
 import com.my.container.InjectionContext;
 import com.my.container.Injector;
 import com.my.container.NoSuchBeanDefinitionException;
@@ -31,6 +32,7 @@ import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.MapBindingHolder;
 import com.my.container.binding.ProvidedBinding;
+import com.my.container.util.ContractsHelper;
 
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
 import static com.my.container.util.ReflectionHelper.invokeMethod;
@@ -41,7 +43,7 @@ import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
  *
  * @author kevinpollet
  */
-public final class ContextBeanStoreImpl implements ContextBeanStore {
+public final class BeanStoreImpl implements BeanStore {
 
 	private final BindingHolder holder;
 
@@ -51,18 +53,20 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 
 	private final Map<Class<?>, Object> singletonBeans;
 
+	private final Injector injector;
+
 
 	/**
 	 * Bean Factory constructor.
 	 *
 	 * @param list the binding list
 	 */
-	public ContextBeanStoreImpl(final List<Binding<?>> list) {
+	public BeanStoreImpl(final List<Binding<?>> list) {
 		this.holder = new MapBindingHolder();
 		this.providerHolder = new MapBindingHolder();
-
 		this.prototypeBean = new ArrayList<Object>();
 		this.singletonBeans = new HashMap<Class<?>, Object>();
+		this.injector = new InjectorImpl();
 
 		//Populate holder
 		if ( list != null ) {
@@ -78,10 +82,9 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 	}
 
 	public <T> T get(Class<T> clazz) {
-        if ( clazz == null ) {
-			throw new IllegalArgumentException( "The clazz parameter cannot be null" );
-		}
-		else if ( !this.holder.isBindingFor( clazz ) ) {
+		ContractsHelper.assertNoNull( clazz, "clazz" );
+
+		if ( !holder.isBindingFor( clazz ) ) {
 			throw new NoSuchBeanDefinitionException(
 					String.format(
 							"The class %s have no binding defined", clazz.getSimpleName()
@@ -90,79 +93,77 @@ public final class ContextBeanStoreImpl implements ContextBeanStore {
 		}
 
 		T createdBean;
-		Binding<T> binding = this.holder.getBindingFor( clazz );
+		Binding<T> binding = holder.getBindingFor( clazz );
 		Class<? extends T> toClass = binding.getImplementation();
 
-		if ( binding.getImplementation().isAnnotationPresent( Singleton.class ) && this.singletonBeans
-				.containsKey( clazz ) ) {
-			return clazz.cast( this.singletonBeans.get( toClass ) );
-		}
+		if ( toClass.isAnnotationPresent( Singleton.class ) && singletonBeans.containsKey( clazz ) ) {
 
-		InjectionContext context = new InjectionContextImpl( this, false );
-		createdBean = getInjector().constructClass( context, toClass );
+			createdBean = clazz.cast( singletonBeans.get( toClass ) );
+		}
+		else {
+		    InjectionContext context = new InjectionContextImpl( this, false );
+			createdBean = injector.constructClass( context, toClass );
+		}
 
 		return createdBean;
 	}
 
-	public <T> void put(Class<T> clazz, T Object) {
-		if ( Object.getClass().isAnnotationPresent( Singleton.class ) ) {
-			singletonBeans.put( clazz, Object );
+	public <T> void put(T bean) {
+		ContractsHelper.assertNoNull( bean, "bean" );
+
+		if ( bean.getClass().isAnnotationPresent( Singleton.class ) ) {
+			singletonBeans.put( bean.getClass(), bean );
 		}
-		prototypeBean.add( Object );
+		else if ( getMethodAnnotatedWith( PreDestroy.class, bean.getClass() ) != null ) {
+			prototypeBean.add( bean );
+		}
+
+		postConstruct( bean );
 	}
 
 	public Injector getInjector() {
-		return new InjectorImpl();
+		return injector;
 	}
 
-	/**
-	 * This method remove all beans references
-	 * memorised by the singleton for PreDestroy
-	 * CallBack and Singleton scope.
-	 */
 	public void destroy() {
 		List<Object> createdBean = new ArrayList<Object>();
 		createdBean.addAll( prototypeBean );
 		createdBean.addAll( singletonBeans.values() );
 
-		//Call PreDestroy callbacks
 		for ( Object bean : createdBean ) {
-			Method method = getMethodAnnotatedWith( PreDestroy.class, bean.getClass() );
-			if ( method!= null && isValidCallbackMethod( method ) ) {
-				if ( !method.isAccessible() ) {
-					method.setAccessible( true );
-				}
-				try {
-					invokeMethod( bean, method );
-				}
-				catch ( RuntimeException ex ) {
-					//ignore runtime exception - see JSR250 PreDestroy method
-				}
-			}
+			preDestroy( bean );
 		}
 	}
 
+	private void postConstruct(Object object) {
+		Method postConstructMethod = getMethodAnnotatedWith( PostConstruct.class, object.getClass() );
+		if ( postConstructMethod != null && isValidCallbackMethod( postConstructMethod ) ) {
+			if ( !postConstructMethod.isAccessible() ) {
+				postConstructMethod.setAccessible( true );
+			}
+			invokeMethod( object, postConstructMethod );
+		}
+	}
 
-	public  Map<Class<?>, Object> getSingletonBeans() {
+	private void preDestroy(Object object) {
+		Method postConstructMethod = getMethodAnnotatedWith( PreDestroy.class, object.getClass() );
+		if ( postConstructMethod != null && isValidCallbackMethod( postConstructMethod ) ) {
+			if ( !postConstructMethod.isAccessible() ) {
+				postConstructMethod.setAccessible( true );
+			}
+			invokeMethod( object, postConstructMethod );
+		}
+	}
+
+	public Map<Class<?>, Object> getSingletonBeans() {
 		return singletonBeans;
 	}
 
-	/**
-	 * Get the binding holder.
-	 *
-	 * @return the binding holder
-	 */
 	public BindingHolder getBindingHolder() {
 		return holder;
 	}
 
-	/**
-	 * Get the provided binding holder.
-	 *
-	 * @return the provided binding holder
-	 */
 	public BindingHolder getProviderHolder() {
 		return providerHolder;
 	}
-
 }

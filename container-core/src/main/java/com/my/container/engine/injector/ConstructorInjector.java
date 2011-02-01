@@ -15,38 +15,29 @@
  */
 package com.my.container.engine.injector;
 
-import com.my.container.BeanInstantiationException;
-import com.my.container.InjectionContext;
-import com.my.container.BeanDependencyInjectionException;
-import com.my.container.binding.Binding;
-import com.my.container.binding.BindingHolder;
-import com.my.container.binding.ProvidedBinding;
-import com.my.container.engine.ContextBeanStoreImpl;
-import com.my.container.NoSuchBeanDefinitionException;
-import com.my.container.spi.BeanProcessor;
-import com.my.container.engine.provider.GenericProvider;
-import com.my.container.util.ReflectionHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Qualifier;
-import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
+import javax.inject.Provider;
+import javax.inject.Qualifier;
 
-import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
-import static com.my.container.util.ReflectionHelper.invokeMethod;
-import static com.my.container.util.ReflectionHelper.isMethodAnnotatedWith;
-import static com.my.container.util.ValidationHelper.isValidCallbackMethod;
+import com.my.container.BeanDependencyInjectionException;
+import com.my.container.BeanInstantiationException;
+import com.my.container.InjectionContext;
+import com.my.container.NoSuchBeanDefinitionException;
+import com.my.container.binding.Binding;
+import com.my.container.binding.BindingHolder;
+import com.my.container.binding.ProvidedBinding;
+import com.my.container.engine.BeanStoreImpl;
+import com.my.container.engine.DefaultInstanceProvider;
+import com.my.container.spi.BeanProcessor;
+import com.my.container.util.ReflectionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Definition of an injector. This injector
@@ -61,16 +52,10 @@ public class ConstructorInjector {
 
 	private final List<BeanProcessor> beanProcessors;
 
-	private final FieldInjector fieldInjector;
-
-	private final MethodInjector methodInjector;
-
 	/**
 	 * Construct an Injector instance.
 	 */
 	public ConstructorInjector(List<BeanProcessor> beanProcessors) {
-		this.fieldInjector = new FieldInjector( this );
-		this.methodInjector = new MethodInjector( this );
 		this.beanProcessors= beanProcessors;
 	}
 
@@ -84,11 +69,11 @@ public class ConstructorInjector {
 	 *
 	 * @return an instance of the class with it's properties resolved
 	 */
-	public <T> T constructClass(final InjectionContext context, final Class<T> clazz) {
-		this.logger.debug( "Construct an instance of class {}", clazz.getSimpleName() );
+	public <T> T constructClass(InjectionContext context, Class<T> clazz) {
+		logger.debug( "Construct an instance of class {}", clazz.getSimpleName() );
 
 		T classInstance = null;
-		ContextBeanStoreImpl beanStore = (ContextBeanStoreImpl) context.getContextBeanStore();
+		BeanStoreImpl beanStore = (BeanStoreImpl) context.getBeanStore();
 		BindingHolder holder = beanStore.getBindingHolder();
 		BindingHolder providerHolder = beanStore.getProviderHolder();
 
@@ -106,103 +91,79 @@ public class ConstructorInjector {
 			return clazz.cast( objectRef );
 		}
 
-		//Construct an instance of the given class
-		try {
+		Set<Constructor<?>> constructors = ReflectionHelper.getInjectableConstructors( clazz );
 
-			for ( Constructor<?> constructor : clazz.getDeclaredConstructors() ) {
+		if ( !constructors.isEmpty() ) {  //use first injectable constructor
 
-				if ( constructor.isAnnotationPresent( Inject.class ) ) {
+			Constructor<?> constructor = constructors.iterator().next();
+			Class<?>[] parametersClass = constructor.getParameterTypes();
+			Type[] parametersTypes = constructor.getGenericParameterTypes();
+			Object[] parameters = new Object[parametersTypes.length];
+			Annotation[][] parametersAnnotations = constructor.getParameterAnnotations();
 
-					Class<?>[] parametersClass = constructor.getParameterTypes();
-					Type[] parametersTypes = constructor.getGenericParameterTypes();
-					Object[] parameters = new Object[parametersTypes.length];
-					Annotation[][] parametersAnnotations = constructor.getParameterAnnotations();
+			context.markClassAsProcessed( clazz, null );
 
-					context.markClassAsProcessed( clazz, null );
+			for ( int i = 0; i < parametersTypes.length; i++ ) {
 
-					for ( int i = 0; i < parametersTypes.length; i++ ) {
+				Annotation qualifier = null;
+				Binding injectionBinding = null;
+				Type parameterType = parametersTypes[i];
+				Class<?> classToInject = parametersClass[i];
 
-						Annotation qualifier = null;
-						Binding injectionBinding = null;
-						Type parameterType = parametersTypes[i];
-						Class<?> classToInject = parametersClass[i];
-
-						//Get qualifier
-						for ( Annotation annotation : parametersAnnotations[i] ) {
-							if ( annotation.annotationType().isAnnotationPresent( Qualifier.class ) ) {
-								qualifier = annotation;
-								break;
-							}
-						}
-
-						//Provider Injection
-						if ( classToInject.isAssignableFrom( Provider.class ) ) {
-
-							if ( parameterType instanceof ParameterizedType ) {
-								classToInject = (Class<?>) ( (ParameterizedType) parameterType ).getActualTypeArguments()[0];
-
-								//Check if user provider
-								injectionBinding = providerHolder.getBindingFor( classToInject, qualifier );
-								if ( injectionBinding == null ) {
-									injectionBinding = holder.getBindingFor( classToInject, qualifier );
-									if ( injectionBinding == null ) {
-										throw new NoSuchBeanDefinitionException(
-												String.format(
-														"There is no binding defined for the class %s",
-														classToInject.getName()
-												)
-										);
-									}
-									parameters[i] = new GenericProvider(
-											beanStore, injectionBinding.getImplementation()
-									);
-
-								}
-								else {
-									parameters[i] = this.constructClass(
-											context, ( (ProvidedBinding) injectionBinding ).getProvider()
-									);
-								}
-							}
-
-							//Normal injection
-						}
-						else {
-							injectionBinding = holder.getBindingFor( classToInject, qualifier );
-							if ( injectionBinding == null ) {
-								throw new NoSuchBeanDefinitionException(
-										String.format(
-												"There is no binding defined for the class %s", classToInject.getName()
-										)
-								);
-							}
-							parameters[i] = this.constructClass( context, injectionBinding.getImplementation() );
-						}
+				//Get qualifier
+				for ( Annotation annotation : parametersAnnotations[i] ) {
+					if ( annotation.annotationType().isAnnotationPresent( Qualifier.class ) ) {
+						qualifier = annotation;
+						break;
 					}
-
-					if ( !Modifier.isPrivate( constructor.getModifiers() )
-							&& !constructor.isAccessible() ) {
-						constructor.setAccessible( true );
-					}
-
-					classInstance = clazz.cast( constructor.newInstance( parameters ) );
-					context.removeMarkFor( clazz );
-					break;
 				}
 
+				if ( !Provider.class.isAssignableFrom( classToInject ) ) {
+					injectionBinding = holder.getBindingFor( classToInject, qualifier );
+					if ( injectionBinding == null ) {
+						throw new NoSuchBeanDefinitionException( "There is no binding defined for the class " + classToInject.getName() );
+					}
+					parameters[i] = constructClass( context, injectionBinding.getImplementation() );
+
+				} //it's a user provider injection
+				else {
+					classToInject = (Class<?>) ( (ParameterizedType) parameterType ).getActualTypeArguments()[0];
+
+					//Check if user provider
+					injectionBinding = providerHolder.getBindingFor( classToInject, qualifier );
+					if ( injectionBinding == null ) {
+						injectionBinding = holder.getBindingFor( classToInject, qualifier );
+						if ( injectionBinding == null ) {
+							throw new NoSuchBeanDefinitionException( "There is no binding defined for the class " + classToInject.getName() );
+						}
+						parameters[i] = new DefaultInstanceProvider( beanStore, injectionBinding.getImplementation() );
+					}
+					else {
+						parameters[i] = constructClass( context, ( (ProvidedBinding) injectionBinding ).getProvider() );
+					}
+				}
 			}
 
-			if ( classInstance == null ) {
-				classInstance = clazz.newInstance();
+			try {
+				if ( !Modifier.isPrivate( constructor.getModifiers() ) && !constructor.isAccessible() ) {
+					constructor.setAccessible( true );
+				}
+
+		   		classInstance = clazz.cast( constructor.newInstance( parameters ) );
+				context.removeMarkFor( clazz );
+			}
+			catch ( Exception ex ) {
+				throw new BeanInstantiationException("The " + clazz.getName() + " class cannot be instantiated", ex);
 			}
 
 		}
-		catch ( Exception ex ) {
-			throw new BeanInstantiationException(
-					String.format(
-							"The %s class cannot be instantiated", clazz.getName()
-					), ex
-			);
+		else {
+			try {
+		   		classInstance = clazz.newInstance();
+			}
+			catch ( Exception ex ) {
+				throw new BeanInstantiationException("The " + clazz.getName() + " class cannot be instantiated", ex);
+			}
 		}
 
 		//apply bean post processor on the newly created bean
@@ -212,35 +173,13 @@ public class ConstructorInjector {
 			}
 		}
 
-		//hold singletons and prototypes bean if needed
-		if (clazz.isAnnotationPresent( Singleton.class ) || isMethodAnnotatedWith( PreDestroy.class, clazz ) ) {
-			beanStore.put( clazz, classInstance );
-		}
-
 		//inject fields and method
 		injectFieldAndMethod( context, clazz, classInstance );
 
-		//Dependency injection is done call PostContruct method
-		Method postConstructMethod = getMethodAnnotatedWith( PostConstruct.class, clazz );
-		if ( postConstructMethod != null && isValidCallbackMethod( postConstructMethod ) ) {
-			if ( !postConstructMethod.isAccessible() ) {
-				postConstructMethod.setAccessible( true );
-			}
-			invokeMethod( classInstance, postConstructMethod );
-		}
+		//hold constructed bean instance
+		beanStore.put( classInstance );
 
 		return classInstance;
-	}
-
-	/**
-	 * Inject dependencies into an existing beans.
-	 *
-	 * @param context the injection engine
-	 * @param bean the bean to be injected
-	 */
-	public void injectDependencies(final InjectionContext context, final Object bean) {
-		this.logger.debug( "Inject dependencies in instance of class {}", bean.getClass().getSimpleName() );
-		this.injectFieldAndMethod( context, bean.getClass(), bean );
 	}
 
 	/**
@@ -251,15 +190,15 @@ public class ConstructorInjector {
 	 * @param clazz the current class injected
 	 * @param instance the instance where values are injected
 	 */
-	private void injectFieldAndMethod(final InjectionContext context, final Class<?> clazz, final Object instance) {
+	private void injectFieldAndMethod(InjectionContext context, Class<?> clazz, Object instance) {
 		Class<?> superClass = clazz.getSuperclass();
 
 		if ( !superClass.equals( Object.class ) ) {
-			this.injectFieldAndMethod( context, superClass, instance );
+			injectFieldAndMethod( context, superClass, instance );
 		}
 
-		this.fieldInjector.injectFieldsDependencies( context, clazz, instance );
-		this.methodInjector.injectMethodsDependencies( context, clazz, instance );
+		FieldInjector.injectFieldsDependencies( context, clazz, instance );
+		MethodInjector.injectMethodsDependencies( context, clazz, instance );
 	}
 
 }

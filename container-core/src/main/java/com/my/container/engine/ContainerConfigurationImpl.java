@@ -13,34 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container;
+package com.my.container.engine;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.my.container.Container;
+import com.my.container.ContainerConfiguration;
 import com.my.container.binding.BindingProvider;
 import com.my.container.bootstrap.Bootstrap;
 
 /**
  * @author Kevin Pollet
  */
-public class ConfigurationImpl implements SpecificConfiguration {
+public class ContainerConfigurationImpl implements ContainerConfiguration {
 
 	private boolean shutDownHookEnable;
 
 	private List<BindingProvider> providers;
 
-	public ConfigurationImpl() {
+	public ContainerConfigurationImpl() {
 		this.shutDownHookEnable = false;
 		this.providers = new ArrayList<BindingProvider>();
 	}
 
-	public <T extends BindingProvider> SpecificConfiguration addBindingProvider(T provider) {
+	public <T extends BindingProvider> ContainerConfiguration addBindingProvider(T provider) {
 		providers.add( provider );
 		return this;
 	}
 
-	public SpecificConfiguration shutDownHook(boolean enable) {
+	public ContainerConfiguration shutDownHook(boolean enable) {
 		shutDownHookEnable = enable;
 		return this;
 	}

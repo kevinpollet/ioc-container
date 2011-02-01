@@ -15,9 +15,9 @@
  */
 package com.my.container.test.injection;
 
+import com.my.container.BeanDependencyInjectionException;
 import com.my.container.Container;
 import com.my.container.binding.FluentBindingProvider;
-import com.my.container.BeanInstantiationException;
 import com.my.container.test.injection.services.ServiceA;
 import com.my.container.test.injection.services.ServiceB;
 import com.my.container.test.injection.services.ServiceC;
@@ -154,7 +154,7 @@ public class ConstructorInjectionTest {
 		Assert.assertEquals( "echo", serviceE.echo( "ECHO" ) );
 	}
 
-	@Test(expected = BeanInstantiationException.class)
+	@Test(expected = BeanDependencyInjectionException.class)
 	public void testCyclicConstructorInjection() {
 		Container injector = Container.configure().addBindingProvider(
 				new FluentBindingProvider() {

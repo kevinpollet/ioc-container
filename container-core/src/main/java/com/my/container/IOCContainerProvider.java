@@ -15,20 +15,22 @@
  */
 package com.my.container;
 
+import com.my.container.engine.ContainerConfigurationImpl;
+import com.my.container.engine.ContainerImpl;
 import com.my.container.spi.ContainerProvider;
 
 /**
  * @author Kevin Pollet
  */
-public class ContainerProviderImpl implements ContainerProvider {
+public class IOCContainerProvider implements ContainerProvider {
 
 	public Configuration configure() {
-		return new ConfigurationImpl();
+		return new ContainerConfigurationImpl();
 	}
 
 	public <T extends Configuration> T useSpecificConfiguration(Class<T> clazz) {
-		if ( SpecificConfiguration.class.equals( SpecificConfiguration.class ) ) {
-			return clazz.cast( new ConfigurationImpl() );
+		if ( ContainerConfiguration.class.equals( ContainerConfiguration.class ) ) {
+			return clazz.cast( new ContainerConfigurationImpl() );
 		}
 		throw new ContainerException( String.format( "Configuration class %s is not supported", clazz.getName() ) );
 	}

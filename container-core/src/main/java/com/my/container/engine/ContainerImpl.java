@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.my.container;
+package com.my.container.engine;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.my.container.BeanStore;
+import com.my.container.Configuration;
+import com.my.container.Container;
+import com.my.container.InjectionContext;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingProvider;
-import com.my.container.engine.ContextBeanStoreImpl;
-import com.my.container.engine.InjectionContextImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * The basic implementation of the container interface.
@@ -33,7 +34,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class ContainerImpl extends Container {
 
-	private final ContextBeanStore beanStore;
+	private final BeanStore beanStore;
 
 	/**
 	 * Construct the engine.
@@ -41,7 +42,7 @@ public class ContainerImpl extends Container {
 	 * @param configuration the configuration object
 	 */
 	public ContainerImpl(Configuration configuration) {
-		ConfigurationImpl config = (ConfigurationImpl) configuration;
+		ContainerConfigurationImpl config = (ContainerConfigurationImpl) configuration;
 
 		List<Binding<?>> bindings = new ArrayList<Binding<?>>();
 		for ( BindingProvider provider : config.getBindingProviders() ) {
@@ -49,7 +50,7 @@ public class ContainerImpl extends Container {
 			bindings.addAll( provider.getBindings() );
 		}
 
-		this.beanStore = new ContextBeanStoreImpl( bindings );
+		this.beanStore = new BeanStoreImpl( bindings );
 		if ( config.isShutDownHookEnable() ) {
 			registerShutdownHook();
 		}
@@ -94,14 +95,14 @@ public class ContainerImpl extends Container {
 
 		private final Logger logger = LoggerFactory.getLogger( CallbackShutdownHook.class );
 
-		private final ContextBeanStore context;
+		private final BeanStore context;
 
 		/**
 		 * The CallbackShutdown hook beanStore.
 		 *
 		 * @param context the bean beanStore
 		 */
-		public CallbackShutdownHook(ContextBeanStore context) {
+		public CallbackShutdownHook(BeanStore context) {
 			this.context = context;
 		}
 

@@ -18,7 +18,7 @@ package com.my.container.engine;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.my.container.ContextBeanStore;
+import com.my.container.BeanStore;
 import com.my.container.InjectionContext;
 
 /**
@@ -28,7 +28,7 @@ public class InjectionContextImpl implements InjectionContext {
 
 	private final boolean staticInjection;
 
-    private final ContextBeanStore beanFactory;
+    private final BeanStore beanFactory;
 
     private final Map<Class<?>, Object> processedBean;
 
@@ -37,7 +37,7 @@ public class InjectionContextImpl implements InjectionContext {
      *
      * @param beanFactory the bean factory.
      */
-    public InjectionContextImpl(ContextBeanStore beanFactory, boolean staticInjection) {
+    public InjectionContextImpl(BeanStore beanFactory, boolean staticInjection) {
         this.beanFactory = beanFactory;
 		this.staticInjection = staticInjection;
         this.processedBean = new HashMap<Class<?>, Object>();
@@ -47,7 +47,7 @@ public class InjectionContextImpl implements InjectionContext {
 		return staticInjection;
 	}
 
-	public ContextBeanStore getContextBeanStore() {
+	public BeanStore getBeanStore() {
 		return beanFactory;
 	}
 

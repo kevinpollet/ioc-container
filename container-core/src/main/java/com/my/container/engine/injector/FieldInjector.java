@@ -18,13 +18,11 @@ package com.my.container.engine.injector;
 import com.my.container.BeanDependencyInjectionException;
 import com.my.container.InjectionContext;
 import com.my.container.NoSuchBeanDefinitionException;
-import com.my.container.engine.ContextBeanStoreImpl;
+import com.my.container.engine.BeanStoreImpl;
 import com.my.container.binding.Binding;
 import com.my.container.binding.ProvidedBinding;
-import com.my.container.engine.provider.GenericProvider;
+import com.my.container.engine.DefaultInstanceProvider;
 import com.my.container.util.ProxyHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -41,22 +39,6 @@ import java.lang.reflect.ParameterizedType;
  */
 public class FieldInjector {
 
-	private final Logger logger = LoggerFactory.getLogger( FieldInjector.class );
-
-	/**
-	 * The parent injector.
-	 */
-	private final ConstructorInjector injector;
-
-	/**
-	 * Create a fields injector
-	 *
-	 * @param injector the parent injector
-	 */
-	public FieldInjector(final ConstructorInjector injector) {
-		this.injector = injector;
-	}
-
 	/**
 	 * Inject dependency field annotated by @Inject.
 	 *
@@ -64,7 +46,7 @@ public class FieldInjector {
 	 * @param clazz the current class injected
 	 * @param instance the bean instance injected
 	 */
-	public void injectFieldsDependencies(final InjectionContext context, final Class<?> clazz, final Object instance) {
+	public static void injectFieldsDependencies(final InjectionContext context, final Class<?> clazz, final Object instance) {
 
 		for ( Field field : clazz.getDeclaredFields() ) {
 
@@ -97,11 +79,11 @@ public class FieldInjector {
 				if ( fieldClass.isAssignableFrom( Provider.class ) ) {
 					if ( field.getGenericType() instanceof ParameterizedType ) {
 						Class<?> classToInject = (Class<?>) ( (ParameterizedType) field.getGenericType() ).getActualTypeArguments()[0];
-						injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore())
+						injectionBinding = ((BeanStoreImpl) context.getBeanStore())
 								.getProviderHolder()
 								.getBindingFor( classToInject, qualifier );
 						if ( injectionBinding == null ) {
-							injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore())
+							injectionBinding = ((BeanStoreImpl) context.getBeanStore())
 									.getBindingHolder()
 									.getBindingFor( classToInject, qualifier );
 							if ( injectionBinding == null ) {
@@ -111,18 +93,17 @@ public class FieldInjector {
 										)
 								);
 							}
-							fieldInstance = new GenericProvider(
-									((ContextBeanStoreImpl) context.getContextBeanStore()), injectionBinding.getImplementation()
+							fieldInstance = new DefaultInstanceProvider(
+									((BeanStoreImpl) context.getBeanStore()), injectionBinding.getImplementation()
 							);
 						}
 						else {
-							fieldInstance = this.injector
-									.constructClass( context, ( (ProvidedBinding) injectionBinding ).getProvider() );
+							fieldInstance = context.getBeanStore().getInjector().constructClass( context, ( (ProvidedBinding) injectionBinding ).getProvider() );
 						}
 					}
 				}
 				else {
-					injectionBinding = ((ContextBeanStoreImpl) context.getContextBeanStore())
+					injectionBinding = ((BeanStoreImpl) context.getBeanStore())
 							.getBindingHolder()
 							.getBindingFor( field.getType(), qualifier );
 					if ( injectionBinding == null ) {
@@ -132,7 +113,7 @@ public class FieldInjector {
 								)
 						);
 					}
-					fieldInstance = this.injector.constructClass( context, injectionBinding.getImplementation() );
+					fieldInstance = context.getBeanStore().getInjector().constructClass( context, injectionBinding.getImplementation() );
 				}
 
 				//Set field instance
