@@ -28,8 +28,12 @@ public abstract class FluentBindingProvider extends BindingProvider {
 	 *
 	 * @param clazz the class to bind
 	 */
-	protected final void bindClass(Class<?> clazz) {
-		addBinding( new Binding( clazz ) );
+	protected final <T> void bindClass(Class<T> clazz) {
+		Binding<T> binding = new Binding<T>();
+		binding.setClazz( clazz );
+		binding.setImplementation( clazz );
+
+		addBinding( binding );
 	}
 
 	/**
@@ -66,7 +70,10 @@ public abstract class FluentBindingProvider extends BindingProvider {
 		 * @param impl the implementation class
 		 */
 		public final FluentQualifierBinder to(Class<? extends T> impl) {
-			Binding<T> binding = new Binding<T>( clazz, impl );
+			Binding<T> binding = new Binding<T>();
+			binding.setClazz( clazz );
+			binding.setImplementation( impl );
+
 			FluentBindingProvider.this.addBinding( binding );
 			return FluentBindingProvider.this.new FluentQualifierBinder( binding );
 		}
@@ -77,7 +84,10 @@ public abstract class FluentBindingProvider extends BindingProvider {
 		 * @param provider the provider class
 		 */
 		public final FluentQualifierBinder toProvider(Class<? extends Provider<T>> provider) {
-			Binding<T> binding = new ProvidedBinding<T>( clazz, provider );
+			Binding<T> binding = new Binding<T>();
+			binding.setClazz( clazz );
+			binding.setProvider( provider );
+
 			FluentBindingProvider.this.addBinding( binding );
 			return FluentBindingProvider.this.new FluentQualifierBinder( binding );
 		}

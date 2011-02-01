@@ -20,7 +20,6 @@ import com.my.container.InjectionContext;
 import com.my.container.NoSuchBeanDefinitionException;
 import com.my.container.engine.BeanStoreImpl;
 import com.my.container.binding.Binding;
-import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.DefaultInstanceProvider;
 import com.my.container.util.ProxyHelper;
 
@@ -98,7 +97,7 @@ public class FieldInjector {
 							);
 						}
 						else {
-							fieldInstance = context.getBeanStore().getInjector().constructClass( context, ( (ProvidedBinding) injectionBinding ).getProvider() );
+							fieldInstance = context.getBeanStore().getInjector().constructClass( context, injectionBinding.getProvider() );
 						}
 					}
 				}

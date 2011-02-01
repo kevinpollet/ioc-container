@@ -31,7 +31,6 @@ import com.my.container.NoSuchBeanDefinitionException;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
 import com.my.container.binding.MapBindingHolder;
-import com.my.container.binding.ProvidedBinding;
 import com.my.container.util.ContractsHelper;
 
 import static com.my.container.util.ReflectionHelper.getMethodAnnotatedWith;
@@ -71,7 +70,7 @@ public final class BeanStoreImpl implements BeanStore {
 		//Populate holder
 		if ( list != null ) {
 			for ( Binding b : list ) {
-				if ( b instanceof ProvidedBinding ) {
+				if ( b.getProvider() != null ) {
 					this.providerHolder.put( b );
 				}
 				else {

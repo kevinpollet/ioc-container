@@ -20,7 +20,6 @@ import com.my.container.InjectionContext;
 import com.my.container.NoSuchBeanDefinitionException;
 import com.my.container.engine.BeanStoreImpl;
 import com.my.container.binding.Binding;
-import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.DefaultInstanceProvider;
 import com.my.container.util.ProxyHelper;
 import com.my.container.util.ReflectionHelper;
@@ -101,7 +100,7 @@ public class MethodInjector {
                                     }
                                     parameters[i] = new DefaultInstanceProvider(((BeanStoreImpl) context.getBeanStore()), injectionBinding.getImplementation());
                                 } else {
-                                    parameters[i] = context.getBeanStore().getInjector().constructClass(context, ((ProvidedBinding) injectionBinding).getProvider());
+                                    parameters[i] = context.getBeanStore().getInjector().constructClass(context, injectionBinding.getProvider());
                                 }
                             }
                         } else {

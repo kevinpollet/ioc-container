@@ -31,7 +31,6 @@ import com.my.container.InjectionContext;
 import com.my.container.NoSuchBeanDefinitionException;
 import com.my.container.binding.Binding;
 import com.my.container.binding.BindingHolder;
-import com.my.container.binding.ProvidedBinding;
 import com.my.container.engine.BeanStoreImpl;
 import com.my.container.engine.DefaultInstanceProvider;
 import com.my.container.spi.BeanProcessor;
@@ -139,7 +138,7 @@ public class ConstructorInjector {
 						parameters[i] = new DefaultInstanceProvider( beanStore, injectionBinding.getImplementation() );
 					}
 					else {
-						parameters[i] = constructClass( context, ( (ProvidedBinding) injectionBinding ).getProvider() );
+						parameters[i] = constructClass( context, injectionBinding.getProvider() );
 					}
 				}
 			}

@@ -16,6 +16,7 @@
 package com.my.container.binding;
 
 import java.lang.annotation.Annotation;
+import javax.inject.Provider;
 
 /**
  * The binding definition Class.
@@ -24,15 +25,11 @@ import java.lang.annotation.Annotation;
  */
 public class Binding<T> {
 
-	/**
-	 * The class to be bind.
-	 */
 	private Class<T> clazz;
 
-	/**
-	 * The binding implementation class.
-	 */
 	private Class<? extends T> impl;
+
+	private Class<? extends Provider<T>> provider;
 
 	/**
 	 * The named qualifier.
@@ -48,114 +45,6 @@ public class Binding<T> {
 	 * @see javax.inject.Qualifier
 	 */
 	private Class<? extends Annotation> qualifier;
-
-	/**
-	 * Create a simple binding where the class to be bind
-	 * is equal to the class implementation.
-	 *
-	 * @param clazz the class to be bind
-	 */
-	public Binding(final Class<T> clazz) {
-		this( clazz, clazz );
-	}
-
-	/**
-	 * Create a binding.
-	 *
-	 * @param clazz the binding class
-	 * @param impl the binding implementation
-	 */
-	public Binding(final Class<T> clazz, final Class<? extends T> impl) {
-		this.clazz = clazz;
-		this.impl = impl;
-		this.name = null;
-		this.qualifier = null;
-	}
-
-	/**
-	 * <p>
-	 * Create a named binding.
-	 * </p>
-	 * <p>
-	 * A Named binding is a binding who can be injected if the
-	 * injection is qualified by @Name like :
-	 * <br/>
-	 * <br/>
-	 * <pre>
-	 * public class Sample {
-	 *
-	 *     &#64;Inject &#64;Name("name")
-	 *     private Dependency dependency;
-	 *
-	 *     &#64;Inject
-	 *     public Sample(&#64;Name("name") Dependency dependency) {
-	 *      //...
-	 *	 }
-	 *
-	 *     &#64;Inject
-	 *     public void sampleMethod(&#64;Name("name") Dependency dependency) {
-	 *      //...
-	 *	 }
-	 *
-	 *  }
-	 * </pre>
-	 * </p>
-	 *
-	 * @param clazz the binding class
-	 * @param impl the binding class implementation
-	 * @param name the name qualifier of this binding
-	 *
-	 * @see javax.inject.Named
-	 */
-	public Binding(final Class<T> clazz, final Class<? extends T> impl, final String name) {
-		this.clazz = clazz;
-		this.impl = impl;
-		this.name = name;
-		this.qualifier = null;
-	}
-
-	/**
-	 * <p>
-	 * Create a qualified binding.
-	 * </p>
-	 * <p>
-	 * A Qualified binding is a binding who can be injected if the
-	 * injection is qualified by the the given qualifier. For example
-	 * with the qualifier @Foo :
-	 * <br/>
-	 * <br/>
-	 * <pre>
-	 * <code>public class Sample {
-	 *
-	 *     &#64;Inject &#64;Foo
-	 *     private Dependency dependency;
-	 *
-	 *     &#64;Inject
-	 *     public Sample(&#64;Foo Dependency dependency) {
-	 *      //...
-	 *	 }
-	 *
-	 *     &#64;Inject
-	 *     public void sampleMethod(&#64;Foo Dependency dependency) {
-	 *      //...
-	 *	 }
-	 *
-	 *  }</code>
-	 * </pre>
-	 * </p>
-	 *
-	 * @param clazz the binding class
-	 * @param impl the binding implementation
-	 * @param qualifier the qualifier of the binding
-	 *
-	 * @see javax.inject.Qualifier
-	 */
-	public Binding(final Class<T> clazz, final Class<? extends T> impl, final Class<? extends Annotation> qualifier) {
-		this.clazz = clazz;
-		this.impl = impl;
-		this.name = null;
-		this.qualifier = qualifier;
-	}
 
 	/**
 	 * Get the qualifier for this binding.
@@ -229,4 +118,21 @@ public class Binding<T> {
 		this.qualifier = qualifier;
 	}
 
+	/**
+	 * Get the provider.
+	 *
+	 * @return the provider
+	 */
+	public Class<? extends Provider<T>> getProvider() {
+		return this.provider;
+	}
+
+	/**
+	 * Set the provider.
+	 *
+	 * @param provider the provider
+	 */
+	public void setProvider(final Class<? extends Provider<T>> provider) {
+		this.provider = provider;
+	}
 }
