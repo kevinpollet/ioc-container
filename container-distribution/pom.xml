@@ -6,8 +6,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>container</artifactId>
         <groupId>com.my.container</groupId>
+        <artifactId>container</artifactId>
         <version>0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -21,4 +21,36 @@
             <email>pollet.kevin@gmail.com</email>
         </developer>
     </developers>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.my.container</groupId>
+            <artifactId>container-api</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.my.container</groupId>
+            <artifactId>container-core</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+                Assembly configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>IOC-Container-${project.version}</finalName>
+                    <descriptors>
+                        <descriptor>${project.basedir}/src/main/assembly/dist.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

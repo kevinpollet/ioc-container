@@ -81,6 +81,20 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2</version>
+                    <executions>
+                        <execution>
+                            <id>package-distribution</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>2.1.2</version>
@@ -145,6 +159,7 @@
                         <exclude>**/pom.xml</exclude>
                         <exclude>**/licence.txt</exclude>
                         <exclude>**/logback-test.xml</exclude>
+                        <exclude>**/dist.xml</exclude>
                     </excludes>
                     <headerDefinitions>
                         <headerDefinition>${basedir}/etc/javaLicenceHeader.xml</headerDefinition>
