@@ -22,6 +22,10 @@
         </developer>
     </developers>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.my.container</groupId>
@@ -30,16 +34,25 @@
         </dependency>
         <dependency>
             <groupId>com.my.container</groupId>
+            <artifactId>container-api</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.my.container</groupId>
             <artifactId>container-core</artifactId>
             <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.my.container</groupId>
+            <artifactId>container-core</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <classifier>sources</classifier>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!--
-                Assembly configuration
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
