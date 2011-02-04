@@ -1,42 +1,30 @@
-h1. Readme 
+h1. What is it ? 
 
-h2. Description
+This project is an implementation of the "JSR 330":http://code.google.com/p/atinject/ specification.
 
-This project is an implementation of the "JSR 330":http://code.google.com/p/atinject/ implementation.
+Actually there is no version deployed in a Maven respository. To use this project you have to download and build it from it's sources with Maven. Run <code>mvn clean install</code> from the root directory. To use this project with Maven or Ivy, add the following lines with the correct version.
 
-h2. Using this project
-
-Actually there is no version deployed in a Maven respository. To use this project you have to download and build it from it's sources with Maven. Run <code>mvn install</code> from the root directory. To use this project with Maven or Ivy, add the following lines (If you want an example, you can have a look at the container-sample project).
-
-* API module
+* API
 
 <pre>
 <code><dependency>
    <groupId>com.my.container</groupId>
    <artifactId>container-api</artifactId>
-   <version>0.1-SNAPSHOT</version>
+   <version>project-version</version>
 </dependency></code>
 </pre>
 
-* Core module
+* Core
 
 <pre>
 <code><dependency>
    <groupId>com.my.container</groupId>
    <artifactId>container-core</artifactId>
-   <version>0.1-SNAPSHOT</version>
+   <version>project-version</version>
 </dependency></code>
 </pre>
 
-* AOP module
-
-<pre>
-<code><dependency>
-   <groupId>com.my.container</groupId>
-   <artifactId>container-core</artifactId>
-   <version>0.1-SNAPSHOT</version>
-</dependency></code>
-</pre>
+*Note :* if you want an example, you can have a look at the container-sample project.	
 
 h2. System Requirements
 
