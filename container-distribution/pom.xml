@@ -40,6 +40,12 @@
         </dependency>
         <dependency>
             <groupId>com.my.container</groupId>
+            <artifactId>container-api</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <classifier>javadoc</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.my.container</groupId>
             <artifactId>container-core</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
@@ -48,6 +54,12 @@
             <artifactId>container-core</artifactId>
             <version>0.1-SNAPSHOT</version>
             <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.my.container</groupId>
+            <artifactId>container-core</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <classifier>javadoc</classifier>
         </dependency>
     </dependencies>
 

@@ -24,6 +24,7 @@
             </includes>
             <excludes>
                 <exclude>*:sources</exclude>
+                 <exclude>*:javadoc</exclude>
             </excludes>
         </dependencySet>
 
@@ -32,6 +33,14 @@
             <includes>
                 <include>com.my.container:container-api:*:sources</include>
                 <include>com.my.container:container-core:*:sources</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>/javadoc</outputDirectory>
+            <includes>
+                <include>com.my.container:container-api:*:javadoc</include>
+                <include>com.my.container:container-core:*:javadoc</include>
             </includes>
         </dependencySet>
 
