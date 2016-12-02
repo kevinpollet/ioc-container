@@ -2,7 +2,7 @@ h1. What is it ?
 
 This project is an implementation of the "JSR 330":http://code.google.com/p/atinject/ specification.
 
-Actually there is no version deployed in a Maven respository. To use this project you have to download and build it from it's sources with Maven. Run <code>mvn clean install</code> from the root directory. To use this project with Maven or Ivy, add the following lines with the correct version.
+Actually there is no version deployed in a Maven respository. To use this project you have to download and build it from its sources with Maven. Run <code>mvn clean install</code> from the root directory. To use this project with Maven or Ivy, add the following lines with the correct version.
 
 * API
 
